@@ -22,7 +22,7 @@ COPY config/extensions/phalcon.so /usr/local/lib/php/extensions/no-debug-non-zts
 COPY config/extensions/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/xdebug.so
 RUN echo "extension=psr.so" > /usr/local/etc/php/conf.d/docker-php-ext-psr.ini
 RUN echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/docker-php-ext-phalcon.ini
-RUN echo "extension=xdebug.so" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20190902/xdebug.so" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 RUN ln -s /app/vendor/phalcon/devtools/phalcon /usr/bin/phalcon
 
 # Install Composer
@@ -31,8 +31,6 @@ RUN wget -O composer-setup.php --progress=bar:force https://getcomposer.org/inst
     rm -f composer-setup.php
 
 # Run APP
-#COPY --chown=$USER:$USER ./app /app
-COPY app /app
+COPY --chown=www-data:www-data app /app
 WORKDIR /app
 RUN if [ "$APP_ENV" = "development" ]; then composer install; else composer install --no-dev --optimize-autoloader; fi
-#RUN (crontab -l ; echo "* * * * * /usr/local/bin/php /app/artisan schedule:run --env="$APP_ENV" >> /dev/null 2>&1") | crontab
