@@ -3,7 +3,7 @@ services:
   rms-app:
     container_name: rms-app
     build:
-      context: 'config'
+      context: '.'
       args:
         - APP_ENV=development
         - COMPOSER_NO_INTERACTION=0
@@ -15,4 +15,3 @@ services:
     environment:
       - LOG_STDOUT=/dev/null
       - LOG_STDERR=/dev/null
-#    command: bash -c "composer update --lock --prefer-source && supervisord"
