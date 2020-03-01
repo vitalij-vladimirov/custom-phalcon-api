@@ -1,0 +1,18 @@
+version: '3.7'
+services:
+  rms-app:
+    container_name: rms-app
+    build:
+      context: 'config'
+      args:
+        - APP_ENV=development
+        - COMPOSER_NO_INTERACTION=0
+    image: rms-app
+    ports:
+      - 801:80
+    volumes:
+      - ./app:/app
+    environment:
+      - LOG_STDOUT=/dev/null
+      - LOG_STDERR=/dev/null
+#    command: bash -c "composer update --lock --prefer-source && supervisord"
