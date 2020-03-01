@@ -17,9 +17,9 @@ RUN apt-get update && apt-get -y install procps mcedit bsdtar libaio1 musl-dev \
 COPY config/nginx-root.conf /opt/docker/etc/nginx/vhost.common.d/10-location-root.conf
 
 # Configure Phalcon 4.0.4 and DevTools 4.0.1
-COPY config/extensions/psr.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/psr.so
-COPY config/extensions/phalcon.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/phalcon.so
-COPY config/extensions/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/xdebug.so
+COPY config/php-ext/psr.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/psr.so
+COPY config/php-ext/phalcon.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/phalcon.so
+COPY config/php-ext/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/xdebug.so
 RUN echo "extension=psr.so" > /usr/local/etc/php/conf.d/docker-php-ext-psr.ini
 RUN echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/docker-php-ext-phalcon.ini
 RUN echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20190902/xdebug.so" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
