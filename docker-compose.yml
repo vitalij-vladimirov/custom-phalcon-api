@@ -30,4 +30,4 @@ services:
       - ./config/mysql/my.cnf:/root/.my.cnf:ro
       - ./config/mysql/conf.d:/etc/mysql/conf.d:ro
       - ./data/logs/mysql:/var/log/mysql:rw
-      - ./data/mysql:/var/lib/mysql:rw
+#      - ./data/mysql:/var/lib/mysql:rw
