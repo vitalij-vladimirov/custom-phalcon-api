@@ -28,9 +28,8 @@ COPY .config/php-ext/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20
 RUN echo "extension=psr.so" > /usr/local/etc/php/conf.d/docker-php-ext-psr.ini
 RUN echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/docker-php-ext-phalcon.ini
 RUN echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20190902/xdebug.so" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN ln -s /app/vendor/phalcon/devtools/phalcon /usr/bin/phalcon
 
-# Install Composer
+# Configure Composer
 COPY .config/composer/compose_1.9.3.phar /usr/bin/composer.phar
 
 # Run APP

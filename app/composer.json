@@ -1,5 +1,7 @@
 {
     "require": {
-        "phalcon/devtools": "dev-master"
+        "vlucas/phpdotenv": "^4.1",
+        "phpunit/phpunit": "^9.0",
+        "sneakybobito/phalcon-stubs": "^3.3"
     }
 }

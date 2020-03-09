@@ -2,3 +2,4 @@
 app/vendor
 data/logs/mysql/*
 !data/logs/mysql/.gitkeep
+.env
