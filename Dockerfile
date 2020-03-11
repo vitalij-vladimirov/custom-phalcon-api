@@ -21,7 +21,7 @@ COPY .config/mcedit/edit /usr/bin/edit
 COPY .config/mcedit/mc.keymap /etc/mc/mc.keymap
 RUN chmod +x /usr/bin/edit
 
-# Configure Phalcon 4.0.4 and DevTools 4.0.1
+# Configure Phalcon 4.0.4
 COPY .config/php-ext/psr.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/psr.so
 COPY .config/php-ext/phalcon.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/phalcon.so
 COPY .config/php-ext/xdebug.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/xdebug.so
