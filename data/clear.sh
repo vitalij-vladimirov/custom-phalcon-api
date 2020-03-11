@@ -5,8 +5,6 @@ PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 STRUCTURE=(
   "mysql"
   "log"
-  "log/mysql"
-  "log/std"
 )
 
 for FILE in $PATH/*; do

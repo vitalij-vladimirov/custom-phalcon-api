@@ -3,5 +3,4 @@ app/vendor
 data
 !data/clear.sh
 !data/*/.gitkeep
-!data/*/*/.gitkeep
 .env
