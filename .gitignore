@@ -1,7 +1,7 @@
 .idea
 app/vendor
 data
+!data/clear.sh
+!data/*/.gitkeep
+!data/*/*/.gitkeep
 .env
-#!data/log/*/.gitkeep
-#./data/mysql/
-#!data/mysql/.gitkeep
