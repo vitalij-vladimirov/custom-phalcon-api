@@ -1,4 +1,6 @@
 .idea
 app/vendor
-data/logs/mysql/*
-!data/logs/mysql/.gitkeep
+data
+!data/clear.sh
+!data/*/.gitkeep
+.env
