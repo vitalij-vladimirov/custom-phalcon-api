@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "14b23983ae37d4470dc2b31934498096",
+    "content-hash": "eff025b395a19f8742037f77d559de14",
     "packages": [
         {
             "name": "doctrine/instantiator",
@@ -109,6 +109,58 @@
                 "object graph"
             ],
             "time": "2020-01-17T21:11:47+00:00"
+        },
+        {
+            "name": "phalcon/ide-stubs",
+            "version": "v4.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phalcon/ide-stubs.git",
+                "reference": "f3ef56204ded840477793edb58992f1bd88ffa36"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phalcon/ide-stubs/zipball/f3ef56204ded840477793edb58992f1bd88ffa36",
+                "reference": "f3ef56204ded840477793edb58992f1bd88ffa36",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "squizlabs/php_codesniffer": "3.*",
+                "vimeo/psalm": "^3.4"
+            },
+            "type": "library",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Phalcon Team",
+                    "email": "team@phalconphp.io",
+                    "homepage": "https://phalconphp.io/en/team"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/phalcon/ide-stubs/graphs/contributors"
+                }
+            ],
+            "description": "The most complete Phalcon Framework IDE stubs library which enables autocompletion in modern IDEs.",
+            "homepage": "https://phalconphp.io",
+            "keywords": [
+                "Devtools",
+                "Eclipse",
+                "autocomplete",
+                "ide",
+                "netbeans",
+                "phalcon",
+                "phpstorm",
+                "stub",
+                "stubs"
+            ],
+            "time": "2020-02-16T08:55:47+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -1495,31 +1547,6 @@
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
             "time": "2020-01-21T06:36:37+00:00"
-        },
-        {
-            "name": "sneakybobito/phalcon-stubs",
-            "version": "v3.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/gsouf/phalcon-stubs.git",
-                "reference": "d5316de837b55911e18468950c981b9971d1dd9d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/gsouf/phalcon-stubs/zipball/d5316de837b55911e18468950c981b9971d1dd9d",
-                "reference": "d5316de837b55911e18468950c981b9971d1dd9d",
-                "shasum": ""
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "description": "IDE Stubs for phalconphp",
-            "homepage": "https://github.com/gsouf/phalcon-stubs",
-            "keywords": [
-                "ide",
-                "phalcon",
-                "stubs"
-            ],
-            "time": "2018-01-16T07:59:04+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
