@@ -29,6 +29,9 @@ RUN echo "extension=psr.so" > /usr/local/etc/php/conf.d/docker-php-ext-psr.ini
 RUN echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/docker-php-ext-phalcon.ini
 RUN echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20190902/xdebug.so" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+# Configure terminal commands
+RUN ln -s /app/mvc/cli.php /usr/bin/cli
+
 # Configure Composer
 COPY .config/composer/compose_1.9.3.phar /usr/bin/composer.phar
 

@@ -2,6 +2,8 @@
     "require": {
         "phalcon/ide-stubs": "^4.0",
         "vlucas/phpdotenv": "^4.1",
-        "phpunit/phpunit": "^9.0"
+        "phpunit/phpunit": "^9.0",
+        "phalcon/dd": "^1.1",
+        "ext-json": "*"
     }
 }

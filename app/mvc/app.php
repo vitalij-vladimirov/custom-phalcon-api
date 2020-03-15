@@ -9,7 +9,7 @@
  * Add your routes here
  */
 $app->get('/', function () {
-    echo $this['view']->render('index');
+    echo (new \Test\Controller\TestController())->index() . ' test';
 });
 
 /**

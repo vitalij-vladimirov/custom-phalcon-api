@@ -8,7 +8,7 @@ use Phalcon\Url as UrlResolver;
  * Shared configuration service
  */
 $di->setShared('config', function () {
-    return include APP_PATH . "/config/config.php";
+    return include '/app/mvc/config.php';
 });
 
 /**
@@ -52,7 +52,5 @@ $di->setShared('db', function () {
         unset($params['charset']);
     }
 
-    $connection = new $class($params);
-
-    return $connection;
+    return new $class($params);
 });
