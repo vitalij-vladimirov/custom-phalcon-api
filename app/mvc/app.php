@@ -1,5 +1,8 @@
 <?php
 
+use Dice\Dice;
+$dice = new Dice();
+
 /**
  * Local variables
  * @var \Phalcon\Mvc\Micro $app
@@ -8,9 +11,9 @@
 /**
  * Add your routes here
  */
-$app->get('/', function () {
-    echo (new \Test\Controller\NewController(new \Test\Controller\TestController()))->runTest();
-//    phpinfo();
+$app->get('/', function () use ($dice) {
+    $run = $dice->create(\Test\Controller\NewController::class);
+    $run->runTest();
 });
 
 /**
