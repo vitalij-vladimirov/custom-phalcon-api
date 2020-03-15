@@ -9,7 +9,8 @@
  * Add your routes here
  */
 $app->get('/', function () {
-    echo (new \Test\Controller\TestController())->index() . ' test';
+    echo (new \Test\Controller\NewController(new \Test\Controller\TestController()))->runTest();
+//    phpinfo();
 });
 
 /**

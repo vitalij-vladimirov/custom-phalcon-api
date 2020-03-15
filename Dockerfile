@@ -39,3 +39,4 @@ COPY .config/composer/compose_1.9.3.phar /usr/bin/composer.phar
 COPY --chown=www-data:www-data app /app
 WORKDIR /app
 RUN if [ "$APP_ENV" = "development" ]; then composer install; else composer install --no-dev --optimize-autoloader; fi
+RUN (crontab -l ; echo "* * * * * /usr/local/bin/php /app/mvc/cron.php >> /dev/null 2>&1") | crontab

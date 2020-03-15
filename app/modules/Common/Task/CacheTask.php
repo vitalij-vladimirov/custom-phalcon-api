@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace Common\Task;
 
-use Common\Helpers\Cache;
-use Common\Helpers\Json;
 use Phalcon\Cli\Task;
+use Common\{Cache, Json};
 
 class CacheTask extends Task
 {
     private const MODULES_DIRECTORIES = [
-        '/app/mvc' => 'Mvc',
         '/app/modules' => '',
     ];
 
@@ -19,27 +17,29 @@ class CacheTask extends Task
         '..'
     ];
 
-    public function clearCache()
-    {
-
-    }
-
+    /**
+     * Run namespace caching every 15 seconds
+     */
     public function cacheNamespacesAction()
     {
         $namespaces = [];
 
-        foreach (self::MODULES_DIRECTORIES as $directory => $namespace) {
-            $directories = $this->generateDirectoriesList($directory);
+        for ($i = 1; $i <= 4; ++$i) {
+            foreach (self::MODULES_DIRECTORIES as $directory => $namespace) {
+                $directories = $this->generateDirectoriesList($directory);
 
-            if (count($directories)) {
-                $namespaces = array_merge(
-                    $namespaces,
-                    $this->generateNamespaceForDirectories($directory, $namespace, $directories)
-                );
+                if (count($directories)) {
+                    $namespaces = array_merge(
+                        $namespaces,
+                        $this->generateNamespaceForDirectories($directory, $namespace, $directories)
+                    );
+                }
             }
-        }
 
-        Cache::write('namespaces', Json::encode($namespaces));
+            Cache::write('namespaces', Json::encode($namespaces));
+
+            sleep(15);
+        }
     }
 
     private function generateDirectoriesList(string $directory): array

@@ -4,6 +4,7 @@
         "vlucas/phpdotenv": "^4.1",
         "phpunit/phpunit": "^9.0",
         "phalcon/dd": "^1.1",
-        "ext-json": "*"
+        "ext-json": "*",
+        "peppeocchi/php-cron-scheduler": "^3.0"
     }
 }

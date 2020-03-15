@@ -5,7 +5,7 @@
  * @var \Phalcon\Config $config
  */
 
-use Common\Helpers\{Cache, Json};
+use Common\{Cache, Json};
 
 /**
  * Registering an autoloader

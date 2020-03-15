@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\Helpers;
+namespace Common;
 
 class Cache
 {
-    private const CACHE_DIRECTORY = '/tmp/cache';
+    private const CACHE_DIRECTORY = '/var/cache/api';
 
     public static function write(string $cacheFile, string $cacheText): void
     {

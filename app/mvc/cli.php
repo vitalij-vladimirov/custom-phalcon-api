@@ -11,51 +11,104 @@ $di = new CliDi();
 
 include '/app/mvc/bootstrap.php';
 
-$console = new ConsoleApp($di);
-$dispatcher = new Dispatcher();
+new CliTask($di, array_slice($argv, 1));
 
-if (count($argv) === 1 || in_array($argv[1], ['-help', '--help', '-h'], true)) {
-    echo 'CLI call structure:' . PHP_EOL;
-    echo '1. Module name' . PHP_EOL;
-    echo '2. Task class name without `Task` in the end' . PHP_EOL;
-    echo '3. Action name without `Action` in the end' . PHP_EOL;
-    echo '... Parameters' . PHP_EOL;
-    echo PHP_EOL;
-    echo 'Example: `cli Test CacheBuilder Build`' . PHP_EOL;
-    echo PHP_EOL;
+class CliTask
+{
+    private CliDi $di;
+    private array $args;
+    private string $module;
+    private array $arguments;
 
-    exit;
-}
+    public function __construct(CliDi $di, array $args)
+    {
+        $this->di = $di;
+        $this->args = $args;
 
-$arguments = [];
-foreach ($argv as $k => $arg) {
-    if ($k == 1) {
-        $module = $arg;
-    } elseif ($k == 2) {
-        $arguments['task'] = lcfirst($arg);
-        if (substr($arguments['task'], -4) === 'Task') {
-            $arguments['task'] = substr($arguments['task'], 0, -4);
-        }
-    } elseif ($k == 3) {
-        $arguments['action'] =  lcfirst($arg);
-        if (substr($arguments['action'], -6) === 'Action') {
-            $arguments['action'] = substr($arguments['action'], 0, -6);
-        }
-    } elseif ($k >= 4) {
-        $arguments['params'][] = $arg;
+        $this->collectArguments();
+        $this->validateArguments();
+        $this->runTask();
     }
-}
 
-$dispatcher->setDefaultNamespace($module . '\Task');
-$di->setShared('dispatcher', $dispatcher);
+    private function collectArguments(): void
+    {
+        if (!count($this->args) || in_array($this->args[0], ['-help', '--help', '-h'], true)) {
+            $this->module = 'Common';
+            $this->arguments['task'] = 'default';
 
-$console = new Console($di);
+            $this->runTask();
+        }
 
-try {
-    $console->handle($arguments);
-    echo PHP_EOL;
-} catch (Exception $e) {
-    echo $e->getMessage() . PHP_EOL;
-    echo $e->getTraceAsString() . PHP_EOL;
-    exit(255);
+        list($this->module, $this->arguments['task'], $this->arguments['action']) = explode(':', $this->args[0]);
+
+        if (!empty($this->arguments['task']) && substr($this->arguments['task'], -4) === 'Task') {
+            $this->arguments['task'] = substr($this->arguments['task'], 0, -4);
+        }
+
+        if (!empty($this->arguments['action']) && substr($this->arguments['action'], -6) === 'Action') {
+            $this->arguments['action'] = substr($this->arguments['action'], 0, -6);
+        }
+
+        if (count($this->args) > 1) {
+            for ($i = 1; $i < count($this->args); ++$i) {
+                $this->arguments['params'][] = $this->args[$i];
+            }
+        }
+
+        if (!empty($this->arguments['task']) && empty($this->arguments['action'])) {
+            $this->arguments['action'] = 'main';
+        }
+    }
+
+    private function validateArguments(): void
+    {
+        // TODO: log exceptions
+
+        $class = $this->module . '\Task\\' . ucfirst($this->arguments['task']) . 'Task';
+
+        if (!class_exists($class)) {
+            $this->module = 'Common';
+            $this->arguments = [
+                'task' => 'default',
+                'action' => 'notFound',
+                'params' => [
+                    $this->arguments['task']
+                ],
+            ];
+
+            $this->runTask();
+        }
+
+        if (!method_exists($class, $this->arguments['action'] . 'Action')) {
+            $this->module = 'Common';
+            $this->arguments = [
+                'task' => 'default',
+                'action' => 'notFound',
+                'params' => [
+                    $this->arguments['task'],
+                    $this->arguments['action']
+                ],
+            ];
+
+            $this->runTask();
+        }
+    }
+
+    private function runTask(): void
+    {
+        $console = new ConsoleApp($this->di);
+        $dispatcher = new Dispatcher();
+
+        $dispatcher->setNamespaceName($this->module . '\Task');
+        $this->di->setShared('dispatcher', $dispatcher);
+
+        try {
+            $console->handle($this->arguments);
+            exit;
+        } catch (Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+            echo $e->getTraceAsString() . PHP_EOL;
+            exit(255);
+        }
+    }
 }
