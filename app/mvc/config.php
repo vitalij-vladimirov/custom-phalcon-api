@@ -17,6 +17,7 @@ return new \Phalcon\Config([
         'migrationsDir' => '/app/db/migrations/',
         'seedsDir'      => '/app/db/seeds/',
         'viewsDir'      => '/app/views/',
+        'cacheDir'      => '/var/cache/api',
         'baseUri'       => '/',
     ],
 ]);

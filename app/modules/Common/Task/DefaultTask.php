@@ -27,7 +27,6 @@ class DefaultTask extends Task
     {
         if ($action === null) {
             echo 'Task `' . $task . '` not found.' . PHP_EOL;
-
             return;
         }
 

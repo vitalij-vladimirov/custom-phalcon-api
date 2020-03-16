@@ -21,7 +21,7 @@ class Crontab
 
     private function setupCronjobs(Scheduler $cron): Scheduler
     {
-        $cron->php('/app/mvc/cli.php Common:Cache:cacheNamespaces')->everyMinute();
+        $cron->php('/app/mvc/cli.php Common:CacheNamespaces')->everyMinute();
 
         return $cron;
     }

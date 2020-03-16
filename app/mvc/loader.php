@@ -5,7 +5,8 @@
  * @var \Phalcon\Config $config
  */
 
-use Common\{Cache, Json};
+use Common\{File, Json};
+use Common\Task\CacheNamespacesTask;
 
 /**
  * Registering an autoloader
@@ -21,11 +22,14 @@ $loader->registerNamespaces(getNamespaces());
 
 function getNamespaces(): array
 {
-    $namespacesCache = Cache::read('namespaces') ?? null;
+    $namespacesCache = file_exists(CacheNamespacesTask::NAMESPACES_CACHE_FILE) ?
+        (file_get_contents(CacheNamespacesTask::NAMESPACES_CACHE_FILE) ?? null) :
+        null
+    ;
 
     if (!$namespacesCache) {
         return [
-            'Common\Helpers' => '/app/modules/Common/Helpers',
+            'Common' => '/app/modules/Common',
             'Common\Task' => '/app/modules/Common/Task',
         ];
     }

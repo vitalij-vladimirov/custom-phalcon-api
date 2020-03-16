@@ -4,10 +4,12 @@ declare(strict_types=1);
 namespace Common\Task;
 
 use Phalcon\Cli\Task;
-use Common\{Cache, Json};
+use Common\{File, Json};
 
-class CacheTask extends Task
+class CacheNamespacesTask extends Task
 {
+    public const NAMESPACES_CACHE_FILE = '/var/cache/api/namespaces.json';
+
     private const MODULES_DIRECTORIES = [
         '/app/modules' => '',
     ];
@@ -20,7 +22,7 @@ class CacheTask extends Task
     /**
      * Run namespace caching every 15 seconds
      */
-    public function cacheNamespacesAction()
+    public function mainAction()
     {
         $namespaces = [];
 
@@ -36,9 +38,28 @@ class CacheTask extends Task
                 }
             }
 
-            Cache::write('namespaces', Json::encode($namespaces));
+            $namespacesJson = Json::encode($namespaces);
 
-            sleep(15);
+            if (
+                File::exists(self::NAMESPACES_CACHE_FILE)
+                && File::getInfo(self::NAMESPACES_CACHE_FILE)->getHash() === md5($namespacesJson)
+            ) {
+                echo $i . " skip\n";
+
+                if ($i < 4) {
+                    sleep(15);
+                }
+
+                continue;
+            }
+
+            echo $i . " write\n";
+
+            File::write(self::NAMESPACES_CACHE_FILE, $namespacesJson);
+
+            if ($i < 4) {
+                sleep(15);
+            }
         }
     }
 
