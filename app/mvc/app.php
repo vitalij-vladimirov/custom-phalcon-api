@@ -1,12 +1,15 @@
 <?php
 
+namespace BaseMvc;
+
 use Dice\Dice;
+use Phalcon\Mvc\Micro;
 
 $dice = new Dice();
 
 /**
  * Local variables
- * @var \Phalcon\Mvc\Micro $app
+ * @var Micro $app
  */
 
 /**

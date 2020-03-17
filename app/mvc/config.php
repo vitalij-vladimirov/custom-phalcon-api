@@ -1,6 +1,8 @@
 <?php
 
-return new \Phalcon\Config([
+use Phalcon\Config;
+
+return new Config([
     'database' => [
         'adapter'    => getenv('DB_CONNECTION'),
         'host'       => getenv('DB_HOST'),

@@ -2,6 +2,8 @@
 <?php
 declare(strict_types=1);
 
+namespace BaseMvc;
+
 use GO\Scheduler;
 
 require_once '/app/vendor/autoload.php';

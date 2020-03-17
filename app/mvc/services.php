@@ -1,8 +1,16 @@
 <?php
 declare(strict_types=1);
 
+namespace BaseMvc;
+
+use Phalcon\Di;
 use Phalcon\Mvc\View\Simple as View;
 use Phalcon\Url as UrlResolver;
+
+/**
+ * Local variables
+ * @var Di $di
+ */
 
 /**
  * Shared configuration service

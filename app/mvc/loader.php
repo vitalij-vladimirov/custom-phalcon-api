@@ -1,17 +1,22 @@
 <?php
+declare(strict_types=1);
 
-/**
- * Local variables
- * @var \Phalcon\Config $config
- */
+namespace BaseMvc;
 
+use Phalcon\Config;
+use Phalcon\Loader;
 use Common\Json;
 use Common\Task\CacheNamespacesTask;
 
 /**
+ * Local variables
+ * @var Config $config
+ */
+
+/**
  * Registering an autoloader
  */
-$loader = new \Phalcon\Loader();
+$loader = new Loader();
 
 $loader->registerDirs([
     $config->application->modulesDir,

@@ -1,14 +1,22 @@
 <?php
 declare(strict_types=1);
 
-define('APP_PATH', '/app');
+namespace BaseMvc;
 
 use Dotenv\Dotenv;
+use Phalcon\Config;
+use Phalcon\Di;
 
-include APP_PATH . '/vendor/autoload.php';
-$dotenv = (Dotenv::createImmutable(APP_PATH . '/'))->load();
+/**
+ * Local variables
+ * @var Config $config
+ * @var Di $di
+ */
 
-include APP_PATH . '/mvc/services.php';
+include '/app/vendor/autoload.php';
+(Dotenv::createImmutable('/app/'))->load();
+
+include '/app/mvc/services.php';
 $config = $di->getConfig();
 
-include APP_PATH . '/mvc/loader.php';
+include '/app/mvc/loader.php';
