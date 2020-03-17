@@ -1,6 +1,7 @@
 <?php
 
 use Dice\Dice;
+
 $dice = new Dice();
 
 /**
@@ -19,7 +20,7 @@ $app->get('/', function () use ($dice) {
 /**
  * Not found handler
  */
-$app->notFound(function () use($app) {
-    $app->response->setStatusCode(404, "Not Found")->sendHeaders();
+$app->notFound(function () use ($app) {
+    $app->response->setStatusCode(404, 'Not Found')->sendHeaders();
     echo $app['view']->render('404');
 });

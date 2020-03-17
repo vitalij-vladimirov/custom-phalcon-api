@@ -5,7 +5,7 @@
  * @var \Phalcon\Config $config
  */
 
-use Common\{File, Json};
+use Common\Json;
 use Common\Task\CacheNamespacesTask;
 
 /**

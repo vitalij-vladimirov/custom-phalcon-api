@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace Common\Task;
 
 use Phalcon\Cli\Task;
-use Common\{File, Json};
+use Common\File;
+use Common\Json;
 
 class CacheNamespacesTask extends Task
 {
@@ -40,10 +41,8 @@ class CacheNamespacesTask extends Task
 
             $namespacesJson = Json::encode($namespaces);
 
-            if (
-                File::exists(self::NAMESPACES_CACHE_FILE)
-                && File::getInfo(self::NAMESPACES_CACHE_FILE)->getHash() === md5($namespacesJson)
-            ) {
+            $fileExists = File::exists(self::NAMESPACES_CACHE_FILE);
+            if ($fileExists && File::getInfo(self::NAMESPACES_CACHE_FILE)->getHash() === md5($namespacesJson)) {
                 echo $i . " skip\n";
 
                 if ($i < 4) {
@@ -87,10 +86,8 @@ class CacheNamespacesTask extends Task
         if ($handle = opendir($directory)) {
             while (false !== ($file = readdir($handle))) {
                 $path = $directory . '/' . $file;
-                if (
-                    !in_array($file, self::IGNORE_FILES, true)
-                    && filetype($path) === 'dir'
-                ) {
+
+                if (!in_array($file, self::IGNORE_FILES, true) && filetype($path) === 'dir') {
                     $directories[] = $path;
                 }
             }

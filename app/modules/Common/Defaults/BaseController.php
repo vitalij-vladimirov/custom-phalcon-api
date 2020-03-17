@@ -5,5 +5,4 @@ namespace Common\Defaults;
 
 abstract class BaseController extends BaseClass
 {
-
 }

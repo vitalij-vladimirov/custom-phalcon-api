@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Test\Controller;
 
-use Common\Abstraction\AbstractController;
+use Common\Defaults\BaseController;
 
-class NewController extends AbstractController
+class NewController extends BaseController
 {
     private TestController $testController;
 

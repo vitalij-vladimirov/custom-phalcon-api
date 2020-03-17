@@ -4,3 +4,4 @@ data
 !data/clear.sh
 !data/*/.gitkeep
 .env
+.php_cs.cache

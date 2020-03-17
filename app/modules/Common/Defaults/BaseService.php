@@ -5,5 +5,4 @@ namespace Common\Defaults;
 
 abstract class BaseService extends BaseClass
 {
-
 }
