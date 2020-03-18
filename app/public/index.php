@@ -5,6 +5,8 @@ error_reporting(E_ALL);
 
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\Micro;
+use Common\Json;
+use Common\ApiException\ApiException;
 
 $di = new FactoryDefault();
 
@@ -15,8 +17,16 @@ $app = new Micro($di);
 include '../mvc/app.php';
 
 try {
-    $app->handle($_SERVER['REQUEST_URI']);
-} catch (\Exception $e) {
-    echo $e->getMessage() . '<br>';
-    echo '<pre>' . $e->getTraceAsString() . '</pre>';
+    echo $app->handle($_SERVER['REQUEST_URI']);
+} catch (ApiException $exception) {
+    http_response_code($exception->getHttpCode());
+    header('Content-type:application/json;charset=utf-8');
+
+    echo Json::encode([
+        'code' => $exception->getCode(),
+        'message' => $exception->getMessage()
+    ]);
+} catch (Exception $exception) {
+    echo $exception->getMessage() . '<br>';
+    echo $exception->getCode() . '<br>';
 }

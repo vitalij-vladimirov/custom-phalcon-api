@@ -9,9 +9,8 @@ class UnauthorizedException extends DefaultException
 {
     public function __construct(
         string $message = 'Unauthorized',
-        string $code = DefaultErrorCodes::UNAUTHORIZED,
-        int $httpCode = 401
+        string $code = DefaultErrorCodes::UNAUTHORIZED
     ) {
-        parent::__construct($message, $code, $httpCode);
+        parent::__construct($message, $code);
     }
 }

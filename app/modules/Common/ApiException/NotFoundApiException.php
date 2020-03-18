@@ -9,9 +9,8 @@ class NotFoundApiException extends ApiException
 {
     public function __construct(
         string $message = 'Not found',
-        string $code = DefaultErrorCodes::NOT_FOUND,
-        int $httpCode = 404
+        string $code = DefaultErrorCodes::NOT_FOUND
     ) {
-        parent::__construct($message, $code, $httpCode);
+        parent::__construct($message, $code, 404);
     }
 }

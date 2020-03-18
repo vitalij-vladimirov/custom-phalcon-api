@@ -10,11 +10,13 @@ use Phalcon\Cli\Dispatcher;
 use Phalcon\Cli\Console;
 use Exception;
 
+// phpcs:disable
 $di = new CliDi();
 
 include '/app/mvc/bootstrap.php';
 
 new CliTask($di, array_slice($argv, 1));
+// phpcs:enable
 
 class CliTask
 {
@@ -67,18 +69,18 @@ class CliTask
     {
         if (!file_exists('/app/modules/' . $this->module)) {
             echo 'Module "' . $this->module . '" not found' . PHP_EOL;
-            exit(404);
+            exit;
         }
 
         $taskClass = $this->module . '\Task\\' . ucfirst($this->arguments['task']) . 'Task';
         if (!class_exists($taskClass)) {
             echo 'Task "' . $this->arguments['task'] . '" not found' . PHP_EOL;
-            exit(404);
+            exit;
         }
 
         if (!method_exists($taskClass, $this->arguments['action'] . 'Action')) {
             echo 'Action "' . $this->arguments['action'] . '" not found' . PHP_EOL;
-            exit(404);
+            exit;
         }
     }
 

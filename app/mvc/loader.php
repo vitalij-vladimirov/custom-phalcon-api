@@ -13,9 +13,7 @@ use Common\Json;
  * @var Config $config
  */
 
-/**
- * Registering an autoloader
- */
+// phpcs:disable
 $loader = new Loader();
 
 $loader->registerDirs([
@@ -24,6 +22,7 @@ $loader->registerDirs([
 ])->register();
 
 $loader->registerNamespaces(getNamespaces());
+// phpcs:enable
 
 function getNamespaces(): array
 {

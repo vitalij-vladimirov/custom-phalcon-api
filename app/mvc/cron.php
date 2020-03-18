@@ -6,9 +6,11 @@ namespace BaseMvc;
 
 use GO\Scheduler;
 
+// phpcs:disable
 require_once '/app/vendor/autoload.php';
 
 new Crontab();
+// phpcs:enable
 
 class Crontab
 {

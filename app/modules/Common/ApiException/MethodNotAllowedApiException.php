@@ -9,9 +9,8 @@ class MethodNotAllowedApiException extends ApiException
 {
     public function __construct(
         string $message = 'Method not allowed',
-        string $code = DefaultErrorCodes::METHOD_NOT_ALLOWED,
-        int $httpCode = 405
+        string $code = DefaultErrorCodes::METHOD_NOT_ALLOWED
     ) {
-        parent::__construct($message, $code, $httpCode);
+        parent::__construct($message, $code, 405);
     }
 }

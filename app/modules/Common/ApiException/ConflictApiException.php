@@ -9,9 +9,8 @@ class ConflictApiException extends ApiException
 {
     public function __construct(
         string $message = 'Conflict',
-        string $code = DefaultErrorCodes::CONFLICT,
-        int $httpCode = 409
+        string $code = DefaultErrorCodes::CONFLICT
     ) {
-        parent::__construct($message, $code, $httpCode);
+        parent::__construct($message, $code, 409);
     }
 }

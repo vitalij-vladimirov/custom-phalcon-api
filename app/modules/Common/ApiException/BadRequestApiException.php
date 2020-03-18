@@ -9,9 +9,8 @@ class BadRequestApiException extends ApiException
 {
     public function __construct(
         string $message = 'Bad request',
-        string $code = DefaultErrorCodes::BAD_REQUEST,
-        int $httpCode = 400
+        string $code = DefaultErrorCodes::BAD_REQUEST
     ) {
-        parent::__construct($message, $code, $httpCode);
+        parent::__construct($message, $code, 400);
     }
 }

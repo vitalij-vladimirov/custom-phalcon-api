@@ -2,10 +2,10 @@
 
 if [ -z "$1" ]
   then
-    DIR=/app/modules
+    /app/vendor/bin/php-cs-fixer fix /app/mvc --dry-run --diff --verbose
+    /app/vendor/bin/php-cs-fixer fix /app/modules --dry-run --diff --verbose
+    /app/vendor/bin/phpcs -p --standard=PSR2 /app/modules
 else
-  DIR=$1
+  /app/vendor/bin/php-cs-fixer fix "$1" --dry-run --diff --verbose
+  /app/vendor/bin/phpcs -p --standard=PSR2 "$1"
 fi;
-
-/app/vendor/bin/php-cs-fixer fix "$DIR" --dry-run --diff --verbose
-/app/vendor/bin/phpcs -p --standard=PSR2 "$DIR"

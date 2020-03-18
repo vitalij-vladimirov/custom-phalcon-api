@@ -9,9 +9,8 @@ class TooManyRequestsApiException extends ApiException
 {
     public function __construct(
         string $message = 'Too Many Requests',
-        string $code = DefaultErrorCodes::TOO_MANY_REQUESTS,
-        int $httpCode = 429
+        string $code = DefaultErrorCodes::TOO_MANY_REQUESTS
     ) {
-        parent::__construct($message, $code, $httpCode);
+        parent::__construct($message, $code, 429);
     }
 }

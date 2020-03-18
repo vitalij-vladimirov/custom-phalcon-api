@@ -9,9 +9,8 @@ class ForbiddenException extends DefaultException
 {
     public function __construct(
         string $message = 'Forbidden',
-        string $code = DefaultErrorCodes::FORBIDDEN,
-        int $httpCode = 409
+        string $code = DefaultErrorCodes::FORBIDDEN
     ) {
-        parent::__construct($message, $code, $httpCode);
+        parent::__construct($message, $code);
     }
 }
