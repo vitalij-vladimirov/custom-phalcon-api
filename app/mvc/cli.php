@@ -8,6 +8,7 @@ use Phalcon\Di\FactoryDefault\Cli as CliDi;
 use Phalcon\Cli\Console as ConsoleApp;
 use Phalcon\Cli\Dispatcher;
 use Phalcon\Cli\Console;
+use Exception;
 
 $di = new CliDi();
 
@@ -64,35 +65,20 @@ class CliTask
 
     private function validateArguments(): void
     {
-        // TODO: log exceptions
-
-        $class = $this->module . '\Task\\' . ucfirst($this->arguments['task']) . 'Task';
-
-        if (!class_exists($class)) {
-            $this->module = 'Common';
-            $this->arguments = [
-                'task' => 'default',
-                'action' => 'notFound',
-                'params' => [
-                    $this->arguments['task']
-                ],
-            ];
-
-            $this->runTask();
+        if (!file_exists('/app/modules/' . $this->module)) {
+            echo 'Module "' . $this->module . '" not found' . PHP_EOL;
+            exit(404);
         }
 
-        if (!method_exists($class, $this->arguments['action'] . 'Action')) {
-            $this->module = 'Common';
-            $this->arguments = [
-                'task' => 'default',
-                'action' => 'notFound',
-                'params' => [
-                    $this->arguments['task'],
-                    $this->arguments['action']
-                ],
-            ];
+        $taskClass = $this->module . '\Task\\' . ucfirst($this->arguments['task']) . 'Task';
+        if (!class_exists($taskClass)) {
+            echo 'Task "' . $this->arguments['task'] . '" not found' . PHP_EOL;
+            exit(404);
+        }
 
-            $this->runTask();
+        if (!method_exists($taskClass, $this->arguments['action'] . 'Action')) {
+            echo 'Action "' . $this->arguments['action'] . '" not found' . PHP_EOL;
+            exit(404);
         }
     }
 
@@ -107,9 +93,9 @@ class CliTask
         try {
             $console->handle($this->arguments);
             exit;
-        } catch (Exception $e) {
-            echo $e->getMessage() . PHP_EOL;
-            echo $e->getTraceAsString() . PHP_EOL;
+        } catch (Exception $exception) {
+            echo $exception->getMessage() . PHP_EOL;
+            echo $exception->getTraceAsString() . PHP_EOL;
             exit(255);
         }
     }

@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace BaseMvc;
 
+use Common\Service\CacheManager;
 use Phalcon\Config;
 use Phalcon\Loader;
 use Common\Json;
-use Common\Task\CacheNamespacesTask;
 
 /**
  * Local variables
@@ -27,15 +27,17 @@ $loader->registerNamespaces(getNamespaces());
 
 function getNamespaces(): array
 {
-    $namespacesCache = file_exists(CacheNamespacesTask::NAMESPACES_CACHE_FILE) ?
-        (file_get_contents(CacheNamespacesTask::NAMESPACES_CACHE_FILE) ?? null) :
+    $namespacesCache = file_exists(CacheManager::NAMESPACES_CACHE_FILE) ?
+        (file_get_contents(CacheManager::NAMESPACES_CACHE_FILE) ?? null) :
         null
     ;
 
     if (!$namespacesCache) {
+        // List of namespaces necessary to run namespaces cache manager
         return [
             'Common' => '/app/modules/Common',
             'Common\Task' => '/app/modules/Common/Task',
+            'Common\Service' => '/app/modules/Common/Service',
         ];
     }
 

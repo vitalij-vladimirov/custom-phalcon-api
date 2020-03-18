@@ -22,14 +22,4 @@ class DefaultTask extends Task
         echo '- `cli Test:CacheBuilder`' . PHP_EOL;
         echo PHP_EOL;
     }
-
-    public function notFoundAction(string $task, string $action = null): void
-    {
-        if ($action === null) {
-            echo 'Task `' . $task . '` not found.' . PHP_EOL;
-            return;
-        }
-
-        echo 'Action `' . $action . '` not found.' . PHP_EOL;
-    }
 }

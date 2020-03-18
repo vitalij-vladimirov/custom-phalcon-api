@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace Common;
 
 use Carbon\Carbon;
+use Common\Config\ErrorCodes;
 use Common\Entity\Directory;
 use Common\Entity\FileInfo;
 use Common\Entity\FileSize;
+use Common\Exception\NotFoundException;
 
 class File
 {
@@ -77,10 +79,6 @@ class File
 
     public static function getDirectory(string $file): ?Directory
     {
-        if (!self::exists($file)) {
-            return null;
-        }
-
         $map = [];
         $pathSplitter = explode('/', $file);
         foreach ($pathSplitter as $location) {
@@ -104,25 +102,25 @@ class File
         ;
     }
 
-    private static function validateFileExists(string $file): void
+    public static function validateFileExists(string $file): void
     {
         if (!self::exists($file)) {
-            exit; // TODO: throw exception here
+            throw new NotFoundException('File not found', ErrorCodes::FILE_NOT_FOUND);
         }
     }
 
     private static function validateFileDirectoryAndCreateIfNotFound(string $file): void
     {
-        $pathSplitter = explode('/', $file);
-        $directory = substr($file, 0, strlen($pathSplitter[count($pathSplitter)-1]) * -1);
+        $directory = self::getDirectory($file);
 
-        if (self::exists($directory)) {
+        if (self::exists($directory->getPath())) {
             return;
         }
 
         $fullPath = '';
-        for ($i = 1; $i < count($pathSplitter)-1; ++$i) {
-            $fullPath .= '/' . $pathSplitter[$i];
+        for ($i = 0; $i < count($directory->getMap()); ++$i) {
+            $fullPath .= '/' . $directory->getMap()[$i];
+
             if (self::exists($fullPath)) {
                 continue;
             }
