@@ -8,9 +8,10 @@ use Common\Json;
 
 class CacheManager
 {
-    public const NAMESPACES_CACHE_FILE = '/var/cache/api/namespaces.json';
+    public const NAMESPACES_CACHE_FILE = '/var/cache/phalcon/namespaces.json';
 
     private const MODULES_DIRECTORIES = [
+        '/app/mvc' => 'BaseMvc',
         '/app/modules' => '',
     ];
 
@@ -25,6 +26,10 @@ class CacheManager
 
         foreach (self::MODULES_DIRECTORIES as $modulesDir => $namespaceBegin) {
             $modulesDirs = $this->generateDirectoriesList($modulesDir);
+
+            if (!empty($namespaceBegin)) {
+                $namespaces = array_merge($namespaces, [$namespaceBegin => $modulesDir]);
+            }
 
             if (count($modulesDirs)) {
                 $namespaces = array_merge(

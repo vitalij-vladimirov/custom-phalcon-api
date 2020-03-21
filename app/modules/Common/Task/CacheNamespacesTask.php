@@ -10,13 +10,35 @@ class CacheNamespacesTask extends Task
 {
     /**
      * Run namespace caching every 15 seconds
+     *
+     * @param string|null $type
      */
-    public function mainAction()
+    public function mainAction(string $type = null): void
     {
-        for ($i = 1; $i <= 4; ++$i) {
+        /**
+         * Run namespaces caching once
+         */
+        if ($type === null) {
             (new CacheManager())->cacheNamespaces();
 
-            sleep(15);
+            return;
         }
+
+        /**
+         * Run namespaces caching every 15 seconds
+         */
+        if ($type === 'cron') {
+            for ($i = 1; $i <= 4; ++$i) {
+                (new CacheManager())->cacheNamespaces();
+
+                sleep(15);
+            }
+
+            return;
+        }
+
+        echo 'Argument $type is incorrect' . PHP_EOL;
+
+        return;
     }
 }

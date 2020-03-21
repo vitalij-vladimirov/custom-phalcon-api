@@ -3,18 +3,17 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-use Phalcon\Di\FactoryDefault;
-use Phalcon\Mvc\Micro;
+use BaseMvc\bootstrap;
+use Dotenv\Dotenv;
 use Common\Json;
 use Common\ApiException\ApiException;
 
-$di = new FactoryDefault();
+include '../vendor/autoload.php';
+include '../mvc/Bootstrap.php';
 
-include '../mvc/bootstrap.php';
+(Dotenv::createImmutable('../'))->load();
 
-$app = new Micro($di);
-
-include '../mvc/app.php';
+$app = (new Bootstrap())->runApp();
 
 try {
     echo $app->handle($_SERVER['REQUEST_URI']);

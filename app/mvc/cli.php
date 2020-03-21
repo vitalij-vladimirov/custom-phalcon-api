@@ -11,24 +11,25 @@ use Phalcon\Cli\Console;
 use Exception;
 
 // phpcs:disable
-$di = new CliDi();
+include '/app/vendor/autoload.php';
+include '/app/mvc/Bootstrap.php';
 
-include '/app/mvc/bootstrap.php';
+(new Bootstrap())->runCli();
 
-new CliTask($di, array_slice($argv, 1));
+new Cli($argv);
 // phpcs:enable
 
-class CliTask
+class Cli
 {
     private CliDi $di;
     private array $args;
     private string $module;
     private array $arguments;
 
-    public function __construct(CliDi $di, array $args)
+    public function __construct(array $args)
     {
-        $this->di = $di;
-        $this->args = $args;
+        $this->di = new CliDi();
+        $this->args = array_slice($args, 1);
 
         $this->collectArguments();
         $this->validateArguments();

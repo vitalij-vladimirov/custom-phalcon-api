@@ -35,4 +35,5 @@ RUN ln -s /app/mvc/cli.php /usr/bin/cli
 COPY --chown=www-data:www-data app /app
 WORKDIR /app
 RUN if [ "$APP_ENV" = "development" ]; then composer install; else composer install --no-dev --optimize-autoloader; fi
-RUN (crontab -l ; echo "* * * * * /usr/local/bin/php /app/mvc/cron.php >> /dev/null 2>&1") | crontab
+RUN (crontab -l ; echo "* * * * * /usr/local/bin/php /app/mvc/cron.php "$APP_ENV" >> /dev/null 2>&1") | crontab
+RUN (/usr/local/bin/php /app/mvc/cli.php Common:CacheNamespaces)
