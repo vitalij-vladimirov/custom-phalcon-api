@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-class FileSize
+class FileSizeEntity
 {
     private int $bytes;
     private string $kilobytes;
@@ -15,7 +15,7 @@ class FileSize
         return $this->bytes;
     }
 
-    public function setBytes(int $bytes): FileSize
+    public function setBytes(int $bytes): FileSizeEntity
     {
         $this->bytes = $bytes;
 
@@ -27,7 +27,7 @@ class FileSize
         return $this->kilobytes;
     }
 
-    public function setKilobytes(string $kilobytes): FileSize
+    public function setKilobytes(string $kilobytes): FileSizeEntity
     {
         $this->kilobytes = $kilobytes;
 
@@ -39,7 +39,7 @@ class FileSize
         return $this->megabytes;
     }
 
-    public function setMegabytes(string $megabytes): FileSize
+    public function setMegabytes(string $megabytes): FileSizeEntity
     {
         $this->megabytes = $megabytes;
 
@@ -51,7 +51,7 @@ class FileSize
         return $this->gigabytes;
     }
 
-    public function setGigabytes(string $gigabytes): FileSize
+    public function setGigabytes(string $gigabytes): FileSizeEntity
     {
         $this->gigabytes = $gigabytes;
 

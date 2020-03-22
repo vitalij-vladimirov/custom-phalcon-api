@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace BaseMvc;
 
+use Common\Entity\RequestEntity;
+use Common\File;
+use Common\Variable;
 use Phalcon\Config;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Loader;
@@ -10,9 +13,11 @@ use Phalcon\Mvc\Router;
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\View\Simple as View;
 use Phalcon\Url as UrlResolver;
+use Common\Text;
 use Common\ApiException\NotFoundApiException;
 use Common\Service\CacheManager;
 use Common\Json;
+use Throwable;
 
 class Bootstrap
 {
@@ -32,7 +37,12 @@ class Bootstrap
         /**
          * Call default Phalcon Micro service routing
          */
-        $this->defaultRouter();
+//        $this->defaultRouter();
+
+        /**
+         * Call modified routing
+         */
+        $this->modifiedRouter();
 
         return $this->app;
     }
@@ -168,7 +178,7 @@ class Bootstrap
 
             echo Json::encode([
                 'code' => 'success',
-                'message' => 'Here you can run you code.'
+                'message' => 'Test message.'
             ]);
         });
 
@@ -186,5 +196,47 @@ class Bootstrap
 //            $this->app->response->setStatusCode(404, "Not Found")->sendHeaders();
 //            return $this->app['view']->render('404');
 //        });
+    }
+
+    private function modifiedRouter(): void
+    {
+        $request = $this->getModifiedRequest();
+
+        dd($request);
+    }
+
+    private function getModifiedRequest(): RequestEntity
+    {
+        list($urlPath) = explode('?', $this->app->request->getURI());
+
+        $request = (new RequestEntity())
+            ->setMethod(Text::lower($this->app->request->getMethod()))
+            ->setQuery(Variable::restoreTypes($this->app->request->getQuery()))
+            ->setPath($urlPath)
+        ;
+
+        $urlSplitter = explode('/', $urlPath);
+
+        if (count($urlSplitter) < 2 || (count($urlSplitter) < 3 && $urlSplitter[1] === $request::REQUEST_TYPE_API)) {
+            throw new NotFoundApiException();
+        }
+
+        if ($urlSplitter[1] === $request::REQUEST_TYPE_API) {
+            $request
+                ->setType($request::REQUEST_TYPE_API)
+                ->setModule(Text::camelize($urlSplitter[2]))
+                ->setParams(Variable::restoreTypes(array_slice($urlSplitter, 3)));
+        } else {
+            $request
+                ->setType($request::REQUEST_TYPE_VIEW)
+                ->setModule(Text::camelize($urlSplitter[1]))
+                ->setParams(Variable::restoreTypes(array_slice($urlSplitter, 2)));
+        }
+
+        if (!File::exists($this->config->application->modulesDir . $request->getModule())) {
+            throw new NotFoundApiException();
+        }
+
+        return $request;
     }
 }

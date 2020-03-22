@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-class Directory
+class DirectoryEntity
 {
     private string $name;
     private string $path;
@@ -14,7 +14,7 @@ class Directory
         return $this->name;
     }
 
-    public function setName(string $name): Directory
+    public function setName(string $name): DirectoryEntity
     {
         $this->name = $name;
 
@@ -26,7 +26,7 @@ class Directory
         return $this->path;
     }
 
-    public function setPath(string $path): Directory
+    public function setPath(string $path): DirectoryEntity
     {
         $this->path = $path;
 
@@ -38,7 +38,7 @@ class Directory
         return $this->map;
     }
 
-    public function setMap(array $map): Directory
+    public function setMap(array $map): DirectoryEntity
     {
         $this->map = $map;
 

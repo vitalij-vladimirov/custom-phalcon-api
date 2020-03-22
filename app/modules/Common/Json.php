@@ -14,4 +14,11 @@ class Json
     {
         return json_decode($json, true, JSON_PARTIAL_OUTPUT_ON_ERROR, JSON_THROW_ON_ERROR);
     }
+
+    public static function isJson($variable): bool
+    {
+        json_decode($variable);
+
+        return (json_last_error() === JSON_ERROR_NONE);
+    }
 }

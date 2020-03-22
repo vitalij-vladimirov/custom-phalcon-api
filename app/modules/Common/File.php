@@ -5,16 +5,16 @@ namespace Common;
 
 use Carbon\Carbon;
 use Common\Config\ErrorCodes;
-use Common\Entity\Directory;
-use Common\Entity\FileInfo;
-use Common\Entity\FileSize;
+use Common\Entity\DirectoryEntity;
+use Common\Entity\FileInfoEntity;
+use Common\Entity\FileSizeEntity;
 use Common\Exception\NotFoundException;
 
 class File
 {
     public static function write(string $file, string $text): void
     {
-        self::validateFileDirectoryAndCreateIfNotFound($file);
+        self::validateFileDirectoryEntityAndCreateIfNotFound($file);
 
         file_put_contents($file, $text);
     }
@@ -33,18 +33,18 @@ class File
         return file_exists($file);
     }
 
-    public static function getInfo(string $file): ?FileInfo
+    public static function getInfo(string $file): ?FileInfoEntity
     {
         if (!self::exists($file)) {
             return null;
         }
 
-        $fileInfo = (new FileInfo())
+        $fileInfo = (new FileInfoEntity())
             ->setType(mime_content_type($file))
             ->setHash(md5_file($file))
             ->setLastModified(Carbon::createFromTimestamp(filemtime($file)))
-            ->setFileSize(self::getSize($file))
-            ->setDirectory(self::getDirectory($file))
+            ->setFileSizeEntity(self::getSize($file))
+            ->setDirectoryEntity(self::getDirectoryEntity($file))
         ;
 
         $pathSplitter = explode('/', $file);
@@ -61,7 +61,7 @@ class File
         return $fileInfo;
     }
 
-    public static function getSize(string $file): ?FileSize
+    public static function getSize(string $file): ?FileSizeEntity
     {
         if (!self::exists($file)) {
             return null;
@@ -69,7 +69,7 @@ class File
 
         $bytes = filesize($file);
 
-        return (new FileSize())
+        return (new FileSizeEntity())
             ->setBytes($bytes)
             ->setKilobytes((string)number_format($bytes/1024, 2, '.', ''))
             ->setMegabytes((string)number_format($bytes/1024/1024, 2, '.', ''))
@@ -77,7 +77,7 @@ class File
         ;
     }
 
-    public static function getDirectory(string $file): ?Directory
+    public static function getDirectoryEntity(string $file): ?DirectoryEntity
     {
         $map = [];
         $pathSplitter = explode('/', $file);
@@ -95,7 +95,7 @@ class File
             $path .= '/' . $location;
         }
 
-        return (new Directory())
+        return (new DirectoryEntity())
             ->setName($name)
             ->setPath($path)
             ->setMap($map)
@@ -109,9 +109,9 @@ class File
         }
     }
 
-    private static function validateFileDirectoryAndCreateIfNotFound(string $file): void
+    private static function validateFileDirectoryEntityAndCreateIfNotFound(string $file): void
     {
-        $directory = self::getDirectory($file);
+        $directory = self::getDirectoryEntity($file);
 
         if (self::exists($directory->getPath())) {
             return;

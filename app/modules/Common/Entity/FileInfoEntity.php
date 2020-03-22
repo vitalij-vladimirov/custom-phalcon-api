@@ -5,7 +5,7 @@ namespace Common\Entity;
 
 use Carbon\Carbon;
 
-class FileInfo
+class FileInfoEntity
 {
     private string $name;
     private string $ext;
@@ -13,15 +13,15 @@ class FileInfo
     private string $type;
     private string $hash;
     private Carbon $lastModified;
-    private Directory $directory;
-    private FileSize $fileSize;
+    private DirectoryEntity $directory;
+    private FileSizeEntity $fileSize;
 
     public function getName(): string
     {
         return $this->name;
     }
 
-    public function setName(string $name): FileInfo
+    public function setName(string $name): FileInfoEntity
     {
         $this->name = $name;
 
@@ -33,7 +33,7 @@ class FileInfo
         return $this->ext;
     }
 
-    public function setExt(string $ext): FileInfo
+    public function setExt(string $ext): FileInfoEntity
     {
         $this->ext = $ext;
 
@@ -45,7 +45,7 @@ class FileInfo
         return $this->fullName;
     }
 
-    public function setFullName(string $fullName): FileInfo
+    public function setFullName(string $fullName): FileInfoEntity
     {
         $this->fullName = $fullName;
 
@@ -57,7 +57,7 @@ class FileInfo
         return $this->type;
     }
 
-    public function setType(string $type): FileInfo
+    public function setType(string $type): FileInfoEntity
     {
         $this->type = $type;
 
@@ -69,7 +69,7 @@ class FileInfo
         return $this->hash;
     }
 
-    public function setHash(string $hash): FileInfo
+    public function setHash(string $hash): FileInfoEntity
     {
         $this->hash = $hash;
 
@@ -81,31 +81,31 @@ class FileInfo
         return $this->lastModified;
     }
 
-    public function setLastModified(Carbon $lastModified): FileInfo
+    public function setLastModified(Carbon $lastModified): FileInfoEntity
     {
         $this->lastModified = $lastModified;
 
         return $this;
     }
 
-    public function getDirectory(): Directory
+    public function getDirectoryEntity(): DirectoryEntity
     {
         return $this->directory;
     }
 
-    public function setDirectory(Directory $directory): FileInfo
+    public function setDirectoryEntity(DirectoryEntity $directory): FileInfoEntity
     {
         $this->directory = $directory;
 
         return $this;
     }
 
-    public function getFileSize(): FileSize
+    public function getFileSizeEntity(): FileSizeEntity
     {
         return $this->fileSize;
     }
 
-    public function setFileSize(FileSize $fileSize): FileInfo
+    public function setFileSizeEntity(FileSizeEntity $fileSize): FileInfoEntity
     {
         $this->fileSize = $fileSize;
 
