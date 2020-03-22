@@ -13,19 +13,23 @@ include '../mvc/Bootstrap.php';
 
 (Dotenv::createImmutable('../'))->load();
 
-$app = (new Bootstrap())->runApp();
+$bootstrap = new Bootstrap();
+$app = $bootstrap->runApp();
+$config = $bootstrap->getConfig();
 
 try {
-    echo $app->handle($_SERVER['REQUEST_URI']);
-} catch (ApiException $exception) {
-    http_response_code($exception->getHttpCode());
-    header('Content-type:application/json;charset=utf-8');
+    $app->handle($_SERVER['REQUEST_URI']);
+} catch (ApiException $e) {
+    $app->response
+        ->setStatusCode($e->getHttpCode(), $e->getMessage())
+        ->setContentType('application/json; charset=utf-8')
+        ->sendHeaders()
+    ;
 
     echo Json::encode([
-        'code' => $exception->getCode(),
-        'message' => $exception->getMessage()
+        'code' => $e->getCode(),
+        'message' => $e->getMessage()
     ]);
-} catch (Exception $exception) {
-    echo $exception->getMessage() . '<br>';
-    echo $exception->getCode() . '<br>';
+} catch (Exception $e) {
+    throw new $e;
 }

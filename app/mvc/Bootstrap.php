@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace BaseMvc;
 
-use Common\ApiException\NotFoundApiException;
-use Dice\Dice;
 use Phalcon\Config;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Loader;
+use Phalcon\Mvc\Router;
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\View\Simple as View;
 use Phalcon\Url as UrlResolver;
+use Common\ApiException\NotFoundApiException;
 use Common\Service\CacheManager;
 use Common\Json;
 
@@ -20,25 +20,19 @@ class Bootstrap
     private FactoryDefault $services;
     private Loader $loader;
     private Micro $app;
-    private Dice $di;
+    private Router $router;
 
     public function runApp(): Micro
     {
         $this->setupServices();
         $this->setupLoader();
 
-        $this->di = new Dice();
-
         $this->app = new Micro($this->services);
 
-        $this->app->get('/', function () {
-            $run = $this->di->create(\Example\Controller\ExampleController::class);
-            echo $run->getJoke(2);
-        });
-
-        $this->app->notFound(function () {
-            throw new NotFoundApiException();
-        });
+        /**
+         * Call default Phalcon Micro service routing
+         */
+        $this->defaultRouter();
 
         return $this->app;
     }
@@ -47,6 +41,15 @@ class Bootstrap
     {
         $this->setupServices();
         $this->setupLoader();
+    }
+
+    public function getConfig(): Config
+    {
+        if (empty($this->config)) {
+            $this->setupServices();
+        }
+
+        return $this->config;
     }
 
     private function setupServices(): FactoryDefault
@@ -59,40 +62,40 @@ class Bootstrap
         $this->services->setShared('config', function () {
             return include '/app/mvc/config.php';
         });
-        $this->config = $this->services->getConfig();
+        $this->config = $config = $this->services->getConfig();
 
         /**
          * Sets the view component
          */
-        $this->services->setShared('view', function () {
+        $this->services->setShared('view', function () use ($config) {
             $view = new View();
-            $view->setViewsDir($this->config->application->viewsDir);
+            $view->setViewsDir($config->application->viewsDir);
             return $view;
         });
 
         /**
          * The URL component is used to generate all kind of urls in the application
          */
-        $this->services->setShared('url', function () {
+        $this->services->setShared('url', function () use ($config) {
             $url = new UrlResolver();
-            $url->setBaseUri($this->config->application->baseUri);
+            $url->setBaseUri($config->application->baseUri);
             return $url;
         });
 
         /**
          * Database connection is created based in the parameters defined in the configuration file
          */
-        $this->services->setShared('db', function () {
-            $class = 'Phalcon\Db\Adapter\Pdo\\' . $this->config->database->adapter;
+        $this->services->setShared('db', function () use ($config) {
+            $class = 'Phalcon\Db\Adapter\Pdo\\' . $config->database->adapter;
             $params = [
-                'host'     => $this->config->database->host,
-                'username' => $this->config->database->username,
-                'password' => $this->config->database->password,
-                'dbname'   => $this->config->database->dbname,
-                'charset'  => $this->config->database->charset
+                'host'     => $config->database->host,
+                'username' => $config->database->username,
+                'password' => $config->database->password,
+                'dbname'   => $config->database->dbname,
+                'charset'  => $config->database->charset
             ];
 
-            if ($this->config->database->adapter == 'Postgresql') {
+            if ($config->database->adapter == 'Postgresql') {
                 unset($params['charset']);
             }
 
@@ -147,5 +150,41 @@ class Bootstrap
         }
 
         return Json::decode($namespacesCache);
+    }
+
+    /**
+     * Default Phalcon Micro routing
+     * You can setup routes here or call another Class to setup default routes
+     */
+    private function defaultRouter(): void
+    {
+        $app = $this->app;
+
+        $this->app->get('/api/test', function () use ($app) {
+            $app->response
+                ->setContentType('application/json; charset=utf-8')
+                ->sendHeaders()
+            ;
+
+            echo Json::encode([
+                'code' => 'success',
+                'message' => 'Here you can run you code.'
+            ]);
+        });
+
+        /**
+         * Display error in JSON as API
+         */
+        $this->app->notFound(function () {
+            throw new NotFoundApiException();
+        });
+
+//        /**
+//         * Display error in HTML as website
+//         */
+//        $this->app->notFound(function () {
+//            $this->app->response->setStatusCode(404, "Not Found")->sendHeaders();
+//            return $this->app['view']->render('404');
+//        });
     }
 }
