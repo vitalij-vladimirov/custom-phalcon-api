@@ -14,12 +14,12 @@ return new Config([
     ],
 
     'application' => [
-        'mvcDir'        => '/app/mvc/',
-        'modulesDir'    => '/app/modules/',
-        'migrationsDir' => '/app/db/migrations/',
-        'seedsDir'      => '/app/db/seeds/',
-        'viewsDir'      => '/app/views/',
-        'cacheDir'      => '/var/cache/api',
+        'mvcDir'        => '/app/mvc',
+        'modulesDir'    => '/app/modules',
+        'migrationsDir' => '/app/db/migrations',
+        'seedsDir'      => '/app/db/seeds',
+        'viewsDir'      => '/app/views',
+        'cacheDir'      => '/var/cache/phalcon',
         'baseUri'       => '/',
     ],
 ]);

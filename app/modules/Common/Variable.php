@@ -28,17 +28,17 @@ class Variable
                 $value = trim($value);
             }
 
-            if ($convertToBool && self::is_bool($value)) {
+            if ($convertToBool && self::isBoolean($value)) {
                 $restoredVariables[$key] = (bool)$value;
                 continue;
             }
 
-            if (self::is_float($value)) {
-                $restoredVariables[$key] = (float)str_replace(',', '.',$value);
+            if (self::isFloat($value)) {
+                $restoredVariables[$key] = (float)str_replace(',', '.', $value);
                 continue;
             }
 
-            if (self::is_int($value)) {
+            if (self::isInteger($value)) {
                 $restoredVariables[$key] = (int)$value;
                 continue;
             }
@@ -64,7 +64,7 @@ class Variable
         return $restoredVariables;
     }
 
-    public static function is_float($variable, bool $strictCheck = false): bool
+    public static function isFloat($variable, bool $strictCheck = false): bool
     {
         if ($strictCheck === true) {
             return is_float($variable);
@@ -72,9 +72,9 @@ class Variable
 
         if (is_string($variable)
             && (strpos($variable, '.') !== false || strpos($variable, ',') !== false)
-            && is_numeric(str_replace(',', '.',$variable))
+            && is_numeric(str_replace(',', '.', $variable))
         ) {
-            $variable = (float)str_replace(',', '.',$variable);
+            $variable = (float)str_replace(',', '.', $variable);
 
             if (strpos((string)$variable, '.') === false) {
                 return false;
@@ -86,14 +86,14 @@ class Variable
         return false;
     }
 
-    public static function is_int($variable, bool $strictCheck = false): bool
+    public static function isInteger($variable, bool $strictCheck = false): bool
     {
         if ($strictCheck === true) {
             return is_int($variable);
         }
 
         if (is_string($variable) && is_numeric($variable)) {
-            $variable = (float)str_replace(',', '.',$variable);
+            $variable = (float)str_replace(',', '.', $variable);
 
             if (strpos((string)$variable, '.') === false) {
                 return true;
@@ -105,7 +105,7 @@ class Variable
         return false;
     }
 
-    public static function is_bool($variable, bool $strictCheck = false): bool
+    public static function isBoolean($variable, bool $strictCheck = false): bool
     {
         if ($strictCheck === true) {
             return is_bool($variable);

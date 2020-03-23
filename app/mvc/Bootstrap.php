@@ -152,10 +152,10 @@ class Bootstrap
              * Loading namespaces necessary to run namespaces cache manager
              */
             return [
-                'BaseMvc' => substr($this->config->application->mvcDir, 0, -1),
-                'Common' => $this->config->application->modulesDir . 'Common',
-                'Common\Task' => $this->config->application->modulesDir . 'Common/Task',
-                'Common\Service' => $this->config->application->modulesDir . 'Common/Service',
+                'BaseMvc' => $this->config->application->mvcDir,
+                'Common' => $this->config->application->modulesDir . '/Common',
+                'Common\Task' => $this->config->application->modulesDir . '/Common/Task',
+                'Common\Service' => $this->config->application->modulesDir . '/Common/Service',
             ];
         }
 
@@ -202,11 +202,20 @@ class Bootstrap
     {
         $request = $this->getModifiedRequest();
 
+        $routesClass = \Common\DefaultClasses\BaseRoutes::class;
+        if (class_exists('\\' . $request->getModule() . '\\Config\Routes')) {
+            $routesClass = '\\' . $request->getModule() . '\\Config\Routes';
+        }
+
+        $routes = new $routesClass($request);
+
         dd($request);
     }
 
     private function getModifiedRequest(): RequestEntity
     {
+        $modulesDir = $this->config->application->modulesDir;
+
         list($urlPath) = explode('?', $this->app->request->getURI());
 
         $request = (new RequestEntity())
@@ -233,7 +242,7 @@ class Bootstrap
                 ->setParams(Variable::restoreTypes(array_slice($urlSplitter, 2)));
         }
 
-        if (!File::exists($this->config->application->modulesDir . $request->getModule())) {
+        if (!File::exists($modulesDir . '/' . $request->getModule())) {
             throw new NotFoundApiException();
         }
 
