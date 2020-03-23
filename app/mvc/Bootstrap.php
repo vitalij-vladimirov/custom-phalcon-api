@@ -9,7 +9,6 @@ use Common\Variable;
 use Phalcon\Config;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Loader;
-use Phalcon\Mvc\Router;
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\View\Simple as View;
 use Phalcon\Url as UrlResolver;
@@ -17,7 +16,6 @@ use Common\Text;
 use Common\ApiException\NotFoundApiException;
 use Common\Service\CacheManager;
 use Common\Json;
-use Throwable;
 
 class Bootstrap
 {
@@ -25,7 +23,6 @@ class Bootstrap
     private FactoryDefault $services;
     private Loader $loader;
     private Micro $app;
-    private Router $router;
 
     public function runApp(): Micro
     {
@@ -202,14 +199,23 @@ class Bootstrap
     {
         $request = $this->getModifiedRequest();
 
-        $routesClass = \Common\DefaultClasses\BaseRoutes::class;
-        if (class_exists('\\' . $request->getModule() . '\\Config\Routes')) {
-            $routesClass = '\\' . $request->getModule() . '\\Config\Routes';
+        $routesClass = '\\' . $request->getModule() . '\\Config\Routes';
+        if (!class_exists($routesClass)) {
+            throw new NotFoundApiException();
         }
 
-        $routes = new $routesClass($request);
+        $app = $this->app;
+        $responseData = (new $routesClass($request))->get();
 
-        dd($request);
+        $this->app->{$request->getMethod()}(
+            $request->getPath(),
+            function () use ($app, $responseData) {
+                // TODO: describe different data types
+                $app->response
+                    ->setJsonContent($responseData)
+                    ->send();
+            }
+        );
     }
 
     private function getModifiedRequest(): RequestEntity

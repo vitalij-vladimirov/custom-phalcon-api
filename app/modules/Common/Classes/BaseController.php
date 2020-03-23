@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\DefaultClasses;
+namespace Common\Classes;
 
 use Dice\Dice;
 use Phalcon\Config;

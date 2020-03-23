@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Example\Controller;
 
-use Common\DefaultClasses\BaseController;
+use Common\Classes\BaseController;
 use Phalcon\Http\Response;
 
-class ExampleController extends \Phalcon\Mvc\Controller
+class ExampleController extends BaseController
 {
     const JOKES = [
         'Today at the bank, an old lady asked me to help check her balance. So I pushed her over.',
