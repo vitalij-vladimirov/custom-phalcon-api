@@ -1,21 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace BaseMvc;
+namespace Mvc;
 
-use Common\Entity\RequestEntity;
-use Common\File;
-use Common\Variable;
 use Phalcon\Config;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Loader;
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\View\Simple as View;
 use Phalcon\Url as UrlResolver;
-use Common\Text;
-use Common\ApiException\NotFoundApiException;
-use Common\Service\CacheManager;
-use Common\Json;
+use Exception;
 
 class Bootstrap
 {
@@ -31,17 +25,16 @@ class Bootstrap
 
         $this->app = new Micro($this->services);
 
-        /**
-         * Call default Phalcon Micro service routing
-         */
-//        $this->defaultRouter();
+        if (!empty($this->config->customRouter)) {
+            if (!isset(class_implements($this->config->customRouter)[\Mvc\RouterInterface::class])) {
+                throw new Exception('CustomRouter must implement \Mvc\RouterInterface');
+            }
 
-        /**
-         * Call modified routing
-         */
-        $this->modifiedRouter();
+            return (new $this->config->customRouter())
+                ->getRoutes($this->app, $this->config);
+        }
 
-        return $this->app;
+        return (new Routes())->getRoutes($this->app, $this->config);
     }
 
     public function runCli(): void
@@ -136,122 +129,14 @@ class Bootstrap
             $this->setupServices();
         }
 
-        /**
-         * Loading namespaces from cache
-         */
-        $namespacesCache = file_exists(CacheManager::NAMESPACES_CACHE_FILE) ?
-            (file_get_contents(CacheManager::NAMESPACES_CACHE_FILE) ?? null) :
-            null
-        ;
+        $namespacesCacheLocation = $this->config->application->namespacesCache;
 
-        if (!$namespacesCache) {
-            /**
-             * Loading namespaces necessary to run namespaces cache manager
-             */
-            return [
-                'BaseMvc' => $this->config->application->mvcDir,
-                'Common' => $this->config->application->modulesDir . '/Common',
-                'Common\Task' => $this->config->application->modulesDir . '/Common/Task',
-                'Common\Service' => $this->config->application->modulesDir . '/Common/Service',
-            ];
+        if (!file_exists($namespacesCacheLocation)) {
+            return $this->config->defaultNamespaces->toArray();
         }
 
-        return Json::decode($namespacesCache);
-    }
+        $namespacesCache = file_get_contents($namespacesCacheLocation);
 
-    /**
-     * Default Phalcon Micro routing
-     * You can setup routes here or call another Class to setup default routes
-     */
-    private function defaultRouter(): void
-    {
-        $app = $this->app;
-
-        $this->app->get('/api/test', function () use ($app) {
-            $app->response
-                ->setContentType('application/json; charset=utf-8')
-                ->sendHeaders()
-            ;
-
-            echo Json::encode([
-                'code' => 'success',
-                'message' => 'Test message.'
-            ]);
-        });
-
-        /**
-         * Display error in JSON as API
-         */
-        $this->app->notFound(function () {
-            throw new NotFoundApiException();
-        });
-
-//        /**
-//         * Display error in HTML as website
-//         */
-//        $this->app->notFound(function () {
-//            $this->app->response->setStatusCode(404, "Not Found")->sendHeaders();
-//            return $this->app['view']->render('404');
-//        });
-    }
-
-    private function modifiedRouter(): void
-    {
-        $request = $this->getModifiedRequest();
-
-        $routesClass = '\\' . $request->getModule() . '\\Config\Routes';
-        if (!class_exists($routesClass)) {
-            throw new NotFoundApiException();
-        }
-
-        $app = $this->app;
-        $responseData = (new $routesClass($request))->get();
-
-        $this->app->{$request->getMethod()}(
-            $request->getPath(),
-            function () use ($app, $responseData) {
-                // TODO: describe different data types
-                $app->response
-                    ->setJsonContent($responseData)
-                    ->send();
-            }
-        );
-    }
-
-    private function getModifiedRequest(): RequestEntity
-    {
-        $modulesDir = $this->config->application->modulesDir;
-
-        list($urlPath) = explode('?', $this->app->request->getURI());
-
-        $request = (new RequestEntity())
-            ->setMethod(Text::lower($this->app->request->getMethod()))
-            ->setQuery(Variable::restoreTypes($this->app->request->getQuery()))
-            ->setPath($urlPath)
-        ;
-
-        $urlSplitter = explode('/', $urlPath);
-
-        if (count($urlSplitter) < 2 || (count($urlSplitter) < 3 && $urlSplitter[1] === $request::REQUEST_TYPE_API)) {
-            throw new NotFoundApiException();
-        }
-
-        if ($urlSplitter[1] === $request::REQUEST_TYPE_API) {
-            $request
-                ->setType($request::REQUEST_TYPE_API)
-                ->setModule(Text::camelize($urlSplitter[2]))
-                ->setParams(Variable::restoreTypes(array_slice($urlSplitter, 3)));
-        } else {
-            $request
-                ->setType($request::REQUEST_TYPE_VIEW)
-                ->setModule(Text::camelize($urlSplitter[1]))
-                ->setParams(Variable::restoreTypes(array_slice($urlSplitter, 2)));
-        }
-
-        if (!File::exists($modulesDir . '/' . $request->getModule())) {
-            throw new NotFoundApiException();
-        }
-
-        return $request;
+        return json_decode($namespacesCache, true, JSON_PARTIAL_OUTPUT_ON_ERROR, JSON_THROW_ON_ERROR);
     }
 }

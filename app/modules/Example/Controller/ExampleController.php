@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Example\Controller;
 
-use Common\Classes\BaseController;
+use Common\BaseClasses\BaseController;
 use Phalcon\Http\Response;
 
 class ExampleController extends BaseController

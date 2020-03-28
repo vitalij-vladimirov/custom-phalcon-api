@@ -8,11 +8,6 @@ use Phalcon\Cli\Task;
 
 class CacheNamespacesTask extends Task
 {
-    /**
-     * Run namespace caching every 15 seconds
-     *
-     * @param string|null $type
-     */
     public function mainAction(string $type = null): void
     {
         /**
@@ -37,7 +32,7 @@ class CacheNamespacesTask extends Task
             return;
         }
 
-        echo 'Argument $type is incorrect' . PHP_EOL;
+        echo 'Error: Argument {type} is incorrect' . PHP_EOL;
 
         return;
     }

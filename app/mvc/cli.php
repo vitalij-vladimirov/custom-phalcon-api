@@ -2,8 +2,9 @@
 <?php
 declare(strict_types=1);
 
-namespace BaseMvc;
+namespace Mvc;
 
+use Phalcon\Config;
 use Phalcon\Di\FactoryDefault\Cli as CliDi;
 use Phalcon\Cli\Console as ConsoleApp;
 use Phalcon\Cli\Dispatcher;
@@ -14,7 +15,15 @@ use Exception;
 include '/app/vendor/autoload.php';
 include '/app/mvc/Bootstrap.php';
 
-(new Bootstrap())->runCli();
+$bootstrap = new Bootstrap();
+$bootstrap->runCli();
+
+/**
+ * Config can be called from anywhere using $GLOBALS['config']
+ *
+ * @var Config $config
+ */
+$config = $bootstrap->getConfig();
 
 new Cli($argv);
 // phpcs:enable
@@ -39,10 +48,7 @@ class Cli
     private function collectArguments(): void
     {
         if (!count($this->args) || in_array($this->args[0], ['-help', '--help', '-h'], true)) {
-            $this->module = 'Common';
-            $this->arguments['task'] = 'default';
-
-            $this->runTask();
+            $this->showHelp();
         }
 
         list($this->module, $this->arguments['task'], $this->arguments['action']) = explode(':', $this->args[0]);
@@ -101,5 +107,24 @@ class Cli
             echo $exception->getTraceAsString() . PHP_EOL;
             exit(255);
         }
+    }
+
+    private function showHelp()
+    {
+        echo PHP_EOL;
+        echo 'CLI call structure: cli Module:TaskName:ActionName ...parameters' . PHP_EOL;
+        echo '- Module folder name.' . PHP_EOL;
+        echo '- TaskName should be without `Task` in the end.' . PHP_EOL;
+        echo '- ActionName is optional, should be without `Action` in the end. Default action is `main`.' . PHP_EOL;
+        echo '- ...parameters are optional, should be separated with spaces.' . PHP_EOL;
+        echo PHP_EOL;
+        echo 'Examples:' . PHP_EOL;
+        echo '- cli Common:CacheNamespaces:main param1 param2' . PHP_EOL;
+        echo '- cli Common:CacheNamespaces:main' . PHP_EOL;
+        echo '- cli Common:CacheNamespaces param1 param2' . PHP_EOL;
+        echo '- cli Common:CacheNamespaces' . PHP_EOL;
+        echo PHP_EOL;
+
+        exit;
     }
 }

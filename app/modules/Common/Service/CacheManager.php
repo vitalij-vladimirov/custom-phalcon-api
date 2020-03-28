@@ -3,28 +3,34 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
+use Common\BaseClasses\BaseService;
 use Common\File;
 use Common\Json;
 
-class CacheManager
+class CacheManager extends BaseService
 {
-    public const NAMESPACES_CACHE_FILE = '/var/cache/phalcon/namespaces.json';
-
-    private const MODULES_DIRECTORIES = [
-        '/app/mvc' => 'BaseMvc',
-        '/app/modules' => '',
-    ];
-
     private const IGNORE_FILES = [
         '.',
         '..'
     ];
 
+    private array $modulesDirectories;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->modulesDirectories = [
+            $this->config->application->mvcDir => 'Mvc',
+            $this->config->application->modulesDir => '',
+        ];
+    }
+
     public function cacheNamespaces(): void
     {
         $namespaces = [];
 
-        foreach (self::MODULES_DIRECTORIES as $modulesDir => $namespaceBegin) {
+        foreach ($this->modulesDirectories as $modulesDir => $namespaceBegin) {
             $modulesDirs = $this->generateDirectoriesList($modulesDir);
 
             if (!empty($namespaceBegin)) {
@@ -41,12 +47,13 @@ class CacheManager
 
         $namespacesJson = Json::encode($namespaces);
 
-        $fileExists = File::exists(self::NAMESPACES_CACHE_FILE);
-        if ($fileExists && File::getInfo(self::NAMESPACES_CACHE_FILE)->getHash() === md5($namespacesJson)) {
+        $fileExists = File::exists($this->config->application->namespacesCache);
+        if ($fileExists && File::getInfo($this->config->application->namespacesCache)
+                ->getHash() === md5($namespacesJson)) {
             return;
         }
 
-        File::write(self::NAMESPACES_CACHE_FILE, $namespacesJson);
+        File::write($this->config->application->namespacesCache, $namespacesJson);
     }
 
     private function generateDirectoriesList(string $directory): array

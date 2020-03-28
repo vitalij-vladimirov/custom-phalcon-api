@@ -1,8 +1,15 @@
 <?php
 
+namespace Mvc;
+
 use Phalcon\Config;
+use Phalcon\Mvc\Micro;
 
 return new Config([
+
+    // To use default Router comment or delete this line.
+    'customRouter'  => \Common\Service\CustomRouter::class,
+
     'database' => [
         'adapter'    => getenv('DB_CONNECTION'),
         'host'       => getenv('DB_HOST'),
@@ -14,12 +21,20 @@ return new Config([
     ],
 
     'application' => [
-        'mvcDir'        => '/app/mvc',
-        'modulesDir'    => '/app/modules',
-        'migrationsDir' => '/app/db/migrations',
-        'seedsDir'      => '/app/db/seeds',
-        'viewsDir'      => '/app/views',
-        'cacheDir'      => '/var/cache/phalcon',
-        'baseUri'       => '/',
+        'baseUri'           => '/',
+        'mvcDir'            => '/app/mvc',
+        'modulesDir'        => '/app/modules',
+        'migrationsDir'     => '/app/db/migrations',
+        'seedsDir'          => '/app/db/seeds',
+        'viewsDir'          => '/app/views',
+        'cacheDir'          => '/var/cache/phalcon',
+        'namespacesCache'   => '/var/cache/phalcon/namespaces.json',
+    ],
+
+    'defaultNamespaces' => [
+        'Mvc' => '/app/mvc',
+        'Common' => '/app/modules/Common',
+        'Common\Task' => '/app/modules/Common/Task',
+        'Common\Service' => '/app/modules/Common/Service',
     ],
 ]);

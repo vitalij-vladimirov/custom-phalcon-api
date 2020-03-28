@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\Classes;
+namespace Common\BaseClasses;
 
 use Dice\Dice;
 use Phalcon\Config;
 
 abstract class BaseController
 {
-    private Config $config;
-    private Dice $di;
+    protected Config $config;
+    protected Dice $di;
 
     public function __construct()
     {

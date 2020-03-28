@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\Classes;
+namespace Common\BaseClasses;
 
 use Common\Interfaces\RoutesInterface;
 use Common\Entity\RequestEntity;

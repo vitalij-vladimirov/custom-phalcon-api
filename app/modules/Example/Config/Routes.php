@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Example\Config;
 
-use Common\Classes\BaseRoutes;
+use Common\BaseClasses\BaseRoutes;
 
 class Routes extends BaseRoutes
 {

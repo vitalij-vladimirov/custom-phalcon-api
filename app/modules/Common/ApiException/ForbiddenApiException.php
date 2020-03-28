@@ -9,8 +9,9 @@ class ForbiddenApiException extends ApiException
 {
     public function __construct(
         string $message = 'Forbidden',
-        string $code = DefaultErrorCodes::FORBIDDEN
+        string $code = DefaultErrorCodes::FORBIDDEN,
+        array $data = []
     ) {
-        parent::__construct($message, $code, 403);
+        parent::__construct($message, $code, 403, $data);
     }
 }

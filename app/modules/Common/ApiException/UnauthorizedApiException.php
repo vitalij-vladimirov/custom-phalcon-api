@@ -9,8 +9,9 @@ class UnauthorizedApiException extends ApiException
 {
     public function __construct(
         string $message = 'Unauthorized',
-        string $code = DefaultErrorCodes::UNAUTHORIZED
+        string $code = DefaultErrorCodes::UNAUTHORIZED,
+        array $data = []
     ) {
-        parent::__construct($message, $code, 401);
+        parent::__construct($message, $code, 401, $data);
     }
 }
