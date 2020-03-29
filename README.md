@@ -29,3 +29,16 @@ This is Docker based Phalcon API with structured framework and MySQL 8.0 DB. Bui
 - DB files are saved in `./data/mysql` and mysql logs in `./data/log`.
 - In Linux distributions you have to `chmod 0777` both dirs.
 - Sometimes only total clearing of these dirs helps. In Linux you can run `sudo ./data/clear.sh` to do it.
+
+#### PHP Storm IDE templates
+
+**If you use PHP Storm you can import these settings to automate:**
+- Routes creation
+- Controller creation
+- Service creation
+- Task creation
+- Getters and Setters creation
+
+**Notes:**
+- Only templates will be imported. All other settings should stay the same.
+- I suggest you to create current PHP Storm settings backup before importing my examples.

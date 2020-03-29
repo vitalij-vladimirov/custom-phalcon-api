@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-class RouteEntity
+use Common\BaseClasses\BaseEntity;
+
+class RouteEntity extends BaseEntity
 {
     private string $controller;
     private string $action;

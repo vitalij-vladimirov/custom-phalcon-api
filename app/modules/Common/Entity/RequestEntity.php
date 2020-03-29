@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-class RequestEntity
+use Common\BaseClasses\BaseEntity;
+
+class RequestEntity extends BaseEntity
 {
     public const REQUEST_TYPE_API = 'api';
     public const REQUEST_TYPE_VIEW = 'view';

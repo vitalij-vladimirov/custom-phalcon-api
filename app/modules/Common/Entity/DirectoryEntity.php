@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-class DirectoryEntity
+use Common\BaseClasses\BaseEntity;
+
+class DirectoryEntity extends BaseEntity
 {
     private string $name;
     private string $path;

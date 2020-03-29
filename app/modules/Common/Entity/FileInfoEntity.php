@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Common\Entity;
 
 use Carbon\Carbon;
+use Common\BaseClasses\BaseEntity;
 
-class FileInfoEntity
+class FileInfoEntity extends BaseEntity
 {
     private string $name;
     private string $ext;

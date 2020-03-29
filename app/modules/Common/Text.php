@@ -7,8 +7,26 @@ use Phalcon\Text as PhalconText;
 
 class Text extends PhalconText
 {
-    public function lowerCamelize(string $variable): string
+    public static function lowerCamelize(string $value): string
     {
-        return lcfirst(self::camelize($variable));
+        return lcfirst(self::camelize($value));
+    }
+
+    public static function uncamelizeMethod(string $value): string
+    {
+        if (Regex::isMethodName($value, Regex::METHOD_SET_GET)) {
+            $value = preg_replace('/^(get|is|set)/', '', $value);
+        }
+
+        return self::uncamelize($value);
+    }
+
+    public static function methodToVariable(string $value): string
+    {
+        if (Regex::isMethodName($value, Regex::METHOD_GET)) {
+            $value = preg_replace('/^(get|is|set)/', '', $value);
+        }
+
+        return lcfirst($value);
     }
 }
