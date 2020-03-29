@@ -72,14 +72,28 @@ abstract class BaseEntity
         return $array;
     }
 
-    public function toEntity($data, $emptyToNull = false)
+    public function toEntity($data)
     {
         if (Variable::isObject($data)) {
             try {
-                $data = $data->toArray();
+                $array = $data->toArray();
             } catch (Throwable $exception) {
-                throw new BadRequestException('Can\'t convert {data} object');
+                try {
+                    foreach ($data as $key => $value) {
+                        $array[Text::uncamelizeMethod($key)] = $value;
+                    }
+                } catch (Throwable $exception) {
+                    throw new BadRequestException('Can\'t convert {data} object');
+                }
             }
+        }
+
+        if (Variable::isArray($data)) {
+            $array = $data;
+        }
+
+        if (!isset($array)) {
+            throw new BadRequestException('{data} type must be array or object');
         }
 
         $array = Variable::restoreTypes($data);

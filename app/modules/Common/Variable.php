@@ -182,6 +182,11 @@ class Variable
             && in_array($variable, ['0', '1', 0, 1], true);
     }
 
+    public static function isArray($variable): bool
+    {
+        return is_array($variable);
+    }
+
     public static function isObject($variable): bool
     {
         return gettype($variable) === self::VAR_TYPE_OBJECT;
