@@ -17,7 +17,7 @@ class Json
 
     public static function isJson($variable): bool
     {
-        if (!Variable::isString($variable)) {
+        if (!Variable::isString($variable, true)) {
             return false;
         }
 

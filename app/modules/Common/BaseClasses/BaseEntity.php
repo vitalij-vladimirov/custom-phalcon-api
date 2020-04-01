@@ -96,7 +96,7 @@ abstract class BaseEntity
             throw new BadRequestException('{data} type must be array or object');
         }
 
-        $array = Variable::restoreTypes($data);
+        $array = Variable::restoreArrayTypes($data);
 
         foreach (get_class_methods($this) as $method) {
             if (Regex::isMethodName($method, Regex::METHOD_SET) && $this->isMethodPublic($method)) {

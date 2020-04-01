@@ -6,6 +6,9 @@ namespace Common;
 use Carbon\Carbon;
 use DateTimeImmutable;
 use DateTime;
+use Dice\Dice;
+use Exception;
+use Throwable;
 
 class Variable
 {
@@ -16,6 +19,8 @@ class Variable
     public const VAR_TYPE_ARRAY = 'array';
     public const VAR_TYPE_OBJECT = 'object';
     public const VAR_TYPE_NULL = 'null';
+
+    public const VAR_TYPE_JSON = 'json';
 
     public const DEFAULT_VAR_TYPES = [
         self::VAR_TYPE_STRING,
@@ -37,7 +42,7 @@ class Variable
      * @param bool $convertToBool   - convert [0 & 1] to [false & true]
      * @return array
      */
-    public static function restoreTypes(
+    public static function restoreArrayTypes(
         array $variables,
         bool $trimString = true,
         bool $convertToNull = true,
@@ -50,7 +55,7 @@ class Variable
                 $value = trim($value);
             }
 
-            if ($convertToBool && self::isBoolean($value)) {
+            if ($convertToBool && self::isBool($value)) {
                 $restoredVariables[$key] = (bool)$value;
                 continue;
             }
@@ -65,8 +70,8 @@ class Variable
                 continue;
             }
 
-            if (self::isString($value) && Json::isJson($value)) {
-                $restoredVariables[$key] = self::restoreTypes(Json::decode($value));
+            if (Json::isJson($value)) {
+                $restoredVariables[$key] = self::restoreArrayTypes(Json::decode($value));
                 continue;
             }
 
@@ -76,7 +81,7 @@ class Variable
             }
 
             if (is_array($value)) {
-                $restoredVariables[$key] = self::restoreTypes($value);
+                $restoredVariables[$key] = self::restoreArrayTypes($value);
                 continue;
             }
 
@@ -86,39 +91,66 @@ class Variable
         return $restoredVariables;
     }
 
+    /**
+     * @param Carbon|DateTime|DateTimeImmutable $object
+     * @param bool $toTimestamp
+     * @param string $format
+     * @return int|string
+     * @throws Exception
+     */
     public static function convertTimeObjectToString(
         $object,
         bool $toTimestamp = true,
         string $format = 'Y-m-d H:i:s'
     ) {
-        if (self::isDateTime($object) || self::isDateTimeImmutable($object)) {
-            $dateTime = Carbon::instance($object);
-        } else {
-            $dateTime = $object;
+        if (self::isObject($object, \DateTime::class)
+            || self::isObject($object, \DateTimeImmutable::class)
+        ) {
+            $object = Carbon::instance($object);
         }
 
         if ($toTimestamp) {
-            return $dateTime->timestamp;
+            return $object->timestamp;
         }
-        return $dateTime->format($format);
+
+        return $object->format($format);
     }
 
-    public static function getType($variable): string
+    public static function getType($variable, bool $strictCheck = false): string
     {
-        $type = gettype($variable);
-
-        switch ($type) {
-            case 'integer':
-                return self::VAR_TYPE_INT;
-            case 'double':
-                return self::VAR_TYPE_FLOAT;
-            case 'boolean':
-                return self::VAR_TYPE_BOOL;
-            case 'NULL':
-                return self::VAR_TYPE_NULL;
+        if ($variable === null || gettype($variable) === 'NULL') {
+            return self::VAR_TYPE_NULL;
         }
 
-        return $type;
+        if (self::isString($variable, $strictCheck)) {
+            return self::VAR_TYPE_STRING;
+        }
+
+        if (self::isInteger($variable, $strictCheck)) {
+            return self::VAR_TYPE_INT;
+        }
+
+        if (self::isFloat($variable, $strictCheck)) {
+            return self::VAR_TYPE_FLOAT;
+        }
+
+        if (self::isBool($variable, $strictCheck)) {
+            return self::VAR_TYPE_BOOL;
+        }
+
+        if (self::isObject($variable)) {
+            return self::VAR_TYPE_OBJECT;
+        }
+
+        if (self::isArray($variable)) {
+            return self::VAR_TYPE_ARRAY;
+        }
+
+        if (Json::isJson($variable)) {
+            return self::VAR_TYPE_JSON;
+        }
+
+        return gettype($variable);
     }
 
     public static function isDefaultType(string $type): bool
@@ -126,27 +158,37 @@ class Variable
         return in_array($type, self::DEFAULT_VAR_TYPES, true);
     }
 
-    public static function isString($variable): bool
+    public static function isString($variable, bool $strictCheck = false): bool
     {
-        return is_string($variable);
+        if ($strictCheck) {
+            return is_string($variable);
+        }
+
+        return is_string($variable)
+            && !is_numeric(str_replace(',', '.', $variable))
+            && !Json::isJson($variable)
+        ;
     }
 
     public static function isFloat($variable, bool $strictCheck = false): bool
     {
-        if ($strictCheck === true) {
-            return is_float($variable);
+        if (is_float($variable) && ($strictCheck || $variable != (int)$variable)) {
+            return true;
         }
 
-        if (self::isString($variable)
-            && (strpos($variable, '.') !== false || strpos($variable, ',') !== false)
-            && is_numeric(str_replace(',', '.', $variable))
-        ) {
-            $variable = (float)str_replace(',', '.', $variable);
+        if ($strictCheck) {
+            return false;
+        }
 
-            if (strpos((string)$variable, '.') === false) {
-                return false;
-            }
+        $variable = str_replace(',', '.', $variable);
 
+        if (!is_numeric($variable)) {
+            return false;
+        }
+
+        $variable = (float)str_replace(',', '.', $variable);
+
+        if ($variable != (int)$variable) {
             return true;
         }
 
@@ -155,31 +197,40 @@ class Variable
 
     public static function isInteger($variable, bool $strictCheck = false): bool
     {
-        if ($strictCheck === true) {
-            return is_int($variable);
+        if (is_int($variable)) {
+            return true;
         }
 
-        if (self::isString($variable) && is_numeric($variable)) {
-            $variable = (float)str_replace(',', '.', $variable);
-
-            if (strpos((string)$variable, '.') === false) {
-                return true;
-            }
-
+        if ($strictCheck || is_bool($variable)) {
             return false;
+        }
+
+        $variable = str_replace(',', '.', $variable);
+
+        if (!is_numeric($variable)) {
+            return false;
+        }
+
+        $variable = (float)str_replace(',', '.', $variable);
+
+        if ($variable == (int)$variable) {
+            return true;
         }
 
         return false;
     }
 
-    public static function isBoolean($variable, bool $strictCheck = false): bool
+    public static function isBool($variable, bool $strictCheck = true): bool
     {
-        if ($strictCheck === true) {
-            return is_bool($variable);
+        if (is_bool($variable)) {
+            return true;
         }
 
-        return (is_int($variable) || (self::isString($variable) && is_numeric($variable)))
-            && in_array($variable, ['0', '1', 0, 1], true);
+        if ($strictCheck) {
+            return false;
+        }
+
+        return in_array($variable, ['0', '1', 0, 1], true);
     }
 
     public static function isArray($variable): bool
@@ -187,24 +238,36 @@ class Variable
         return is_array($variable);
     }
 
-    public static function isObject($variable): bool
+    /**
+     * @param mixed $variable
+     * @param object|string|null $instanceOf
+     * @return bool
+     */
+    public static function isObject($variable, $instanceOf = null): bool
     {
-        return gettype($variable) === self::VAR_TYPE_OBJECT;
-    }
+        if (gettype($variable) !== self::VAR_TYPE_OBJECT) {
+            return false;
+        }
 
-    public static function isCarbon($variable): bool
-    {
-        return self::isObject($variable) && $variable instanceof Carbon;
-    }
+        if ($instanceOf === null) {
+            return true;
+        }
 
-    public static function isDateTime($variable): bool
-    {
-        return self::isObject($variable) && $variable instanceof DateTime;
-    }
+        if (gettype($instanceOf) === self::VAR_TYPE_OBJECT) {
+            return $variable instanceof $instanceOf;
+        }
 
-    public static function isDateTimeImmutable($variable): bool
-    {
-        return self::isObject($variable) && $variable instanceof DateTimeImmutable;
+        if (self::isString($instanceOf)) {
+            try {
+                $object = (new Dice())->create($instanceOf);
+            } catch (Throwable $exception) {
+                return false;
+            }
+
+            return $variable instanceof $object;
+        }
+
+        return false;
     }
 
     public static function isDateTimeObject($variable): bool
