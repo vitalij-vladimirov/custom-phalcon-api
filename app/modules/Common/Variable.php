@@ -50,45 +50,78 @@ class Variable
     ): array {
         $restoredVariables = [];
 
-        foreach ($variables as $key => $value) {
-            if ($trimString && self::isString($value)) {
-                $value = trim($value);
-            }
-
-            if ($convertToBool && self::isBool($value)) {
-                $restoredVariables[$key] = (bool)$value;
-                continue;
-            }
-
-            if (self::isFloat($value)) {
-                $restoredVariables[$key] = (float)str_replace(',', '.', $value);
-                continue;
-            }
-
-            if (self::isInteger($value)) {
-                $restoredVariables[$key] = (int)$value;
-                continue;
-            }
-
-            if (Json::isJson($value)) {
-                $restoredVariables[$key] = self::restoreArrayTypes(Json::decode($value));
-                continue;
-            }
-
-            if ($convertToNull && empty($value)) {
-                $restoredVariables[$key] = null;
-                continue;
-            }
-
-            if (is_array($value)) {
-                $restoredVariables[$key] = self::restoreArrayTypes($value);
-                continue;
-            }
-
-            $restoredVariables[$key] = $value;
+        foreach ($variables as $key => $variable) {
+            $restoredVariables[$key] = self::restoreVariableType(
+                $variable,
+                $trimString,
+                $convertToNull,
+                $convertToBool
+            );
         }
 
         return $restoredVariables;
+    }
+
+    /**
+     * @param mixed $variable
+     * @param bool $trimString
+     * @param bool $convertToNull
+     * @param bool $convertToBool
+     * @return mixed
+     */
+    public static function restoreVariableType(
+        $variable,
+        bool $trimString = true,
+        bool $convertToNull = true,
+        bool $convertToBool = false
+    ) {
+        if ($trimString && self::isString($variable)) {
+            $variable = trim($variable);
+        }
+
+        if (self::isBool($variable, true)
+            || ($convertToBool && self::isBool($variable, false))
+        ) {
+            if (in_array(
+                is_string($variable) ? strtolower($variable) : $variable,
+                ['1', 1, 'y', 'yes', 'true', 't'],
+                true
+            )) {
+                return true;
+            }
+
+            if (in_array(
+                is_string($variable) ? strtolower($variable) : $variable,
+                ['0', 0, 'n', 'no', 'false', 'f'],
+                true
+            )) {
+                return false;
+            }
+
+            return (bool)$variable;
+        }
+
+        if (self::isInteger($variable)) {
+            return (int)$variable;
+        }
+
+        if (self::isFloat($variable)) {
+            return (float)str_replace(',', '.', $variable);
+        }
+
+        if (Json::isJson($variable)) {
+            return self::restoreArrayTypes(Json::decode($variable));
+        }
+
+        if ($convertToNull && empty($variable)) {
+            return null;
+        }
+
+        if (self::isArray($variable)) {
+            return self::restoreArrayTypes($variable);
+        }
+
+        return $variable;
     }
 
     /**
@@ -116,25 +149,25 @@ class Variable
         return $object->format($format);
     }
 
-    public static function getType($variable, bool $strictCheck = false): string
+    public static function getType($variable, bool $defaultCheck = false): string
     {
         if ($variable === null || gettype($variable) === 'NULL') {
             return self::VAR_TYPE_NULL;
         }
 
-        if (self::isString($variable, $strictCheck)) {
+        if (self::isString($variable, $defaultCheck)) {
             return self::VAR_TYPE_STRING;
         }
 
-        if (self::isInteger($variable, $strictCheck)) {
+        if (self::isInteger($variable, $defaultCheck)) {
             return self::VAR_TYPE_INT;
         }
 
-        if (self::isFloat($variable, $strictCheck)) {
+        if (self::isFloat($variable, $defaultCheck)) {
             return self::VAR_TYPE_FLOAT;
         }
 
-        if (self::isBool($variable, $strictCheck)) {
+        if (self::isBool($variable, $defaultCheck)) {
             return self::VAR_TYPE_BOOL;
         }
 
@@ -158,10 +191,20 @@ class Variable
         return in_array($type, self::DEFAULT_VAR_TYPES, true);
     }
 
-    public static function isString($variable, bool $strictCheck = false): bool
+    public static function isString($variable, bool $defaultCheck = false): bool
     {
-        if ($strictCheck) {
+        if ($defaultCheck) {
             return is_string($variable);
+        }
+
+        if (is_string($variable)
+            && in_array(
+                strtolower($variable),
+                ['0', '1', 'y', 'yes', 'n', 'no', 'true', 'false', 't', 'f'],
+                true
+            )
+        ) {
+            return false;
         }
 
         return is_string($variable)
@@ -170,13 +213,13 @@ class Variable
         ;
     }
 
-    public static function isFloat($variable, bool $strictCheck = false): bool
+    public static function isFloat($variable, bool $defaultCheck = false): bool
     {
-        if (is_float($variable) && ($strictCheck || $variable != (int)$variable)) {
+        if (is_float($variable) && ($defaultCheck || $variable != (int)$variable)) {
             return true;
         }
 
-        if ($strictCheck) {
+        if ($defaultCheck) {
             return false;
         }
 
@@ -195,13 +238,13 @@ class Variable
         return false;
     }
 
-    public static function isInteger($variable, bool $strictCheck = false): bool
+    public static function isInteger($variable, bool $defaultCheck = false): bool
     {
         if (is_int($variable)) {
             return true;
         }
 
-        if ($strictCheck || is_bool($variable)) {
+        if ($defaultCheck || is_bool($variable)) {
             return false;
         }
 
@@ -220,17 +263,21 @@ class Variable
         return false;
     }
 
-    public static function isBool($variable, bool $strictCheck = true): bool
+    public static function isBool($variable, bool $defaultCheck = true): bool
     {
         if (is_bool($variable)) {
             return true;
         }
 
-        if ($strictCheck) {
+        if ($defaultCheck) {
             return false;
         }
 
-        return in_array($variable, ['0', '1', 0, 1], true);
+        return in_array(
+            is_string($variable) ? strtolower($variable) : $variable,
+            ['0', '1', 0, 1, 'y', 'yes', 'n', 'no', 'true', 'false', 't', 'f'],
+            true
+        );
     }
 
     public static function isArray($variable): bool

@@ -7,7 +7,7 @@ use Phalcon\Text as PhalconText;
 
 class Text extends PhalconText
 {
-    public static function lowerCamelize(string $value): string
+    public static function pascalize(string $value): string
     {
         return lcfirst(self::camelize($value));
     }

@@ -25,6 +25,8 @@ class VariableTest extends BaseTest
     private const VAR_FLOAT_INT_STR_COMMA = '1,0';
     private const VAR_BOOL_T = true;
     private const VAR_BOOL_F = false;
+    private const VAR_STRING_BOOL_T = 'y';
+    private const VAR_STRING_BOOL_F = 'n';
     private const VAR_ARRAY = ['t' => 1];
     private const VAR_NULL = null;
     private const VAR_JSON = '{"t":1}';
@@ -47,6 +49,8 @@ class VariableTest extends BaseTest
         $this->assertFalse(Variable::isInteger(self::VAR_FLOAT_INT_STR_COMMA, true));
         $this->assertFalse(Variable::isInteger(self::VAR_BOOL_T, true));
         $this->assertFalse(Variable::isInteger(self::VAR_BOOL_F, true));
+        $this->assertFalse(Variable::isInteger(self::VAR_STRING_BOOL_T, true));
+        $this->assertFalse(Variable::isInteger(self::VAR_STRING_BOOL_F, true));
         $this->assertFalse(Variable::isInteger(self::VAR_ARRAY, true));
         $this->assertFalse(Variable::isInteger(self::VAR_NULL, true));
         $this->assertFalse(Variable::isInteger(self::VAR_JSON, true));
@@ -73,6 +77,8 @@ class VariableTest extends BaseTest
         $this->assertFalse(Variable::isInteger(self::VAR_FLOAT_STR_COMMA));
         $this->assertFalse(Variable::isInteger(self::VAR_BOOL_T));
         $this->assertFalse(Variable::isInteger(self::VAR_BOOL_F));
+        $this->assertFalse(Variable::isInteger(self::VAR_STRING_BOOL_T));
+        $this->assertFalse(Variable::isInteger(self::VAR_STRING_BOOL_F));
         $this->assertFalse(Variable::isInteger(self::VAR_ARRAY));
         $this->assertFalse(Variable::isInteger(self::VAR_NULL));
         $this->assertFalse(Variable::isInteger(self::VAR_JSON));
@@ -97,6 +103,8 @@ class VariableTest extends BaseTest
         $this->assertFalse(Variable::isFloat(self::VAR_FLOAT_INT_STR_COMMA, true));
         $this->assertFalse(Variable::isFloat(self::VAR_BOOL_T, true));
         $this->assertFalse(Variable::isFloat(self::VAR_BOOL_F, true));
+        $this->assertFalse(Variable::isFloat(self::VAR_STRING_BOOL_T, true));
+        $this->assertFalse(Variable::isFloat(self::VAR_STRING_BOOL_F, true));
         $this->assertFalse(Variable::isFloat(self::VAR_ARRAY, true));
         $this->assertFalse(Variable::isFloat(self::VAR_NULL, true));
         $this->assertFalse(Variable::isFloat(self::VAR_JSON, true));
@@ -123,6 +131,8 @@ class VariableTest extends BaseTest
         $this->assertFalse(Variable::isFloat(self::VAR_FLOAT_INT_STR_COMMA));
         $this->assertFalse(Variable::isFloat(self::VAR_BOOL_T));
         $this->assertFalse(Variable::isFloat(self::VAR_BOOL_F));
+        $this->assertFalse(Variable::isFloat(self::VAR_STRING_BOOL_T));
+        $this->assertFalse(Variable::isFloat(self::VAR_STRING_BOOL_F));
         $this->assertFalse(Variable::isFloat(self::VAR_ARRAY));
         $this->assertFalse(Variable::isFloat(self::VAR_NULL));
         $this->assertFalse(Variable::isFloat(self::VAR_JSON));
@@ -140,6 +150,8 @@ class VariableTest extends BaseTest
         $this->assertTrue(Variable::isString(self::VAR_FLOAT_STR_COMMA, true));
         $this->assertTrue(Variable::isString(self::VAR_FLOAT_INT_STR_COMMA, true));
         $this->assertTrue(Variable::isString(self::VAR_JSON, true));
+        $this->assertTrue(Variable::isString(self::VAR_STRING_BOOL_T, true));
+        $this->assertTrue(Variable::isString(self::VAR_STRING_BOOL_F, true));
 
         // Non-string
         $this->assertFalse(Variable::isString(self::VAR_FLOAT, true));
@@ -166,6 +178,8 @@ class VariableTest extends BaseTest
         $this->assertFalse(Variable::isString(self::VAR_FLOAT_STR_COMMA));
         $this->assertFalse(Variable::isString(self::VAR_FLOAT_INT_STR_COMMA));
         $this->assertFalse(Variable::isString(self::VAR_JSON));
+        $this->assertFalse(Variable::isString(self::VAR_STRING_BOOL_T));
+        $this->assertFalse(Variable::isString(self::VAR_STRING_BOOL_F));
 
         // Non-string
         $this->assertFalse(Variable::isString(self::VAR_FLOAT, true));
@@ -186,6 +200,8 @@ class VariableTest extends BaseTest
         $this->assertTrue(Variable::isBool(self::VAR_BOOL_F, true));
         
         // Non-boolean
+        $this->assertFalse(Variable::isBool(self::VAR_STRING_BOOL_T, true));
+        $this->assertFalse(Variable::isBool(self::VAR_STRING_BOOL_F, true));
         $this->assertFalse(Variable::isBool(self::VAR_STRING, true));
         $this->assertFalse(Variable::isBool(self::VAR_INT_STR, true));
         $this->assertFalse(Variable::isBool(self::VAR_FLOAT_E_STR, true));
@@ -214,6 +230,8 @@ class VariableTest extends BaseTest
         $this->assertTrue(Variable::isBool(self::VAR_INT, false));
         $this->assertTrue(Variable::isBool(0, false));
         $this->assertTrue(Variable::isBool('0', false));
+        $this->assertTrue(Variable::isBool(self::VAR_STRING_BOOL_T, false));
+        $this->assertTrue(Variable::isBool(self::VAR_STRING_BOOL_F, false));
 
         // Non-boolean
         $this->assertFalse(Variable::isBool(self::VAR_STRING, false));
@@ -239,6 +257,8 @@ class VariableTest extends BaseTest
         // Non-array
         $this->assertFalse(Variable::isArray(self::VAR_BOOL_T));
         $this->assertFalse(Variable::isArray(self::VAR_BOOL_F));
+        $this->assertFalse(Variable::isArray(self::VAR_STRING_BOOL_T));
+        $this->assertFalse(Variable::isArray(self::VAR_STRING_BOOL_F));
         $this->assertFalse(Variable::isArray(self::VAR_INT_STR));
         $this->assertFalse(Variable::isArray(self::VAR_INT));
         $this->assertFalse(Variable::isArray(self::VAR_STRING));
@@ -263,6 +283,8 @@ class VariableTest extends BaseTest
         // Non-object
         $this->assertFalse(Variable::isObject(self::VAR_BOOL_T));
         $this->assertFalse(Variable::isObject(self::VAR_BOOL_F));
+        $this->assertFalse(Variable::isObject(self::VAR_STRING_BOOL_T));
+        $this->assertFalse(Variable::isObject(self::VAR_STRING_BOOL_F));
         $this->assertFalse(Variable::isObject(self::VAR_INT_STR));
         $this->assertFalse(Variable::isObject(self::VAR_INT));
         $this->assertFalse(Variable::isObject(self::VAR_STRING));
@@ -311,54 +333,60 @@ class VariableTest extends BaseTest
 
     public function testWillValidateStrictTypeDetection(): void
     {
-        $this->assertEquals(Variable::getType(self::VAR_BOOL_T), 'bool');
-        $this->assertEquals(Variable::getType(self::VAR_BOOL_F), 'bool');
+        $this->assertEquals('bool', Variable::getType(self::VAR_BOOL_T));
+        $this->assertEquals('bool', Variable::getType(self::VAR_BOOL_F));
 
-        $this->assertNotEquals(Variable::getType(1), 'bool');
-        $this->assertNotEquals(Variable::getType(0), 'bool');
-        $this->assertNotEquals(Variable::getType(1.0), 'bool');
+        $this->assertEquals('bool', Variable::getType(self::VAR_STRING_BOOL_T));
+        $this->assertEquals('bool', Variable::getType(self::VAR_STRING_BOOL_F));
 
-        $this->assertEquals(Variable::getType(Carbon::now(), true), 'object');
-        $this->assertEquals(Variable::getType(self::VAR_INT_STR, true), 'string');
-        $this->assertEquals(Variable::getType(self::VAR_STRING, true), 'string');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_E_STR, true), 'string');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_STR, true), 'string');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_INT_STR, true), 'string');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_STR_COMMA, true), 'string');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_INT_STR_COMMA, true), 'string');
-        $this->assertEquals(Variable::getType(self::VAR_JSON, true), 'string');
-        $this->assertEquals(Variable::getType(self::VAR_INT, true), 'int');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT, true), 'float');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_E, true), 'float');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_INT, true), 'float');
-        $this->assertEquals(Variable::getType(self::VAR_NULL, true), 'null');
-        $this->assertEquals(Variable::getType(self::VAR_ARRAY, true), 'array');
+        $this->assertNotEquals('bool', Variable::getType(1));
+        $this->assertNotEquals('bool', Variable::getType(0));
+        $this->assertNotEquals('bool', Variable::getType(1.0));
+
+        $this->assertEquals('object', Variable::getType(Carbon::now(), true));
+        $this->assertEquals('string', Variable::getType(self::VAR_INT_STR, true));
+        $this->assertEquals('string', Variable::getType(self::VAR_STRING, true));
+        $this->assertEquals('string', Variable::getType(self::VAR_FLOAT_E_STR, true));
+        $this->assertEquals('string', Variable::getType(self::VAR_FLOAT_STR, true));
+        $this->assertEquals('string', Variable::getType(self::VAR_FLOAT_INT_STR, true));
+        $this->assertEquals('string', Variable::getType(self::VAR_FLOAT_STR_COMMA, true));
+        $this->assertEquals('string', Variable::getType(self::VAR_FLOAT_INT_STR_COMMA, true));
+        $this->assertEquals('string', Variable::getType(self::VAR_JSON, true));
+        $this->assertEquals('int', Variable::getType(self::VAR_INT, true));
+        $this->assertEquals('float', Variable::getType(self::VAR_FLOAT, true));
+        $this->assertEquals('float', Variable::getType(self::VAR_FLOAT_E, true));
+        $this->assertEquals('float', Variable::getType(self::VAR_FLOAT_INT, true));
+        $this->assertEquals('null', Variable::getType(self::VAR_NULL, true));
+        $this->assertEquals('array', Variable::getType(self::VAR_ARRAY, true));
     }
 
     public function testWillValidateNonStrictTypeDetection(): void
     {
-        $this->assertEquals(Variable::getType(self::VAR_BOOL_T, false), 'bool');
-        $this->assertEquals(Variable::getType(self::VAR_BOOL_F, false), 'bool');
+        $this->assertEquals('bool', Variable::getType(self::VAR_BOOL_T, false));
+        $this->assertEquals('bool', Variable::getType(self::VAR_BOOL_F, false));
 
-        $this->assertNotEquals(Variable::getType(1, false), 'bool');
-        $this->assertNotEquals(Variable::getType(0, false), 'bool');
-        $this->assertNotEquals(Variable::getType(1.0, false), 'bool');
+        $this->assertEquals('bool', Variable::getType(self::VAR_STRING_BOOL_T, false));
+        $this->assertEquals('bool', Variable::getType(self::VAR_STRING_BOOL_F, false));
 
-        $this->assertEquals(Variable::getType(self::VAR_STRING), 'string');
-        $this->assertEquals(Variable::getType(self::VAR_JSON), 'json');
-        $this->assertEquals(Variable::getType(Carbon::now()), 'object');
-        $this->assertEquals(Variable::getType(self::VAR_INT_STR), 'int');
-        $this->assertEquals(Variable::getType(self::VAR_INT), 'int');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_E_STR), 'int');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_INT_STR), 'int');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_INT_STR_COMMA), 'int');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_E), 'int');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_INT), 'int');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT), 'float');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_STR), 'float');
-        $this->assertEquals(Variable::getType(self::VAR_FLOAT_STR_COMMA), 'float');
-        $this->assertEquals(Variable::getType(self::VAR_NULL), 'null');
-        $this->assertEquals(Variable::getType(self::VAR_ARRAY), 'array');
+        $this->assertEquals('int', Variable::getType(1, false));
+        $this->assertEquals('int', Variable::getType(0, false));
+        $this->assertEquals('int', Variable::getType(1.0, false));
+
+        $this->assertEquals('string', Variable::getType(self::VAR_STRING));
+        $this->assertEquals('json', Variable::getType(self::VAR_JSON));
+        $this->assertEquals('object', Variable::getType(Carbon::now()));
+        $this->assertEquals('int', Variable::getType(self::VAR_INT_STR));
+        $this->assertEquals('int', Variable::getType(self::VAR_INT));
+        $this->assertEquals('int', Variable::getType(self::VAR_FLOAT_E_STR));
+        $this->assertEquals('int', Variable::getType(self::VAR_FLOAT_INT_STR));
+        $this->assertEquals('int', Variable::getType(self::VAR_FLOAT_INT_STR_COMMA));
+        $this->assertEquals('int', Variable::getType(self::VAR_FLOAT_E));
+        $this->assertEquals('int', Variable::getType(self::VAR_FLOAT_INT));
+        $this->assertEquals('float', Variable::getType(self::VAR_FLOAT));
+        $this->assertEquals('float', Variable::getType(self::VAR_FLOAT_STR));
+        $this->assertEquals('float', Variable::getType(self::VAR_FLOAT_STR_COMMA));
+        $this->assertEquals('null', Variable::getType(self::VAR_NULL));
+        $this->assertEquals('array', Variable::getType(self::VAR_ARRAY));
     }
 
     public function testWillValidateIfVariableTypeIsDefault(): void
@@ -384,17 +412,17 @@ class VariableTest extends BaseTest
         $dateTimeObject = new DateTime($dateTime);
         $dateTimeImmutable = new DateTimeImmutable($dateTime);
 
-        $this->assertEquals(Variable::convertTimeObjectToString($carbonDateTime), $timestamp);
-        $this->assertEquals(Variable::convertTimeObjectToString($dateTimeObject), $timestamp);
-        $this->assertEquals(Variable::convertTimeObjectToString($dateTimeImmutable), $timestamp);
+        $this->assertEquals($timestamp, Variable::convertTimeObjectToString($carbonDateTime));
+        $this->assertEquals($timestamp, Variable::convertTimeObjectToString($dateTimeObject));
+        $this->assertEquals($timestamp, Variable::convertTimeObjectToString($dateTimeImmutable));
 
-        $this->assertEquals(Variable::convertTimeObjectToString($carbonDateTime, false), $dateTime);
-        $this->assertEquals(Variable::convertTimeObjectToString($dateTimeObject, false), $dateTime);
-        $this->assertEquals(Variable::convertTimeObjectToString($dateTimeImmutable, false), $dateTime);
+        $this->assertEquals($dateTime, Variable::convertTimeObjectToString($carbonDateTime, false));
+        $this->assertEquals($dateTime, Variable::convertTimeObjectToString($dateTimeObject, false));
+        $this->assertEquals($dateTime, Variable::convertTimeObjectToString($dateTimeImmutable, false));
 
-        $this->assertEquals(Variable::convertTimeObjectToString($carbonDateTime, false, 'Y-m-d'), $date);
-        $this->assertEquals(Variable::convertTimeObjectToString($dateTimeObject, false, 'Y-m-d'), $date);
-        $this->assertEquals(Variable::convertTimeObjectToString($dateTimeImmutable, false, 'Y-m-d'), $date);
+        $this->assertEquals($date, Variable::convertTimeObjectToString($carbonDateTime, false, 'Y-m-d'));
+        $this->assertEquals($date, Variable::convertTimeObjectToString($dateTimeObject, false, 'Y-m-d'));
+        $this->assertEquals($date, Variable::convertTimeObjectToString($dateTimeImmutable, false, 'Y-m-d'));
     }
 
     public function testWillRestoreArrayTypes(): void
@@ -402,17 +430,22 @@ class VariableTest extends BaseTest
         $carbonObject = Carbon::now();
 
         $array = [
-            'string' => 'some text',
+            'string' => 'some text ',
             'integer' => 10,
-            'integer_bool' => 1,
+            'integer_true' => 1,
+            'integer_false' => 0,
             'float' => 1.1,
             'float_int' => 1.0,
             'float_string' => '1,2',
             'float_str_int' => '1,0',
             'string_int' => '11',
             'null' => null,
-            'empty' => ' ',
-            'bool' => false,
+            'empty' => '',
+            'empty_spaced' => ' ',
+            'bool_true' => true,
+            'bool_false' => false,
+            'bool_string_true' => 'true',
+            'bool_string_int_false' => '0',
             'array' => [
                 'object' => $carbonObject,
                 'json' => '{"t1":"text","t2":"12"}',
@@ -424,15 +457,20 @@ class VariableTest extends BaseTest
             [
                 'string' => 'some text',
                 'integer' => 10,
-                'integer_bool' => 1,
+                'integer_true' => 1,
+                'integer_false' => 0,
                 'float' => 1.1,
                 'float_int' => 1,
                 'float_string' => 1.2,
                 'float_str_int' => 1,
-                'string_int' => 1,
+                'string_int' => 11,
                 'null' => null,
                 'empty' => null,
-                'bool' => false,
+                'empty_spaced' => null,
+                'bool_true' => true,
+                'bool_false' => false,
+                'bool_string_true' => 'true',
+                'bool_string_int_false' => 0,
                 'array' => [
                     'object' => $carbonObject,
                     'json' => [
@@ -442,5 +480,46 @@ class VariableTest extends BaseTest
                 ],
             ]
         );
+
+        $this->assertEquals(
+            Variable::restoreArrayTypes($array, true, true, true),
+            [
+                'string' => 'some text',
+                'integer' => 10,
+                'integer_true' => true,
+                'integer_false' => false,
+                'float' => 1.1,
+                'float_int' => 1,
+                'float_string' => 1.2,
+                'float_str_int' => 1,
+                'string_int' => 11,
+                'null' => null,
+                'empty' => null,
+                'empty_spaced' => null,
+                'bool_true' => true,
+                'bool_false' => false,
+                'bool_string_true' => true,
+                'bool_string_int_false' => false,
+                'array' => [
+                    'object' => $carbonObject,
+                    'json' => [
+                        't1' => 'text',
+                        't2' => 12,
+                    ],
+                ],
+            ]
+        );
+
+        $nonTrimRestore = Variable::restoreArrayTypes($array, false);
+        $this->assertEquals(null, $nonTrimRestore['empty']);
+        $this->assertEquals(' ', $nonTrimRestore['empty_spaced']);
+
+        $nonTrimNonNullRestore = Variable::restoreArrayTypes($array, false, false);
+        $this->assertEquals('', $nonTrimNonNullRestore['empty']);
+        $this->assertEquals(' ', $nonTrimNonNullRestore['empty_spaced']);
+
+        $trimNonNullRestore = Variable::restoreArrayTypes($array, true, false);
+        $this->assertEquals('', $trimNonNullRestore['empty']);
+        $this->assertEquals('', $trimNonNullRestore['empty_spaced']);
     }
 }

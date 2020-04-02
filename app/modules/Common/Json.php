@@ -17,7 +17,12 @@ class Json
 
     public static function isJson($variable): bool
     {
-        if (!Variable::isString($variable, true)) {
+        if (!Variable::isString($variable, true)
+            || (
+                Variable::isString($variable, true)
+                && in_array(strtolower($variable), ['0', '1', 'true', 'false'], true)
+            )
+        ) {
             return false;
         }
 
