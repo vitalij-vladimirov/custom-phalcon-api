@@ -89,24 +89,24 @@ class FileInfoEntity extends BaseEntity
         return $this;
     }
 
-    public function getDirectoryEntity(): DirectoryEntity
+    public function getDirectory(): DirectoryEntity
     {
         return $this->directory;
     }
 
-    public function setDirectoryEntity(DirectoryEntity $directory): FileInfoEntity
+    public function setDirectory(DirectoryEntity $directory): FileInfoEntity
     {
         $this->directory = $directory;
 
         return $this;
     }
 
-    public function getFileSizeEntity(): FileSizeEntity
+    public function getFileSize(): FileSizeEntity
     {
         return $this->fileSize;
     }
 
-    public function setFileSizeEntity(FileSizeEntity $fileSize): FileInfoEntity
+    public function setFileSize(FileSizeEntity $fileSize): FileInfoEntity
     {
         $this->fileSize = $fileSize;
 

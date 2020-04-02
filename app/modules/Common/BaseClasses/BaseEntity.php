@@ -22,7 +22,7 @@ abstract class BaseEntity
         $array = [];
 
         foreach (get_class_methods($this) as $method) {
-            if (Regex::isMethodName($method, Regex::METHOD_GET) && $this->isMethodPublic($method)) {
+            if (Regex::isMethodName($method, Regex::METHOD_TYPE_GET) && $this->isMethodPublic($method)) {
                 $content = $this->getMethodContent($method, $emptyToNull);
 
                 if ($content === null && $includeNulls === false) {
@@ -99,7 +99,7 @@ abstract class BaseEntity
         $array = Variable::restoreArrayTypes($data);
 
         foreach (get_class_methods($this) as $method) {
-            if (Regex::isMethodName($method, Regex::METHOD_SET) && $this->isMethodPublic($method)) {
+            if (Regex::isMethodName($method, Regex::METHOD_TYPE_SET) && $this->isMethodPublic($method)) {
                 $variable = Text::uncamelizeMethod($method);
 
                 $content = $array[$variable];

@@ -4,11 +4,9 @@ declare(strict_types=1);
 namespace Common;
 
 use Carbon\Carbon;
-use Common\Config\ErrorCodes;
 use Common\Entity\DirectoryEntity;
 use Common\Entity\FileInfoEntity;
 use Common\Entity\FileSizeEntity;
-use Common\Exception\NotFoundException;
 
 class File
 {
@@ -17,6 +15,19 @@ class File
         self::validateFileDirectoryEntityAndCreateIfNotFound($file);
 
         file_put_contents($file, $text);
+    }
+
+    public static function delete(string $file): bool
+    {
+        if (!self::exists($file)) {
+            return false;
+        }
+
+        if (is_dir($file)) {
+            return rmdir($file);
+        }
+
+        return unlink($file);
     }
 
     public static function read(string $file): ?string
@@ -43,8 +54,8 @@ class File
             ->setType(mime_content_type($file))
             ->setHash(md5_file($file))
             ->setLastModified(Carbon::createFromTimestamp(filemtime($file)))
-            ->setFileSizeEntity(self::getSize($file))
-            ->setDirectoryEntity(self::getDirectoryEntity($file))
+            ->setFileSize(self::getSize($file))
+            ->setDirectory(self::getDirectory($file))
         ;
 
         $pathSplitter = explode('/', $file);
@@ -77,7 +88,7 @@ class File
         ;
     }
 
-    public static function getDirectoryEntity(string $file): ?DirectoryEntity
+    public static function getDirectory(string $file): ?DirectoryEntity
     {
         $map = [];
         $pathSplitter = explode('/', $file);
@@ -102,16 +113,9 @@ class File
         ;
     }
 
-    public static function validateFileExists(string $file): void
-    {
-        if (!self::exists($file)) {
-            throw new NotFoundException('File not found', ErrorCodes::FILE_NOT_FOUND);
-        }
-    }
-
     private static function validateFileDirectoryEntityAndCreateIfNotFound(string $file): void
     {
-        $directory = self::getDirectoryEntity($file);
+        $directory = self::getDirectory($file);
 
         if (self::exists($directory->getPath())) {
             return;

@@ -21,37 +21,37 @@ class JsonTest extends BaseTest
 
     public function testWillGetVariableType(): void
     {
-        $this->assertEquals('json', Variable::getType(self::JSON_OBJECT));
-        $this->assertEquals('array', Variable::getType(self::JSON_ARRAY));
-        $this->assertEquals('string', Variable::getType(self::JSON_STRING));
-        $this->assertEquals('int', Variable::getType(self::JSON_ONE));
-        $this->assertEquals('int', Variable::getType(self::JSON_ZERO));
-        $this->assertEquals('int', Variable::getType(self::JSON_STRING_ONE));
-        $this->assertEquals('int', Variable::getType(self::JSON_STRING_ZERO));
-        $this->assertEquals('bool', Variable::getType(self::JSON_TRUE));
-        $this->assertEquals('bool', Variable::getType(self::JSON_FALSE));
+        self::assertEquals('json', Variable::getType(self::JSON_OBJECT));
+        self::assertEquals('array', Variable::getType(self::JSON_ARRAY));
+        self::assertEquals('string', Variable::getType(self::JSON_STRING));
+        self::assertEquals('int', Variable::getType(self::JSON_ONE));
+        self::assertEquals('int', Variable::getType(self::JSON_ZERO));
+        self::assertEquals('int', Variable::getType(self::JSON_STRING_ONE));
+        self::assertEquals('int', Variable::getType(self::JSON_STRING_ZERO));
+        self::assertEquals('bool', Variable::getType(self::JSON_TRUE));
+        self::assertEquals('bool', Variable::getType(self::JSON_FALSE));
     }
 
     public function testWillCheckIfVariableIsJson(): void
     {
-        $this->assertTrue(Json::isJson(self::JSON_OBJECT));
-        $this->assertFalse(Json::isJson(self::JSON_ARRAY));
-        $this->assertFalse(Json::isJson(self::JSON_STRING));
-        $this->assertFalse(Json::isJson(self::JSON_ONE));
-        $this->assertFalse(Json::isJson(self::JSON_ZERO));
-        $this->assertFalse(Json::isJson(self::JSON_STRING_ONE));
-        $this->assertFalse(Json::isJson(self::JSON_STRING_ZERO));
-        $this->assertFalse(Json::isJson(self::JSON_TRUE));
-        $this->assertFalse(Json::isJson(self::JSON_FALSE));
+        self::assertTrue(Json::isJson(self::JSON_OBJECT));
+        self::assertFalse(Json::isJson(self::JSON_ARRAY));
+        self::assertFalse(Json::isJson(self::JSON_STRING));
+        self::assertFalse(Json::isJson(self::JSON_ONE));
+        self::assertFalse(Json::isJson(self::JSON_ZERO));
+        self::assertFalse(Json::isJson(self::JSON_STRING_ONE));
+        self::assertFalse(Json::isJson(self::JSON_STRING_ZERO));
+        self::assertFalse(Json::isJson(self::JSON_TRUE));
+        self::assertFalse(Json::isJson(self::JSON_FALSE));
     }
 
     public function testWillEncodeArray(): void
     {
-        $this->assertEquals(self::JSON_OBJECT, Json::encode(self::JSON_ARRAY));
+        self::assertEquals(self::JSON_OBJECT, Json::encode(self::JSON_ARRAY));
     }
 
     public function testWillDecodeJsonObject(): void
     {
-        $this->assertEquals(self::JSON_ARRAY, Json::decode(self::JSON_OBJECT));
+        self::assertEquals(self::JSON_ARRAY, Json::decode(self::JSON_OBJECT));
     }
 }

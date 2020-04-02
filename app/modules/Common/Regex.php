@@ -3,13 +3,25 @@ declare(strict_types=1);
 
 namespace Common;
 
-use Common\Exception\BadRequestException;
-
 class Regex
 {
-    public const METHOD_GET = 'getter';
-    public const METHOD_SET = 'setter';
-    public const METHOD_SET_GET = 'set_get';
+    public const VAR_AZ_LOWER = '/^[a-z0-9]{1,}$/';
+    public const VAR_AZ_UPPER = '/^[A-Z]{1,}$/';
+    public const VAR_AZ_UPPER_FIRST = '/^[A-Z]+[a-z0-9]{1,}$/';
+    public const VAR_PASCAL_CASE = '/^[A-Z]+[a-z0-9]{1,}+[A-Z]+[a-zA-Z0-9]{1,}$/';
+    public const VAR_CAMEL_CASE = '/^[a-z]{1,}+[A-Z]+[a-zA-Z0-9]{1,}$/';
+    public const VAR_SNAKE_CASE = '/^[a-z]+[_]+[a-z_]{1,}$/';
+    public const VAR_KEBAB_CASE = '/^[a-z]+[-]+[a-z\\-]{1,}$/';
+    public const VAR_RAW_CASE = '/^[a-zA-Z]{1,}+[a-zA-Z0-9 _\\-]{1,}$/';
+    
+    public const METHOD_TYPE_GET = 'getter';
+    public const METHOD_TYPE_SET = 'setter';
+    public const METHOD_TYPE_SET_GET = 'set_get';
+
+    public static function isValidPattern(string $value, string $pattern): bool
+    {
+        return preg_match($pattern, $value) ? true : false;
+    }
 
     public static function isEmail(string $value): bool
     {
@@ -19,30 +31,30 @@ class Regex
     public static function isMethodName(string $value, string $type = null): bool
     {
         if ($type !== null && !preg_match('/^[a-z]/', $type)) {
-            throw new BadRequestException('Method type must start from lowercase letter');
+            return false;
         }
 
-        if ($type === self::METHOD_SET_GET) {
-            return preg_match('/^(get|is|set)+[A-Z]+[a-zA-Z0-9]/', $value) ? true : false;
+        if ($type === self::METHOD_TYPE_SET_GET) {
+            return self::isValidPattern($value, '/^(get|is|set)+[A-Z]+[a-zA-Z0-9]/');
         }
 
-        if ($type === self::METHOD_GET) {
-            return preg_match('/^(get|is)+[A-Z]+[a-zA-Z0-9]/', $value) ? true : false;
+        if ($type === self::METHOD_TYPE_GET) {
+            return self::isValidPattern($value, '/^(get|is)+[A-Z]+[a-zA-Z0-9]/');
         }
 
-        if ($type === self::METHOD_SET) {
-            return preg_match('/^(set)+[A-Z]+[a-zA-Z0-9]/', $value) ? true : false;
+        if ($type === self::METHOD_TYPE_SET) {
+            return self::isValidPattern($value, '/^(set)+[A-Z]+[a-zA-Z0-9]/');
         }
 
         if ($type !== null) {
-            return preg_match('/^(' . $type . ')+[A-Z]+[a-zA-Z0-9]/', $value) ? true : false;
+            return self::isValidPattern($value, '/^(' . $type . ')+[A-Z]+[a-zA-Z0-9]/');
         }
 
-        return preg_match('/^[a-z]+[a-zA-Z0-9]/', $value) ? true : false;
+        return self::isValidPattern($value, self::VAR_CAMEL_CASE);
     }
 
-    public static function isClassName(string $value)
+    public static function isClassName(string $value): bool
     {
-        return preg_match('/^[A-Z]+[a-zA-Z0-9]/', $value);
+        return self::isValidPattern($value, self::VAR_PASCAL_CASE);
     }
 }
