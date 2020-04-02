@@ -28,7 +28,7 @@ RUN echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20190902
 
 # Create additional /usr/bin/ commands
 COPY .config/usr_bin/* /usr/bin/
-RUN chmod +x /usr/bin/edit /usr/bin/cs
+RUN chmod +x /usr/bin/edit /usr/bin/cs /usr/bin/phpunit
 RUN ln -s /app/mvc/cli.php /usr/bin/cli
 
 # Run APP
