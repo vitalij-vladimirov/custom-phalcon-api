@@ -87,11 +87,11 @@ class Text extends PhalconText
         }
 
         if ($stringType === self::STRING_TYPE_MIXED_UPPER_CASE || $stringType === self::STRING_TYPE_MIXED_LOWER_CASE) {
-            return ucfirst(strtolower($value));
+            return self::upperFirst(self::lower($value));
         }
 
         if ($stringType === self::STRING_TYPE_CAMEL_CASE) {
-            return strtoupper(substr($value, 0, 1)) . substr($value, 1);
+            return self::upperFirst($value);
         }
 
         if ($stringType === self::STRING_TYPE_SNAKE_CASE || $stringType === self::STRING_TYPE_KEBAB_CASE) {
@@ -114,9 +114,7 @@ class Text extends PhalconText
 
     public static function toCamelCase(string $value): string
     {
-        $pascalCase = self::toPascalCase($value);
-
-        return strtolower(substr($pascalCase, 0, 1)) . substr($pascalCase, 1);
+        return self::lowerFirst(self::toPascalCase($value));
     }
 
     public static function toKebabCase(string $value, bool $url = false): string
@@ -132,7 +130,7 @@ class Text extends PhalconText
         }
 
         if ($stringType === self::STRING_TYPE_MIXED_UPPER_CASE || $stringType === self::STRING_TYPE_PASCAL_ONE_WORD) {
-            return strtolower($value);
+            return self::lower($value);
         }
 
         if ($stringType === self::STRING_TYPE_SNAKE_CASE) {
@@ -144,7 +142,7 @@ class Text extends PhalconText
             || $stringType === self::STRING_TYPE_CAMEL_CASE
         ) {
             $value = preg_replace('/(?<!\ )[A-Z]/', ' $0', $value);
-            $value = trim(strtolower($value));
+            $value = trim(self::lower($value));
 
             return str_replace(['  ', ' ', ''], '-', $value);
         }
@@ -170,7 +168,7 @@ class Text extends PhalconText
 
     public static function toSentence(string $value): string
     {
-        return ucfirst(str_replace('-', ' ', self::toKebabCase($value))) .'.';
+        return self::upperFirst(str_replace('-', ' ', self::toKebabCase($value))) .'.';
     }
 
     public static function toLatin(string $value): string
@@ -197,7 +195,66 @@ class Text extends PhalconText
             $value = preg_replace('/^(get|is|set)/', '', $value);
         }
 
-        return lcfirst($value);
+        return self::lowerFirst($value);
+    }
+
+    public static function lowerFirst(string $value): string
+    {
+        if (empty(trim($value))) {
+            return '';
+        }
+
+        return self::lower(substr($value, 0, 1)) . substr($value, 1);
+    }
+
+    public static function upperFirst(string $value): string
+    {
+        if (empty(trim($value))) {
+            return '';
+        }
+
+        return self::upper(substr($value, 0, 1)) . substr($value, 1);
+    }
+
+    /**
+     * Rewritten Phalcon\Text::camelize method
+     *
+     * @param string $value
+     * @param string|null $delimiter
+     * @return string
+     * @throws InternalErrorException
+     */
+    public static function camelize(string $value, $delimiter = null): string
+    {
+        return self::toPascalCase($value);
+    }
+
+    /**
+     * Rewritten Phalcon\Text::uncamelize method
+     *
+     * @param string $value
+     * @param string $delimiter
+     * @return string
+     * @throws InternalErrorException
+     */
+    public static function uncamelize(string $value, $delimiter = '_'): string
+    {
+        if ($delimiter === '-') {
+            return self::toKebabCase($value);
+        }
+        
+        return self::toSnakeCase($value);
+    }
+
+    /**
+     * Rewritten Phalcon\Text::humanize method
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function humanize(string $value): string
+    {
+        return self::toText($value);
     }
 
     private static function convertRawAndTextToKebabCase(
@@ -214,7 +271,7 @@ class Text extends PhalconText
         }
 
         $value = preg_replace('/(?<!\ )[A-Z]/', ' $0', $value);
-        $value = trim(strtolower($value));
+        $value = trim(self::lower($value));
         $value = preg_replace('/[_ \\-]/', '-', $value);
         $value = str_replace(['---', '--'], '-', $value);
 
@@ -226,7 +283,7 @@ class Text extends PhalconText
                     break;
                 }
 
-                $newValue .= ' ' . strtolower($word);
+                $newValue .= ' ' . self::lower($word);
             }
 
             $value = str_replace('', '-', trim($newValue));
@@ -244,7 +301,7 @@ class Text extends PhalconText
                 break;
             }
 
-            $newValue .= ucfirst(strtolower($word));
+            $newValue .= self::upperFirst(self::lower($word));
         }
 
         return $newValue;

@@ -11,7 +11,7 @@ class CacheManager extends BaseService
 {
     private const IGNORE_FILES = [
         '.',
-        '..'
+        '..',
     ];
 
     private array $modulesDirectories;
