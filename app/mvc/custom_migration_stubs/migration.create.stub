@@ -1,0 +1,23 @@
+<?php
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
+use Common\BaseClasses\BaseDbSchemaBlueprint;
+
+class {{ class }} extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('{{ table }}', function (BaseDbSchemaBlueprint $table) {
+            $table->id();
+            // Create additional table columns here
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('{{ table }}');
+    }
+}

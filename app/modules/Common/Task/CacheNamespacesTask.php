@@ -3,8 +3,9 @@ declare(strict_types=1);
 
 namespace Common\Task;
 
-use Common\Service\CacheManager;
 use Phalcon\Cli\Task;
+use Common\Service\CacheManager;
+use Common\Console;
 
 class CacheNamespacesTask extends Task
 {
@@ -32,7 +33,7 @@ class CacheNamespacesTask extends Task
             return;
         }
 
-        echo 'Error: Argument {type} is incorrect' . PHP_EOL;
+        echo Console::error('Error: Argument {type} is incorrect');
 
         return;
     }

@@ -6,6 +6,23 @@ use Common\Service\CustomRouter;
 
 return new Config([
 
+    /*
+     * Specify cli commands shortcuts he to avoid Writing long command paths
+     * Shortcut must specify full command path: Module:Task:command
+     *
+     * Example:
+     *      'test' => 'Example:Test:run'
+     *      Command:    cli test
+     *      Will run:   cli Example:Test:run
+     */
+    'cliShortcuts' => [
+        'migration' => 'Common:Migration:help',
+        'migration:help' => 'Common:Migration:help',
+        'migration:create' => 'Common:Migration:create',
+        'migration:update' => 'Common:Migration:update',
+        'migration:run' => 'Common:Migration:run',
+    ],
+
     // To use default Router comment or delete this line.
     'customRouter'  => CustomRouter::class,
 
