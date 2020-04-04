@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Common\Entity\DirectoryEntity;
 use Common\Entity\FileInfoEntity;
 use Common\Entity\FileSizeEntity;
+use Common\Exception\BadRequestException;
 
 class File
 {
@@ -111,6 +112,50 @@ class File
             ->setPath($path)
             ->setMap($map)
         ;
+    }
+
+    public function readDirectory(
+        string $directory,
+        bool $scanHiddenFiles = true,
+        bool $readSubDirs = false
+    ): array {
+        if (!self::exists($directory)) {
+            throw new BadRequestException('Directory not found');
+        }
+
+        $directories = [];
+        $files = [];
+
+        $handle = opendir($directory);
+
+        if ($handle) {
+            while (false !== ($file = readdir($handle))) {
+                if (in_array($file, ['.', '..'], true)) {
+                    continue;
+                }
+
+                if (!$scanHiddenFiles && substr($file, 0, 1) === '.') {
+                    continue;
+                }
+
+                $path = $directory . '/' . $file;
+
+                if (filetype($path) === 'dir') {
+                    if ($readSubDirs) {
+                        $directories[$file] = self::readDirectory($path, $scanHiddenFiles, true);
+                        continue;
+                    }
+
+                    $directories[$file] = $path;
+                    continue;
+                }
+
+                $files[$file] = $path;
+            }
+            closedir($handle);
+        }
+
+        return array_merge($directories, $files);
     }
 
     private static function validateFileDirectoryEntityAndCreateIfNotFound(string $file): void

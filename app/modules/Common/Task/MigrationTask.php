@@ -30,8 +30,17 @@ class MigrationTask extends BaseTask
         echo Console::messageHeader('Migration commands:');
         echo Console::message(
             '- cli migration:create table_name - create new table' . PHP_EOL .
-            '- cli migration:update table_name - update existing table' . PHP_EOL .
-            '- cli migration:run - run migrations'
+            '- cli migration:update table_name action_to_do - update existing table' . PHP_EOL .
+            '- cli migration:run - run migrations',
+            false
+        );
+
+        echo Console::messageHeader('Migration update examples:');
+        echo Console::message(
+            '1) cli migration:create users' . PHP_EOL .
+            '2.a) cli migration:update users add_phone_number_and_email' . PHP_EOL .
+            '2.b) cli migration:update users update_gender' . PHP_EOL .
+            '2.c) cli migration:update users remove_personal_code'
         );
     }
 
@@ -44,13 +53,17 @@ class MigrationTask extends BaseTask
         echo Console::success($this->migrationManager->createMigration($table));
     }
 
-    public function updateAction(string $table = null): void
+    public function updateAction(string $table = null, string $action = null): void
     {
         if ($table === null) {
-            throw new BadRequestException('Table argument must be specified!');
+            throw new BadRequestException('First argument $table must be string, null given');
         }
 
-        echo Console::success($this->migrationManager->updateMigration($table));
+        if ($action === null) {
+            throw new BadRequestException('Second argument $action must be string, null given');
+        }
+
+        echo Console::success($this->migrationManager->updateMigration($table, $action));
     }
 
     public function runAction(string $table = null): void

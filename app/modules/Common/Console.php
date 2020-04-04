@@ -68,7 +68,7 @@ class Console
     public static function error(string $text, bool $eolInTheEnt = true): string
     {
         return self::output(
-            ' ' . $text . ' ',
+            $text,
             self::COLOR_BLACK,
             self::COLOR_RED,
             [
@@ -80,7 +80,7 @@ class Console
     public static function warning(string $text, bool $eolInTheEnt = true): string
     {
         return self::output(
-            ' ' . $text . ' ',
+            $text,
             self::COLOR_BLACK,
             self::COLOR_YELLOW,
             [
@@ -92,7 +92,7 @@ class Console
     public static function success(string $text, bool $eolInTheEnt = true): string
     {
         return self::output(
-            ' ' . $text . ' ',
+            $text,
             self::COLOR_BLACK,
             self::COLOR_GREEN,
             [
@@ -108,7 +108,7 @@ class Console
         int $bgColor = self::COLOR_DARK_GRAY,
         array $styles = [self::STYLE_BOLD]
     ): string {
-        return self::output(PHP_EOL . ' ' . $text . ' ', $textColor, $bgColor, $styles) .
+        return self::output(PHP_EOL . $text, $textColor, $bgColor, $styles) .
             ($eolInTheEnt ? PHP_EOL : '');
     }
 
