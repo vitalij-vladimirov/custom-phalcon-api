@@ -26,7 +26,7 @@ class Bootstrap
         $this->app = new Micro($this->services);
 
         if (!empty($this->config->customRouter)) {
-            if (!isset(class_implements($this->config->customRouter)[\Mvc\RouterInterface::class])) {
+            if (!isset(class_implements($this->config->customRouter)[RouterInterface::class])) {
                 throw new Exception('CustomRouter must implement \Mvc\RouterInterface');
             }
 
@@ -95,7 +95,7 @@ class Bootstrap
                 'charset'  => $config->database->charset
             ];
 
-            if ($config->database->adapter == 'Postgresql') {
+            if ($config->database->adapter === 'Postgresql') {
                 unset($params['charset']);
             }
 

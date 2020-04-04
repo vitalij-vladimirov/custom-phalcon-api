@@ -76,8 +76,9 @@ class CacheManager extends BaseService
     private function searchForDirectories(string $directory): array
     {
         $directories = [];
+        $handle = opendir($directory);
 
-        if ($handle = opendir($directory)) {
+        if ($handle) {
             while (false !== ($file = readdir($handle))) {
                 $path = $directory . '/' . $file;
 

@@ -119,7 +119,7 @@ abstract class BaseEntity
                 }
 
                 if ($parameterType === Variable::VAR_TYPE_STRING
-                    && in_array($contentType, [Variable::VAR_TYPE_INT, Variable::VAR_TYPE_FLOAT])
+                    && in_array($contentType, [Variable::VAR_TYPE_INT, Variable::VAR_TYPE_FLOAT], true)
                 ) {
                     $content = (string)$content;
                     $contentType = Variable::getType($content);

@@ -6,10 +6,9 @@ namespace Mvc;
 
 use Phalcon\Config;
 use Phalcon\Di\FactoryDefault\Cli as CliDi;
-use Phalcon\Cli\Console as ConsoleApp;
-use Phalcon\Cli\Dispatcher;
 use Phalcon\Cli\Console;
-use Exception;
+use Phalcon\Cli\Dispatcher;
+use Throwable;
 
 // phpcs:disable
 include '/app/vendor/autoload.php';
@@ -93,7 +92,7 @@ class Cli
 
     private function runTask(): void
     {
-        $console = new ConsoleApp($this->di);
+        $console = new Console($this->di);
         $dispatcher = new Dispatcher();
 
         $dispatcher->setNamespaceName($this->module . '\Task');
@@ -102,7 +101,7 @@ class Cli
         try {
             $console->handle($this->arguments);
             exit;
-        } catch (Exception $exception) {
+        } catch (Throwable $exception) {
             echo $exception->getMessage() . PHP_EOL;
             echo $exception->getTraceAsString() . PHP_EOL;
             exit(255);

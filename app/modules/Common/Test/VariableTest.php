@@ -305,15 +305,15 @@ class VariableTest extends BaseTest
     {
         // Object with correct instance
         self::assertTrue(Variable::isObject(Carbon::now(), new Carbon()));
-        self::assertTrue(Variable::isObject(Carbon::now(), \Carbon\Carbon::class));
+        self::assertTrue(Variable::isObject(Carbon::now(), Carbon::class));
 
         // Object with incorrect instance
-        self::assertFalse(Variable::isObject(Carbon::now(), \DateTimeImmutable::class));
-        self::assertFalse(Variable::isObject(Carbon::now(), new \DateTimeImmutable()));
+        self::assertFalse(Variable::isObject(Carbon::now(), DateTimeImmutable::class));
+        self::assertFalse(Variable::isObject(Carbon::now(), new DateTimeImmutable()));
 
         // Non object
         self::assertFalse(Variable::isObject(Carbon::now(), 'test'));
-        self::assertFalse(Variable::isObject(self::VAR_STRING, \Carbon\Carbon::class));
+        self::assertFalse(Variable::isObject(self::VAR_STRING, Carbon::class));
         self::assertFalse(Variable::isObject(self::VAR_ARRAY, 'test'));
     }
 
@@ -321,8 +321,8 @@ class VariableTest extends BaseTest
     {
         // DateTime object
         self::assertTrue(Variable::isDateTimeObject(Carbon::now()));
-        self::assertTrue(Variable::isDateTimeObject(new \DateTime()));
-        self::assertTrue(Variable::isDateTimeObject(new \DateTimeImmutable()));
+        self::assertTrue(Variable::isDateTimeObject(new DateTime()));
+        self::assertTrue(Variable::isDateTimeObject(new DateTimeImmutable()));
 
         // Not DateTime object
         self::assertFalse(Variable::isDateTimeObject(new Dice()));

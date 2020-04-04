@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit bootstrap="/app/mvc/Bootstrap.Test.php"
+<phpunit bootstrap="mvc/Bootstrap.Test.php"
          backupGlobals="false"
          backupStaticAttributes="false"
          verbose="true"
@@ -15,7 +15,7 @@
 
     <testsuites>
         <testsuite name="Unit tests">
-            <directory>/app/modules/</directory>
+            <directory>modules/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

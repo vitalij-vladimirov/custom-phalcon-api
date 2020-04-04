@@ -4,8 +4,8 @@ if [ -z "$1" ]
   then
     /app/vendor/bin/php-cs-fixer fix /app/mvc --dry-run --diff --verbose
     /app/vendor/bin/php-cs-fixer fix /app/modules --dry-run --diff --verbose
-    /app/vendor/bin/phpcs -p --standard=PSR2 /app/modules
+    /app/vendor/bin/phpcs -p
 else
   /app/vendor/bin/php-cs-fixer fix "$1" --dry-run --diff --verbose
-  /app/vendor/bin/phpcs -p --standard=PSR2 "$1"
+  /app/vendor/bin/phpcs -p
 fi;

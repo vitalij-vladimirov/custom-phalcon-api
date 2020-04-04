@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Common;
 
 use Carbon\Carbon;
+use Dice\Dice;
 use DateTimeImmutable;
 use DateTime;
-use Dice\Dice;
 use Exception;
 use Throwable;
 
@@ -136,8 +136,8 @@ class Variable
         bool $toTimestamp = true,
         string $format = 'Y-m-d H:i:s'
     ) {
-        if (self::isObject($object, \DateTime::class)
-            || self::isObject($object, \DateTimeImmutable::class)
+        if (self::isObject($object, DateTime::class)
+            || self::isObject($object, DateTimeImmutable::class)
         ) {
             $object = Carbon::instance($object);
         }
@@ -215,7 +215,7 @@ class Variable
 
     public static function isFloat($variable, bool $defaultCheck = false): bool
     {
-        if (is_float($variable) && ($defaultCheck || $variable != (int)$variable)) {
+        if (is_float($variable) && ($defaultCheck || $variable !== (float)(int)$variable)) {
             return true;
         }
 
@@ -231,7 +231,7 @@ class Variable
 
         $variable = (float)str_replace(',', '.', $variable);
 
-        if ($variable != (int)$variable) {
+        if ($variable !== (float)(int)$variable) {
             return true;
         }
 
@@ -256,7 +256,7 @@ class Variable
 
         $variable = (float)str_replace(',', '.', $variable);
 
-        if ($variable == (int)$variable) {
+        if ($variable === (float)(int)$variable) {
             return true;
         }
 

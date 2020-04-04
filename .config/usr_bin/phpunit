@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if [ -z "$1" ]
-  then
-    /app/vendor/bin/phpunit
-else
-  /app/vendor/bin/phpunit --filter "$1"
-fi;

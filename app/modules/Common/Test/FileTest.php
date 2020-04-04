@@ -29,8 +29,8 @@ class FileTest extends BaseTest
 
     public function testWillCreateFileInNonExistingDirectoryReadItAndDeleteFile(): void
     {
-        self::assertFileNotExists(self::EXAMPLE_FILE);
-        self::assertFileNotExists(self::EXAMPLE_DIRECTORY);
+        self::assertFileDoesNotExist(self::EXAMPLE_FILE);
+        self::assertFileDoesNotExist(self::EXAMPLE_DIRECTORY);
 
         File::write(self::EXAMPLE_FILE, self::EXAMPLE_TEXT);
 
@@ -42,8 +42,8 @@ class FileTest extends BaseTest
         File::delete(self::EXAMPLE_FILE);
         File::delete(self::EXAMPLE_DIRECTORY);
 
-        self::assertFileNotExists(self::EXAMPLE_FILE);
-        self::assertFileNotExists(self::EXAMPLE_DIRECTORY);
+        self::assertFileDoesNotExist(self::EXAMPLE_FILE);
+        self::assertFileDoesNotExist(self::EXAMPLE_DIRECTORY);
     }
 
     public function testWillCreateFileAndGetItsInfo(): void

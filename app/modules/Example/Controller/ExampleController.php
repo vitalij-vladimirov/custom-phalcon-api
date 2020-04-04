@@ -4,11 +4,10 @@ declare(strict_types=1);
 namespace Example\Controller;
 
 use Common\BaseClasses\BaseController;
-use Phalcon\Http\Response;
 
 class ExampleController extends BaseController
 {
-    const JOKES = [
+    private const JOKES = [
         'Today at the bank, an old lady asked me to help check her balance. So I pushed her over.',
         'I bought some shoes from a drug dealer. ' .
             'I don\'t know what he laced them with, but I\'ve been tripping all day.',
@@ -67,16 +66,8 @@ class ExampleController extends BaseController
         'Just remember - you never really completely useless, you can always serve as a bad example.',
     ];
 
-    public function getJoke(int $jokeId)
+    public function getJoke()
     {
-        $joke = self::JOKES[rand(0, count(self::JOKES)-1)];
-
-        return $joke;
-
-        return (new Response())
-            ->setJsonContent([
-                'joke' => $joke,
-            ])
-        ;
+        return self::JOKES[rand(0, count(self::JOKES)-1)];
     }
 }

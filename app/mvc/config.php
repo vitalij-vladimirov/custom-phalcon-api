@@ -1,14 +1,13 @@
 <?php
-
-namespace Mvc;
+declare(strict_types=1);
 
 use Phalcon\Config;
-use Phalcon\Mvc\Micro;
+use Common\Service\CustomRouter;
 
 return new Config([
 
     // To use default Router comment or delete this line.
-    'customRouter'  => \Common\Service\CustomRouter::class,
+    'customRouter'  => CustomRouter::class,
 
     'database' => [
         'adapter'    => getenv('DB_CONNECTION'),
