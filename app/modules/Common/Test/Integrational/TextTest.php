@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\Test;
+namespace Common\Integrational\Test;
 
 use Common\BaseClasses\BaseTest;
 use Common\Exception\InternalErrorException;
