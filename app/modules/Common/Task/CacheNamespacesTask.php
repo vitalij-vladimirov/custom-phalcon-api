@@ -3,14 +3,18 @@ declare(strict_types=1);
 
 namespace Common\Task;
 
+use Common\Exception\BadRequestException;
 use Phalcon\Cli\Task;
 use Common\Service\CacheManager;
-use Common\Console;
 
 class CacheNamespacesTask extends Task
 {
     public function mainAction(string $type = null): void
     {
+        if ($type !== null && $type !== 'cron') {
+            throw new BadRequestException('Argument $type must be empty or \'cron\'.');
+        }
+
         /**
          * Run namespaces caching once
          */
@@ -32,8 +36,6 @@ class CacheNamespacesTask extends Task
 
             return;
         }
-
-        echo Console::error('Error: Argument {type} is incorrect');
 
         return;
     }
