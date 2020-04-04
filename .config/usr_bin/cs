@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 if [ -z "$1" ]
   then
     /app/vendor/bin/php-cs-fixer fix /app/mvc --dry-run --diff --verbose
