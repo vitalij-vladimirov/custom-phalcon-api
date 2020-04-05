@@ -6,7 +6,7 @@ namespace Common\BaseClasses;
 use Dice\Dice;
 use Phalcon\Cli\Task;
 
-class BaseTask extends Task
+abstract class BaseTask extends Task
 {
     protected Dice $di;
 

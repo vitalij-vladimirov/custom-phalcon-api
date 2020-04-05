@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
-use Common\BaseClasses\BaseDbSchemaBlueprint;
+use Common\Service\Database\Blueprint;
 
 class {{ class }} extends Migration
 {
@@ -12,7 +12,7 @@ class {{ class }} extends Migration
         //
     }
 
-    public function down(): vdoi
+    public function down(): void
     {
         //
     }

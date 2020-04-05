@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\BaseClasses;
+namespace Common\Service\Database;
 
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Blueprint as LaravelBlueprint;
 use Illuminate\Support\Facades\DB;
 
-class BaseDbSchemaBlueprint extends Blueprint
+class Blueprint extends LaravelBlueprint
 {
     public function timestamps($precision = 0)
     {

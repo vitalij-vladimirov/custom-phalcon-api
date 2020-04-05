@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
-use Common\BaseClasses\BaseDbSchemaBlueprint;
+use Common\Service\Database\Blueprint;
 
 class {{ class }} extends Migration
 {
     public function up(): void
     {
-        Schema::table('{{ table }}', function (BaseDbSchemaBlueprint $table) {
+        Schema::table('{{ table }}', function (Blueprint $table) {
             //
         });
     }
