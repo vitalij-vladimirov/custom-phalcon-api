@@ -8,20 +8,22 @@ use Common\Entity\DirectoryEntity;
 use Common\Entity\FileInfoEntity;
 use Common\Entity\FileSizeEntity;
 use Common\Exception\BadRequestException;
+use Common\Exception\InternalErrorException;
 
 class File
 {
-    public static function write(string $file, string $text): void
+    public static function write(string $file, string $text): bool
     {
         self::validateFileDirectoryEntityAndCreateIfNotFound($file);
 
-        file_put_contents($file, $text);
+        return file_put_contents($file, $text);
     }
 
+    // TODO: write test
     public static function delete(string $file): bool
     {
         if (!self::exists($file)) {
-            return false;
+            throw new InternalErrorException('File not found');
         }
 
         if (is_dir($file)) {
@@ -29,6 +31,20 @@ class File
         }
 
         return unlink($file);
+    }
+
+    // TODO: write test
+    public static function move(string $from, string $to): bool
+    {
+        if (!self::exists($from)) {
+            throw new InternalErrorException('Source file not found');
+        }
+
+        if (self::exists($to)) {
+            throw new InternalErrorException('Destination file already exists');
+        }
+
+        return rename($from, $to);
     }
 
     public static function read(string $file): ?string
@@ -114,6 +130,7 @@ class File
         ;
     }
 
+    // TODO: create test
     public function readDirectory(
         string $directory,
         bool $scanHiddenFiles = true,

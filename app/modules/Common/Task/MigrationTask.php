@@ -68,6 +68,6 @@ class MigrationTask extends BaseTask
 
     public function runAction(string $table = null): void
     {
-        echo Console::success($this->migrationManager->runMigrations());
+        $this->migrationManager->runMigrations();
     }
 }

@@ -8,28 +8,45 @@ use Common\Exception\BadRequestException;
 use Common\File;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\MigrationCreator;
+use Phinx\Console\PhinxApplication;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class MigrationManager extends BaseService
 {
     private const STUDS_PATH = '/app/modules/Common/Config/Database/migration_stubs';
+    private const PHINX_CONFIG = '/app/modules/Common/Config/Database/phinx-config.php';
 
     private MigrationCreator $migrationCreator;
+    private ConsoleOutput $consoleOutput;
+    
+    private string $migrationsDir;
 
     public function __construct(
-        Filesystem $filesystem
+        Filesystem $filesystem,
+        ConsoleOutput $consoleOutput
     ) {
         parent::__construct();
 
+        $this->consoleOutput = $consoleOutput;
         $this->migrationCreator = new MigrationCreator($filesystem, self::STUDS_PATH);
+
+        $this->migrationsDir = $this->config->application->migrationsDir;
+
+        if (substr($this->migrationsDir, -1) === '/') {
+            $this->migrationsDir = substr($this->migrationsDir, 0, -1);
+        }
     }
 
     public function createMigration(string $table): string
     {
-        return $this->migrationCreator->create(
-            'create_' . $table . '_table',
-            $this->config->application->migrationsDir,
-            $table,
-            true
+        return $this->correctMigrationName(
+            $this->migrationCreator->create(
+                'create_' . $table . '_table',
+                $this->migrationsDir,
+                $table,
+                true
+            )
         );
     }
 
@@ -46,7 +63,7 @@ class MigrationManager extends BaseService
                 $actionDirection = '_to_';
                 break;
             case 'update':
-                $actionDirection = '_on_';
+                $actionDirection = '_in_';
                 break;
             case 'remove':
                 $actionDirection = '_from_';
@@ -57,28 +74,21 @@ class MigrationManager extends BaseService
                 );
         }
 
-        return $this->migrationCreator->create(
-            $action . $actionDirection . $table . '_table',
-            $this->config->application->migrationsDir,
-            $table,
-            false
+        return $this->correctMigrationName(
+            $this->migrationCreator->create(
+                $action . $actionDirection . $table . '_table',
+                $this->migrationsDir,
+                $table,
+                false
+            )
         );
     }
 
-    public function runMigrations(): string
+    public function runMigrations(): void
     {
-//        require_once '/app/db/migrations/2020_04_05_111557_create_user_table.php';
-//
-//        try {
-//            (new \CreateUserTable())->up();
-//        } catch (\Throwable $e) {
-//            echo $e->getMessage() . PHP_EOL;
-//            echo $e->getTraceAsString();
-//
-//            exit;
-//        }
+        $input = new ArgvInput([null, 'migrate', '-c', self::PHINX_CONFIG]);
 
-        return '';
+        (new PhinxApplication())->doRun($input, $this->consoleOutput);
     }
 
     private function ensurePrimaryMigrationExist(string $table): bool
@@ -86,17 +96,35 @@ class MigrationManager extends BaseService
         $fileName = 'create_' . $table . '_table';
 
         $migrationsList = File::readDirectory(
-            $this->config->application->migrationsDir,
+            $this->migrationsDir,
             false,
             false
         );
 
         foreach ($migrationsList as $file => $filePath) {
-            if (substr($file, 18, strlen($fileName)) === $fileName) {
+            if (substr($file, 15, strlen($fileName)) === $fileName) {
                 return true;
             }
         }
 
         return false;
+    }
+    
+    private function correctMigrationName(string $filename): string
+    {
+        $pathLength = strlen($this->migrationsDir) + 1;
+        
+        $fileVersion = substr(
+            $filename,
+            $pathLength,
+            17
+        );
+
+        $fileVersion = str_replace('_', '', $fileVersion);
+        $newMigrationFile = $this->migrationsDir . '/' . $fileVersion . substr($filename, $pathLength + 17);
+
+        File::move($filename, $newMigrationFile);
+        
+        return $newMigrationFile;
     }
 }
