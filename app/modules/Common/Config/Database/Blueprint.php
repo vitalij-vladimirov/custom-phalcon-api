@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\Service\Database;
+namespace Common\Config\Database;
 
 use Illuminate\Database\Schema\Blueprint as LaravelBlueprint;
 use Illuminate\Support\Facades\DB;

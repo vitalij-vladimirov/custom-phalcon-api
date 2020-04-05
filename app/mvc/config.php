@@ -34,6 +34,7 @@ return new Config([
         'password'   => getenv('DB_PASSWORD'),
         'dbname'     => getenv('DB_DATABASE'),
         'charset'    => getenv('DB_CHARSET'),
+        'collation'  => getenv('DB_COLLATION'),
     ],
 
     'application' => [

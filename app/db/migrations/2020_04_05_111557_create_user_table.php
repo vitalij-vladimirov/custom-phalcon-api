@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
-use Common\Service\Database\Blueprint;
+use Common\Config\Database\Blueprint;
 
 class CreateUserTable extends Migration
 {

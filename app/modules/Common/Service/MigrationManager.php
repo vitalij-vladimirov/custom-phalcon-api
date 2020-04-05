@@ -11,7 +11,7 @@ use Illuminate\Database\Migrations\MigrationCreator;
 
 class MigrationManager extends BaseService
 {
-    private const STUDS_PATH = '/app/modules/Common/Service/Database/migration_stubs';
+    private const STUDS_PATH = '/app/modules/Common/Config/Database/migration_stubs';
 
     private MigrationCreator $migrationCreator;
 
@@ -67,8 +67,16 @@ class MigrationManager extends BaseService
 
     public function runMigrations(): string
     {
-        require_once '/app/db/migrations/2020_04_04_230249_create_user_table.php';
-        (new \CreateUserTable())->up();
+//        require_once '/app/db/migrations/2020_04_05_111557_create_user_table.php';
+//
+//        try {
+//            (new \CreateUserTable())->up();
+//        } catch (\Throwable $e) {
+//            echo $e->getMessage() . PHP_EOL;
+//            echo $e->getTraceAsString();
+//
+//            exit;
+//        }
 
         return '';
     }
