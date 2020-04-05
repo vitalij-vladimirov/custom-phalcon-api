@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Common\Integrational\Test;
 
-use Common\BaseClasses\BaseTest;
+use Common\BaseClasses\BaseTestCase;
 use Common\Json;
 use Common\Variable;
 
-class JsonTest extends BaseTest
+class JsonTestCase extends BaseTestCase
 {
     private const JSON_OBJECT = '{"t":"y","t2":{"t1":1,"t2":"two"},"t3":[["v1","v2"],["v3","v4"]]}';
     private const JSON_ARRAY = ['t' => 'y','t2' => ['t1' => 1,'t2' => 'two'],'t3' => [['v1','v2'],['v3','v4']]];

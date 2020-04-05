@@ -7,7 +7,7 @@ use Dice\Dice;
 use Phalcon\Config;
 use PHPUnit\Framework\TestCase;
 
-abstract class BaseTest extends TestCase
+abstract class BaseTestCase extends TestCase
 {
     protected Config $config;
     protected Dice $di;

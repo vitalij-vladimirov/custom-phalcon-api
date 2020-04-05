@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Common\Integrational\Test;
 
-use Common\BaseClasses\BaseTest;
+use Common\BaseClasses\BaseTestCase;
 use Common\Regex;
 
-class RegexTest extends BaseTest
+class RegexTestCase extends BaseTestCase
 {
     public function testWillValidatePattern(): void
     {

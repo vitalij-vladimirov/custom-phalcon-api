@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Common\Integrational\Test;
 
-use Common\BaseClasses\BaseTest;
+use Common\BaseClasses\BaseTestCase;
 use Common\Variable;
 use Carbon\Carbon;
 use DateTime;
 use DateTimeImmutable;
 use Dice\Dice;
 
-class VariableTest extends BaseTest
+class VariableTestCase extends BaseTestCase
 {
     private const VAR_STRING = 'a';
     private const VAR_INT = 1;

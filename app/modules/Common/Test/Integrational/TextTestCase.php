@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Common\Integrational\Test;
 
-use Common\BaseClasses\BaseTest;
+use Common\BaseClasses\BaseTestCase;
 use Common\Exception\InternalErrorException;
 use Common\Text;
 
-class TextTest extends BaseTest
+class TextTestCase extends BaseTestCase
 {
     private const STRING_ONE_WORD_LOWER = 'test';
     private const STRING_ONE_WORD_UPPER = 'TEST';
