@@ -5,41 +5,34 @@ declare(strict_types=1);
 namespace Mvc;
 
 use Phalcon\Config;
-use Phalcon\Di\FactoryDefault\Cli as CliDi;
+use Phalcon\Di\FactoryDefault\Cli as PhalconCli;
 use Phalcon\Cli\Console as PhalconConsole;
 use Common\Console;
 use Phalcon\Cli\Dispatcher;
+use Phalcon\Mvc\Micro;
 use Throwable;
 
 // phpcs:disable
 include '/app/vendor/autoload.php';
 include '/app/mvc/Bootstrap.php';
 
-$bootstrap = new Bootstrap();
-$bootstrap->runCli();
+$app = (new Bootstrap())->runApp();
 
-/**
- * Config can be called from anywhere using $GLOBALS['config']
- *
- * @var Config $config
- */
-$config = $bootstrap->getConfig();
-
-new Cli($argv, $config);
+new Cli($argv, $app);
 // phpcs:enable
 
 class Cli
 {
-    private CliDi $di;
+    private PhalconCli $cli;
     private Config $config;
     private array $args;
     private string $module;
     private array $arguments;
 
-    public function __construct(array $args, Config $config)
+    public function __construct(array $args, Micro $app)
     {
-        $this->di = new CliDi();
-        $this->config = $config;
+        $this->cli = new PhalconCli();
+        $this->config = $app->di->getShared('config');
         $this->args = array_slice($args, 1);
 
         $this->collectArguments();
@@ -97,11 +90,11 @@ class Cli
 
     private function runTask(): void
     {
-        $console = new PhalconConsole($this->di);
+        $console = new PhalconConsole($this->cli);
         $dispatcher = new Dispatcher();
 
         $dispatcher->setNamespaceName($this->module . '\Task');
-        $this->di->setShared('dispatcher', $dispatcher);
+        $this->cli->setShared('dispatcher', $dispatcher);
 
         try {
             $console->handle($this->arguments);

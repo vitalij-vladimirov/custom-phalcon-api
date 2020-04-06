@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Common\BaseClasses;
 
-use Phalcon\Mvc\Micro;
+use Phalcon\Config;
 
 abstract class BaseController
 {
-    protected Micro $app;
+    protected Config $config;
 
     public function __construct()
     {
-        $this->app = $GLOBALS['app'];
+        $this->config = $GLOBALS['app']->di->getShared('config');
     }
 }

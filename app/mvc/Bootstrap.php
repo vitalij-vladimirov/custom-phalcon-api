@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mvc;
 
-use Phalcon\Config;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Loader;
 use Phalcon\Mvc\Micro;
@@ -22,12 +21,6 @@ class Bootstrap
         $this->setupLoader();
 
         return new Micro($this->services);
-    }
-
-    public function runCli(): void
-    {
-        $this->setupServices();
-        $this->setupLoader();
     }
 
     private function setupServices(): FactoryDefault
