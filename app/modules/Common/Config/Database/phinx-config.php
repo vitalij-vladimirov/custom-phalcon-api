@@ -4,7 +4,7 @@ declare(strict_types=1);
 use Phalcon\Config;
 
 /** @var Config $config */
-$config = $GLOBALS['config'];
+$config = $GLOBALS['app']->di->getShared('config');
 
 return [
     'paths' => [

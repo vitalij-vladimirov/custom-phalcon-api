@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Common\Task;
 
 use Common\BaseClasses\BaseTask;
-use Common\Call;
 use Common\Service\MigrationManager;
 use Common\Console;
 
@@ -17,7 +16,7 @@ class MigrationTask extends BaseTask
     {
         parent::onConstruct();
 
-        $this->migrationManager = Call::class(MigrationManager::class);
+        $this->migrationManager = $this->inject->create(MigrationManager::class);
     }
 
     public function mainAction(): void
