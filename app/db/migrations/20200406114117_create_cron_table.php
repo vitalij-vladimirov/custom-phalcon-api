@@ -20,13 +20,12 @@ use Common\Interfaces\MigrationCreateInterface;
  * Laravel migration standards should be used to specify schema:
  * https://laravel.com/docs/7.x/migrations#creating-columns
  */
-class CreateTestTable extends Migration implements MigrationCreateInterface
+class CreateCronTable extends Migration implements MigrationCreateInterface
 {
-    protected string $table = 'test';
+    protected string $table = 'cron';
 
     public function createSchema(Blueprint $table): void
     {
-        $table->string('username', 64);
-        $table->string('password', 32);
+         $table->string('column_name', 55);
     }
 }

@@ -16,19 +16,19 @@ use Common\Interfaces\MigrationUpdateInterface;
  * Laravel migration standards should be used to specify schema:
  * https://laravel.com/docs/7.x/migrations#creating-columns
  */
-class {{ class }} extends Migration implements MigrationUpdateInterface
+class AddFieldsToCronTable extends Migration implements MigrationUpdateInterface
 {
-    protected string $table = '{{ table }}';
+    protected string $table = 'cron';
 
     public function updateSchema(Blueprint $table): void
     {
-        // $table->string('column_name', 55)
-        //     ->after('past_created_column')
-        // ;
+         $table->string('new_column', 55)
+             ->after('column_name')
+         ;
     }
 
     public function rollbackSchema(Blueprint $table): void
     {
-         // $table->dropColumn('column_name');
+          $table->dropColumn('new_column');
     }
 }
