@@ -3,15 +3,15 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\Migrations\MigrationCreator;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Phinx\Console\PhinxApplication;
 use Common\BaseClasses\BaseService;
 use Common\Exception\InternalErrorException;
 use Common\File;
 use Common\Regex;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\Migrations\MigrationCreator;
-use Phinx\Console\PhinxApplication;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
 
 class MigrationManager extends BaseService
 {

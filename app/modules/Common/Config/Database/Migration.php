@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Common\Config\Database;
 
 use Phalcon\Config;
+use Phalcon\Db\Adapter\Pdo\AbstractPdo;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
@@ -18,21 +19,22 @@ abstract class Migration extends AbstractMigration
     protected Capsule $capsule;
     protected Builder $schema;
 
+    private Config $config;
+
     protected function init()
     {
-        /** @var Config $config */
-        $config = $GLOBALS['config'];
+        $this->config = $GLOBALS['app']->di->getShared('config');
 
         $this->capsule = new Capsule;
         $this->capsule->addConnection([
-            'driver'    => $config->database->adapter,
-            'host'      => $config->database->host,
-            'port'      => $config->database->port,
-            'database'  => $config->database->dbname,
-            'username'  => $config->database->username,
-            'password'  => $config->database->password,
-            'charset'   => $config->database->charset,
-            'collation' => $config->database->collation,
+            'driver'    => $this->config->database->adapter,
+            'host'      => $this->config->database->host,
+            'port'      => $this->config->database->port,
+            'database'  => $this->config->database->dbname,
+            'username'  => $this->config->database->username,
+            'password'  => $this->config->database->password,
+            'charset'   => $this->config->database->charset,
+            'collation' => $this->config->database->collation,
         ]);
 
         $this->capsule->bootEloquent();
@@ -99,8 +101,36 @@ abstract class Migration extends AbstractMigration
         }
     }
 
+    /**
+     * Updating field `updated_at` to "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+     * has been tested only with MySql, so I return this method at the stat if other DB is used.
+     */
     protected function correctUpdatedAtField(): void
     {
-        // TODO: write logic to update field "updated_at" to "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        if (strtolower($this->config->database->adapter) !== 'mysql') {
+            return;
+        }
+
+        $getDefault = 'CURRENT_TIMESTAMP';
+        $getExtra = 'DEFAULT_GENERATED on update CURRENT_TIMESTAMP';
+
+        /** @var AbstractPdo $this->config */
+        $db = $GLOBALS['app']->di->getShared('db');
+
+        $updatedAt = $db->query('
+            SHOW COLUMNS
+            FROM ' . $this->config->database->dbname . '.' . $this->table . '
+            WHERE `field` = \'updated_at\'
+        ')->fetch();
+
+        if (!$updatedAt || ($updatedAt['Default'] === $getDefault && $updatedAt['Extra'] === $getExtra)) {
+            return;
+        }
+
+        $db->query('
+            ALTER TABLE ' . $this->config->database->dbname . '.' . $this->table . '
+            CHANGE COLUMN `updated_at` `updated_at`
+            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ')->execute();
     }
 }

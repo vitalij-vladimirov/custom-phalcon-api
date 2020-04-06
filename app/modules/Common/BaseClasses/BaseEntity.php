@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Common\BaseClasses;
 
+use ReflectionMethod;
 use Carbon\Carbon;
 use Common\Exception\InternalErrorException;
 use Common\Json;
 use Common\Regex;
 use Common\Text;
 use Common\Variable;
-use ReflectionMethod;
 use Throwable;
 
 abstract class BaseEntity

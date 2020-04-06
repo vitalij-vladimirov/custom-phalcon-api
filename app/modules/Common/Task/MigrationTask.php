@@ -16,7 +16,7 @@ class MigrationTask extends BaseTask
     {
         parent::onConstruct();
 
-        $this->migrationManager = $this->di->create(MigrationManager::class);
+        $this->migrationManager = $this->inject->create(MigrationManager::class);
     }
 
     public function mainAction(): void
