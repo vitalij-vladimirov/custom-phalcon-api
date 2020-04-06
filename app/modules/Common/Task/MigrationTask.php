@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Common\Task;
 
 use Common\BaseClasses\BaseTask;
-use Common\Exception\BadRequestException;
+use Common\Exception\InternalErrorException;
 use Common\Service\MigrationManager;
 use Common\Console;
 
@@ -47,7 +47,7 @@ class MigrationTask extends BaseTask
     public function createAction(string $table = null): void
     {
         if ($table === null) {
-            throw new BadRequestException('Table argument must be specified!');
+            throw new InternalErrorException('Argument $table must be specified.');
         }
 
         echo Console::success($this->migrationManager->createMigration($table));
@@ -56,11 +56,11 @@ class MigrationTask extends BaseTask
     public function updateAction(string $table = null, string $action = null): void
     {
         if ($table === null) {
-            throw new BadRequestException('First argument $table must be string, null given');
+            throw new InternalErrorException('First argument $table must be string, null given.');
         }
 
         if ($action === null) {
-            throw new BadRequestException('Second argument $action must be string, null given');
+            throw new InternalErrorException('Second argument $action must be string, null given.');
         }
 
         echo Console::success($this->migrationManager->updateMigration($table, $action));

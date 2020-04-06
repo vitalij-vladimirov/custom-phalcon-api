@@ -43,7 +43,7 @@ abstract class Migration extends AbstractMigration
     public function up(): void
     {
         if (empty($this->table)) {
-            throw new InternalErrorException('$table name must be specified');
+            throw new InternalErrorException('$table name must be specified.');
         }
 
         if (isset(class_implements($this)[MigrationCreateInterface::class])) {
@@ -74,14 +74,14 @@ abstract class Migration extends AbstractMigration
         }
 
         throw new InternalErrorException(
-            'Migration must implement migration \'create\' or \'update\' interface'
+            'Migration must implement migration \'create\' or \'update\' interface.'
         );
     }
 
     public function down(): void
     {
         if (empty($this->table)) {
-            throw new InternalErrorException('$table name must be specified');
+            throw new InternalErrorException('$table name must be specified.');
         }
 
         if (isset(class_implements($this)[MigrationCreateInterface::class])) {

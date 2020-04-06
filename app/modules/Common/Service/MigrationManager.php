@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Common\Service;
 
 use Common\BaseClasses\BaseService;
-use Common\Exception\BadRequestException;
+use Common\Exception\InternalErrorException;
 use Common\File;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\MigrationCreator;
@@ -16,6 +16,7 @@ class MigrationManager extends BaseService
 {
     private const STUDS_PATH = '/app/modules/Common/Config/Database/migration_stubs';
     private const PHINX_CONFIG = '/app/modules/Common/Config/Database/phinx-config.php';
+    private const FORBIDDEN_TABLE_NAMES = ['migration', 'phinx'];
 
     private MigrationCreator $migrationCreator;
     private ConsoleOutput $consoleOutput;
@@ -40,6 +41,10 @@ class MigrationManager extends BaseService
 
     public function createMigration(string $table): string
     {
+        if (in_array($table, self::FORBIDDEN_TABLE_NAMES, true)) {
+            throw new InternalErrorException('Table name \'' . $table . '\' is forbidden.');
+        }
+
         return $this->correctMigrationName(
             $this->migrationCreator->create(
                 'create_' . $table . '_table',
@@ -53,7 +58,7 @@ class MigrationManager extends BaseService
     public function updateMigration(string $table, string $action): string
     {
         if (!$this->ensurePrimaryMigrationExist($table)) {
-            throw new BadRequestException('Table \'' . $table . '\' not found in migrations');
+            throw new InternalErrorException('Table \'' . $table . '\' not found in migrations.');
         }
 
         list($prefix) = explode('_', $action);
@@ -69,7 +74,7 @@ class MigrationManager extends BaseService
                 $actionDirection = '_from_';
                 break;
             default:
-                throw new BadRequestException(
+                throw new InternalErrorException(
                     '$action must start with one of these prefixes: \'add_\', \'update_\', \'remove_\''
                 );
         }

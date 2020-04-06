@@ -106,7 +106,7 @@ class Text extends PhalconText
         );
 
         if (empty(trim($value))) {
-            throw new InternalErrorException('No valid characters found');
+            throw new InternalErrorException('No valid characters found.');
         }
 
         return $value;
@@ -150,7 +150,7 @@ class Text extends PhalconText
         $value = self::convertRawAndTextToKebabCase($value, $stringType, $url);
 
         if (empty(trim($value))) {
-            throw new InternalErrorException('No valid characters found');
+            throw new InternalErrorException('No valid characters found.');
         }
 
         return $value;

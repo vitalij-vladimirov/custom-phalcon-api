@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Common\BaseClasses;
 
 use Carbon\Carbon;
-use Common\Exception\BadRequestException;
+use Common\Exception\InternalErrorException;
 use Common\Json;
 use Common\Regex;
 use Common\Text;
@@ -83,7 +83,7 @@ abstract class BaseEntity
                         $array[Text::uncamelizeMethod($key)] = $value;
                     }
                 } catch (Throwable $exception) {
-                    throw new BadRequestException('Can\'t convert {data} object');
+                    throw new InternalErrorException('Can\'t convert $data object.');
                 }
             }
         }
@@ -93,7 +93,7 @@ abstract class BaseEntity
         }
 
         if (!isset($array)) {
-            throw new BadRequestException('{data} type must be array or object');
+            throw new InternalErrorException('$data type must be array or object.');
         }
 
         $array = Variable::restoreArrayTypes($data);
