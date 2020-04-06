@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 use Phalcon\Config;
 use Common\Service\CustomRouter;
+use Dotenv\Dotenv;
+
+(Dotenv::createImmutable('/app/'))->load();
 
 return new Config([
 
@@ -29,7 +32,7 @@ return new Config([
     'database' => [
         'adapter'    => getenv('DB_CONNECTION'),
         'host'       => getenv('DB_HOST'),
-        'post'       => getenv('DB_PORT'),
+        'port'       => getenv('DB_PORT'),
         'username'   => getenv('DB_USERNAME'),
         'password'   => getenv('DB_PASSWORD'),
         'dbname'     => getenv('DB_DATABASE'),

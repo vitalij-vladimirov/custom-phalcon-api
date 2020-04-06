@@ -7,7 +7,7 @@ use Common\BaseClasses\BaseTestCase;
 use Common\Json;
 use Common\Variable;
 
-class JsonTestCase extends BaseTestCase
+class JsonTest extends BaseTestCase
 {
     private const JSON_OBJECT = '{"t":"y","t2":{"t1":1,"t2":"two"},"t3":[["v1","v2"],["v3","v4"]]}';
     private const JSON_ARRAY = ['t' => 'y','t2' => ['t1' => 1,'t2' => 'two'],'t3' => [['v1','v2'],['v3','v4']]];

@@ -7,7 +7,7 @@ use Common\BaseClasses\BaseTestCase;
 use Common\Exception\InternalErrorException;
 use Common\Text;
 
-class TextTestCase extends BaseTestCase
+class TextTest extends BaseTestCase
 {
     private const STRING_ONE_WORD_LOWER = 'test';
     private const STRING_ONE_WORD_UPPER = 'TEST';

@@ -16,7 +16,9 @@ class File
     {
         self::validateFileDirectoryEntityAndCreateIfNotFound($file);
 
-        return file_put_contents($file, $text);
+        $fileWrite = file_put_contents($file, $text);
+
+        return ($fileWrite || $text === '') ?? false;
     }
 
     // TODO: write test

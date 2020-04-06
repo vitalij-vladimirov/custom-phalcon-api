@@ -6,7 +6,7 @@ namespace Common\Integrational\Test;
 use Common\BaseClasses\BaseTestCase;
 use Common\Regex;
 
-class RegexTestCase extends BaseTestCase
+class RegexTest extends BaseTestCase
 {
     public function testWillValidatePattern(): void
     {

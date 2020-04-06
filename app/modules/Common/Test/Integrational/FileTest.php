@@ -10,7 +10,7 @@ use Common\Entity\FileInfoEntity;
 use Common\Entity\FileSizeEntity;
 use Common\File;
 
-class FileTestCase extends BaseTestCase
+class FileTest extends BaseTestCase
 {
     private const EXAMPLE_TEXT = 'This is example text.';
     private const EXAMPLE_DIRECTORY = '/var/cache/test_dir/inside/last_dir';

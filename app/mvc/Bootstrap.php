@@ -10,6 +10,7 @@ use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\View\Simple as View;
 use Phalcon\Url as UrlResolver;
 use Exception;
+use Throwable;
 
 class Bootstrap
 {
@@ -137,6 +138,10 @@ class Bootstrap
 
         $namespacesCache = file_get_contents($namespacesCacheLocation);
 
-        return json_decode($namespacesCache, true, JSON_PARTIAL_OUTPUT_ON_ERROR, JSON_THROW_ON_ERROR);
+        try {
+            return json_decode($namespacesCache, true, JSON_PARTIAL_OUTPUT_ON_ERROR, JSON_THROW_ON_ERROR);
+        } catch (Throwable $exception) {
+            return $this->config->defaultNamespaces->toArray();
+        }
     }
 }

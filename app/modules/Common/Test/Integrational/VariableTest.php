@@ -10,7 +10,7 @@ use DateTime;
 use DateTimeImmutable;
 use Dice\Dice;
 
-class VariableTestCase extends BaseTestCase
+class VariableTest extends BaseTestCase
 {
     private const VAR_STRING = 'a';
     private const VAR_INT = 1;
