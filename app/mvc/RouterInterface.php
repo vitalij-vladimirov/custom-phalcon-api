@@ -8,5 +8,5 @@ use Phalcon\Mvc\Micro;
 
 interface RouterInterface
 {
-    public function getRoutes(Micro $app, Config $config): Micro;
+    public function getRoutes(Micro $app);
 }

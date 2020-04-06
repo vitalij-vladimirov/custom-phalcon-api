@@ -3,17 +3,14 @@ declare(strict_types=1);
 
 namespace Common\BaseClasses;
 
-use Dice\Dice;
-use Phalcon\Config;
+use Phalcon\Mvc\Micro;
 
 abstract class BaseController
 {
-    protected Config $config;
-    protected Dice $di;
+    protected Micro $app;
 
     public function __construct()
     {
-        $this->config = $GLOBALS['config'];
-        $this->di = new Dice();
+        $this->app = $GLOBALS['app'];
     }
 }

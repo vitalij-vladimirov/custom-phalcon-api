@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
-use Phalcon\Config;
 use Phalcon\Mvc\Micro;
 use Phalcon\Http\Response;
 use Mvc\RouterInterface;
@@ -17,12 +16,10 @@ use Common\Variable;
 class CustomRouter implements RouterInterface
 {
     private Micro $app;
-    private Config $config;
 
-    public function getRoutes(Micro $app, Config $config): Micro
+    public function getRoutes(Micro $app): Micro
     {
         $this->app = $app;
-        $this->config = $config;
 
         try {
             $request = $this->getRequest();
@@ -51,7 +48,7 @@ class CustomRouter implements RouterInterface
 
     private function getRequest(): RequestEntity
     {
-        $modulesDir = $this->config->application->modulesDir;
+        $modulesDir = $this->app->di->getShared('config')->application->modulesDir;
 
         list($urlPath) = explode('?', $this->app->request->getURI());
 
