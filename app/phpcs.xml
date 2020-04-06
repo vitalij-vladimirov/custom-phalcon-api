@@ -4,6 +4,7 @@
 
     <file>/app/mvc</file>
     <file>/app/modules</file>
+    <file>/app/db</file>
 
     <exclude-pattern>/app/modules/Common/Test/Integrational/VariableTest.php</exclude-pattern>
 

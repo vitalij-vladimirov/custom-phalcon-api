@@ -26,6 +26,6 @@ class CreateCronTable extends Migration implements MigrationCreateInterface
 
     public function createSchema(Blueprint $table): void
     {
-         $table->string('column_name', 55);
+        $table->string('column_name', 55);
     }
 }

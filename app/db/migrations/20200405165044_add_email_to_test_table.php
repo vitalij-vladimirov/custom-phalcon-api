@@ -29,6 +29,6 @@ class AddEmailToTestTable extends Migration implements MigrationUpdateInterface
 
     public function rollbackSchema(Blueprint $table): void
     {
-         $table->dropColumn('email');
+        $table->dropColumn('email');
     }
 }

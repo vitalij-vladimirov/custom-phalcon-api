@@ -91,8 +91,8 @@ abstract class Migration extends AbstractMigration
         }
 
         if (isset(class_implements($this)[MigrationUpdateInterface::class])) {
-            $this->schema->table('test', function (Blueprint $table) {
-                $this->revertSchema($table);
+            $this->schema->table($this->table, function (Blueprint $table) {
+                $this->rollbackSchema($table);
             });
 
             return;

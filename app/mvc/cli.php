@@ -53,7 +53,7 @@ class Cli
             $this->showHelp();
         }
 
-        $command = $this->config->cliShortcuts[$this->args[0]] ?? $this->args[0];
+        $command = $this->findCommand($this->args[0]);
 
         list($this->module, $this->arguments['task'], $this->arguments['action']) = explode(':', $command);
 
@@ -133,5 +133,24 @@ class Cli
         );
 
         exit;
+    }
+
+    private function findCommand(string $commandArgument): string
+    {
+        if (isset($this->config->cliShortcuts[$commandArgument])) {
+            return $this->config->cliShortcuts[$commandArgument];
+        }
+
+        $arguments = explode(':', $commandArgument);
+
+        if (count($arguments) !== 2) {
+            return $commandArgument;
+        }
+
+        if (isset($this->config->cliShortcuts[$arguments[0]])) {
+            return $this->config->cliShortcuts[$arguments[0]] . ':' . $arguments[1];
+        }
+
+        return $commandArgument;
     }
 }

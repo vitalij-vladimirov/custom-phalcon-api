@@ -19,11 +19,7 @@ return new Config([
      *      Will run:   cli Example:Test:run
      */
     'cliShortcuts' => [
-        'migration' => 'Common:Migration:help',
-        'migration:help' => 'Common:Migration:help',
-        'migration:create' => 'Common:Migration:create',
-        'migration:update' => 'Common:Migration:update',
-        'migration:run' => 'Common:Migration:run',
+        'migration' => 'Common:Migration',
     ],
 
     // To use default Router comment or delete this line.

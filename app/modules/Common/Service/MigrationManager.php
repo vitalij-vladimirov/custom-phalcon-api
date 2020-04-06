@@ -6,6 +6,7 @@ namespace Common\Service;
 use Common\BaseClasses\BaseService;
 use Common\Exception\InternalErrorException;
 use Common\File;
+use Common\Regex;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Phinx\Console\PhinxApplication;
@@ -20,27 +21,34 @@ class MigrationManager extends BaseService
 
     private MigrationCreator $migrationCreator;
     private ConsoleOutput $consoleOutput;
+    private PhinxApplication $phinxApplication;
     
     private string $migrationsDir;
 
     public function __construct(
         Filesystem $filesystem,
-        ConsoleOutput $consoleOutput
+        ConsoleOutput $consoleOutput,
+        PhinxApplication $phinxApplication
     ) {
         parent::__construct();
 
         $this->consoleOutput = $consoleOutput;
+        $this->phinxApplication = $phinxApplication;
+
         $this->migrationCreator = new MigrationCreator($filesystem, self::STUDS_PATH);
 
         $this->migrationsDir = $this->config->application->migrationsDir;
-
         if (substr($this->migrationsDir, -1) === '/') {
             $this->migrationsDir = substr($this->migrationsDir, 0, -1);
         }
     }
 
-    public function createMigration(string $table): string
+    public function createMigration(string $table = null): string
     {
+        if ($table === null) {
+            throw new InternalErrorException('Argument $table must be specified.');
+        }
+
         if (in_array($table, self::FORBIDDEN_TABLE_NAMES, true)) {
             throw new InternalErrorException('Table name \'' . $table . '\' is forbidden.');
         }
@@ -55,8 +63,16 @@ class MigrationManager extends BaseService
         );
     }
 
-    public function updateMigration(string $table, string $action): string
+    public function updateMigration(string $table = null, string $action = null): string
     {
+        if ($table === null) {
+            throw new InternalErrorException('Argument $table must be string, null given.');
+        }
+
+        if ($action === null) {
+            throw new InternalErrorException('Argument $action must be string, null given.');
+        }
+
         if (!$this->ensurePrimaryMigrationExist($table)) {
             throw new InternalErrorException('Table \'' . $table . '\' not found in migrations.');
         }
@@ -93,7 +109,18 @@ class MigrationManager extends BaseService
     {
         $input = new ArgvInput([null, 'migrate', '-c', self::PHINX_CONFIG]);
 
-        (new PhinxApplication())->doRun($input, $this->consoleOutput);
+        $this->phinxApplication->doRun($input, $this->consoleOutput);
+    }
+
+    public function rollbackMigration(string $date = null): void
+    {
+        if ($date === null || !Regex::isValidPattern($date, '/^[0-9]{4,14}$/')) {
+            throw new InternalErrorException('Argument $date is required and must contains from 4 to 14 numbers.');
+        }
+
+        $input = new ArgvInput(['phinx', 'rollback', '-d', $date, '-c', self::PHINX_CONFIG]);
+
+        $this->phinxApplication->doRun($input, $this->consoleOutput);
     }
 
     private function ensurePrimaryMigrationExist(string $table): bool

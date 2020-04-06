@@ -22,13 +22,13 @@ class AddFieldsToCronTable extends Migration implements MigrationUpdateInterface
 
     public function updateSchema(Blueprint $table): void
     {
-         $table->string('new_column', 55)
-             ->after('column_name')
-         ;
+        $table->string('new_column', 55)
+            ->after('column_name')
+        ;
     }
 
     public function rollbackSchema(Blueprint $table): void
     {
-          $table->dropColumn('new_column');
+        $table->dropColumn('new_column');
     }
 }
