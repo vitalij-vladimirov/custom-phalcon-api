@@ -35,12 +35,15 @@ class Cron
     private function development(Scheduler $cron): Scheduler
     {
         $cron->php('/app/mvc/cli.php Common:CacheNamespaces cron')->everyMinute();
+        $cron->php('/app/mvc/cli.php Common:RemoveUnusedFiles')->everyMinute();
 
         return $cron;
     }
 
     private function production(Scheduler $cron): Scheduler
     {
+        $cron->php('/app/mvc/cli.php Common:RemoveUnusedFiles')->everyMinute();
+
         return $cron;
     }
 }

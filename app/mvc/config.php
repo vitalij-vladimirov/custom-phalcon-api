@@ -22,6 +22,16 @@ return new Config([
         'migration' => 'Common:Migration',
     ],
 
+    /*
+     * List of files (mostly vendor/*) that should be automatically deleted.
+     * To manually remove files run `cli Common:RemoveUnusedFiles`.
+     * Removal command is being automatically ran every minute.
+     */
+    'unusedFiles' => [
+        '/app/vendor/bin/phinx',    // use command `cli migration` instead of `phinx`
+        '/app/vendor/bin/carbon',   // I do not use this one. Remove this line if you need Carbon-Cli
+    ],
+
     // To use default Router comment or delete this line.
     'customRouter'  => CustomRouter::class,
 

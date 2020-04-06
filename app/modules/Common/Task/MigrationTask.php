@@ -31,31 +31,50 @@ class MigrationTask extends BaseTask
             '- cli migration:create $table_name - create new table' . PHP_EOL .
             '- cli migration:update $table_name $action_to_do - update existing table' . PHP_EOL .
             '- cli migration:run - run migrations' . PHP_EOL .
-            '- cli migration:rollback $date - rollback migration by version (date or datetime)',
+            '- cli migration:run $date - run migrations until exact $date' . PHP_EOL .
+            '- cli migration:rollback $date - rollback migration created after $date',
             false
         );
 
         echo Console::messageHeader('Migration update examples:');
         echo Console::message(
-            '1) cli migration:create users' . PHP_EOL .
-            '2.a) cli migration:update users add_phone_number_and_email' . PHP_EOL .
-            '2.b) cli migration:update users update_gender' . PHP_EOL .
-            '2.c) cli migration:update users remove_personal_code',
+            'first: cli migration:create users' . PHP_EOL .
+            '- cli migration:update users add_phone_number_and_email' . PHP_EOL .
+            '- cli migration:update users update_gender' . PHP_EOL .
+            '- cli migration:update users remove_personal_code',
+            false
+        );
+
+        echo Console::messageHeader('Migration run examples:');
+        echo Console::message(
+            '- cli migration:run - will create all migrations that are not created yet' . PHP_EOL .
+            '- cli migration:run 20200229121530 - will create migrations until 2020-02-29 at 12:15:30, ' .
+                'all newer created migrations will be rolled back' . PHP_EOL .
+            '- cli migration:run 202002291215 - will create migrations until 12pm 15min of february 29th of 2020, ' .
+                'all newer created migrations will be rolled back' . PHP_EOL .
+            '- cli migration:run 2020022912 - will create migrations until 12pm of february 29th of 2020, ' .
+                'all newer created migrations will be rolled back' . PHP_EOL .
+            '- cli migration:run 20200229 - will create migrations until february 29th of 2020, ' .
+                'all newer created migrations will be rolled back' . PHP_EOL .
+            '- cli migration:run 202002 - will create migrations until february of 2020, ' .
+                'all newer created migrations will be rolled back' . PHP_EOL .
+            '- cli migration:run 2020 - will create migrations until 2020, ' .
+                'all newer created migrations will be rolled back',
             false
         );
 
         echo Console::messageHeader('Migration rollback examples:');
         echo Console::message(
-            'a) cli migration:rollback 20200229121530 - will rollback migration ' .
-                'created exactly on 2020-02-29 at 12:15:30' . PHP_EOL .
-            'b) cli migration:rollback 202002291215 - will rollback all migrations ' .
-                'created at 12pm 15min on february 29th of 2020' . PHP_EOL .
-            'c) cli migration:rollback 2020022912 - will rollback all migrations ' .
-                'created from 12pm to 1pm on february 29th of 2020' . PHP_EOL .
-            'd) cli migration:rollback 20200229 - will rollback all migrations ' .
-                'created on february 29th of 2020' . PHP_EOL .
-            'e) cli migration:rollback 202002 - will rollback all migrations created on february of 2020' . PHP_EOL .
-            'f) cli migration:rollback 2020 - will rollback all migrations of 2020'
+            '- cli migration:rollback 20200229121530 - will rollback migrations ' .
+                'created after on 2020-02-29 at 12:15:30' . PHP_EOL .
+            '- cli migration:rollback 202002291215 - will rollback all migrations ' .
+                'created after 12pm 15min of february 29th of 2020' . PHP_EOL .
+            '- cli migration:rollback 2020022912 - will rollback all migrations ' .
+                'created after 12pm of february 29th of 2020' . PHP_EOL .
+            '- cli migration:rollback 20200229 - will rollback all migrations ' .
+                'created after february 29th of 2020' . PHP_EOL .
+            '- cli migration:rollback 202002 - will rollback all migrations created after february of 2020' . PHP_EOL .
+            '- cli migration:rollback 2020 - will rollback all migrations created after 2020'
         );
     }
 
@@ -69,9 +88,9 @@ class MigrationTask extends BaseTask
         echo Console::success($this->migrationManager->updateMigration($table, $action));
     }
 
-    public function runAction(): void
+    public function runAction(string $date = null): void
     {
-        $this->migrationManager->runMigrations();
+        $this->migrationManager->runMigrations($date);
     }
 
     public function rollbackAction(string $date = null): void

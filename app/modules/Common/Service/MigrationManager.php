@@ -105,9 +105,17 @@ class MigrationManager extends BaseService
         );
     }
 
-    public function runMigrations(): void
+    public function runMigrations(string $date = null): void
     {
-        $input = new ArgvInput([null, 'migrate', '-c', self::PHINX_CONFIG]);
+        if ($date !== null && !Regex::isValidPattern($date, '/^[0-9]{4,14}$/')) {
+            throw new InternalErrorException('Argument $date must contain exactly 14 numerical characters.');
+        }
+
+        if ($date !== null) {
+            $input = new ArgvInput([null, 'migrate', '-d', $date, '-c', self::PHINX_CONFIG]);
+        } else {
+            $input = new ArgvInput([null, 'migrate', '-c', self::PHINX_CONFIG]);
+        }
 
         $this->phinxApplication->doRun($input, $this->consoleOutput);
     }
@@ -115,7 +123,9 @@ class MigrationManager extends BaseService
     public function rollbackMigration(string $date = null): void
     {
         if ($date === null || !Regex::isValidPattern($date, '/^[0-9]{4,14}$/')) {
-            throw new InternalErrorException('Argument $date is required and must contains from 4 to 14 numbers.');
+            throw new InternalErrorException(
+                'Argument $date is required and must contains from 4 to 14 numerical characters.'
+            );
         }
 
         $input = new ArgvInput(['phinx', 'rollback', '-d', $date, '-c', self::PHINX_CONFIG]);
