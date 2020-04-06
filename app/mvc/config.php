@@ -19,6 +19,7 @@ return new Config([
      *      Will run:   cli Example:Test:run
      */
     'cliShortcuts' => [
+        'test' => 'Common:Test',
         'migration' => 'Common:Migration',
     ],
 
