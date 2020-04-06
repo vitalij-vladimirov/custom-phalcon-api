@@ -3,13 +3,18 @@ declare(strict_types=1);
 
 namespace Common\Task;
 
-use Common\Service\CacheManager;
+use Common\Exception\InternalErrorException;
 use Phalcon\Cli\Task;
+use Common\Service\CacheManager;
 
 class CacheNamespacesTask extends Task
 {
     public function mainAction(string $type = null): void
     {
+        if ($type !== null && $type !== 'cron') {
+            throw new InternalErrorException('Argument $type must be empty or \'cron\'.');
+        }
+
         /**
          * Run namespaces caching once
          */
@@ -31,8 +36,6 @@ class CacheNamespacesTask extends Task
 
             return;
         }
-
-        echo 'Error: Argument {type} is incorrect' . PHP_EOL;
 
         return;
     }

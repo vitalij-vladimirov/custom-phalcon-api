@@ -6,10 +6,10 @@ namespace Mvc;
 
 use Phalcon\Config;
 use Phalcon\Di\FactoryDefault\Cli as CliDi;
-use Phalcon\Cli\Console as ConsoleApp;
+use Phalcon\Cli\Console as PhalconConsole;
+use Common\Console;
 use Phalcon\Cli\Dispatcher;
-use Phalcon\Cli\Console;
-use Exception;
+use Throwable;
 
 // phpcs:disable
 include '/app/vendor/autoload.php';
@@ -25,19 +25,21 @@ $bootstrap->runCli();
  */
 $config = $bootstrap->getConfig();
 
-new Cli($argv);
+new Cli($argv, $config);
 // phpcs:enable
 
 class Cli
 {
     private CliDi $di;
+    private Config $config;
     private array $args;
     private string $module;
     private array $arguments;
 
-    public function __construct(array $args)
+    public function __construct(array $args, Config $config)
     {
         $this->di = new CliDi();
+        $this->config = $config;
         $this->args = array_slice($args, 1);
 
         $this->collectArguments();
@@ -51,7 +53,9 @@ class Cli
             $this->showHelp();
         }
 
-        list($this->module, $this->arguments['task'], $this->arguments['action']) = explode(':', $this->args[0]);
+        $command = $this->findCommand($this->args[0]);
+
+        list($this->module, $this->arguments['task'], $this->arguments['action']) = explode(':', $command);
 
         if (!empty($this->arguments['task']) && substr($this->arguments['task'], -4) === 'Task') {
             $this->arguments['task'] = substr($this->arguments['task'], 0, -4);
@@ -93,7 +97,7 @@ class Cli
 
     private function runTask(): void
     {
-        $console = new ConsoleApp($this->di);
+        $console = new PhalconConsole($this->di);
         $dispatcher = new Dispatcher();
 
         $dispatcher->setNamespaceName($this->module . '\Task');
@@ -102,29 +106,51 @@ class Cli
         try {
             $console->handle($this->arguments);
             exit;
-        } catch (Exception $exception) {
-            echo $exception->getMessage() . PHP_EOL;
-            echo $exception->getTraceAsString() . PHP_EOL;
+        } catch (Throwable $exception) {
+            echo Console::error($exception->getMessage());
+//            echo Console::error('Exception: ' . $exception->getMessage(), false);
+//            echo Console::messageHeader('Exception trace:');
+//            echo Console::message($exception->getTraceAsString());
+
             exit(255);
         }
     }
 
     private function showHelp()
     {
-        echo PHP_EOL;
-        echo 'CLI call structure: cli Module:TaskName:ActionName ...parameters' . PHP_EOL;
-        echo '- Module folder name.' . PHP_EOL;
-        echo '- TaskName should be without `Task` in the end.' . PHP_EOL;
-        echo '- ActionName is optional, should be without `Action` in the end. Default action is `main`.' . PHP_EOL;
-        echo '- ...parameters are optional, should be separated with spaces.' . PHP_EOL;
-        echo PHP_EOL;
-        echo 'Examples:' . PHP_EOL;
-        echo '- cli Common:CacheNamespaces:main param1 param2' . PHP_EOL;
-        echo '- cli Common:CacheNamespaces:main' . PHP_EOL;
-        echo '- cli Common:CacheNamespaces param1 param2' . PHP_EOL;
-        echo '- cli Common:CacheNamespaces' . PHP_EOL;
-        echo PHP_EOL;
+        echo Console::message(
+            'CLI call structure: cli Module:TaskName:ActionName ...parameters' . PHP_EOL .
+            '- Module folder name.' . PHP_EOL .
+            '- TaskName should be without `Task` in the end.' . PHP_EOL .
+            '- ActionName is optional, should be without `Action` in the end. Default action is `main`.' . PHP_EOL .
+            '- ...parameters are optional, should be separated with spaces.' . PHP_EOL .
+            PHP_EOL .
+            'Examples:' . PHP_EOL .
+            '- cli Common:CacheNamespaces:main param1 param2' . PHP_EOL .
+            '- cli Common:CacheNamespaces:main' . PHP_EOL .
+            '- cli Common:CacheNamespaces param1 param2' . PHP_EOL .
+            '- cli Common:CacheNamespaces'
+        );
 
         exit;
+    }
+
+    private function findCommand(string $commandArgument): string
+    {
+        if (isset($this->config->cliShortcuts[$commandArgument])) {
+            return $this->config->cliShortcuts[$commandArgument];
+        }
+
+        $arguments = explode(':', $commandArgument);
+
+        if (count($arguments) !== 2) {
+            return $commandArgument;
+        }
+
+        if (isset($this->config->cliShortcuts[$arguments[0]])) {
+            return $this->config->cliShortcuts[$arguments[0]] . ':' . $arguments[1];
+        }
+
+        return $commandArgument;
     }
 }

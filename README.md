@@ -1,6 +1,6 @@
 # Phalcon API
 
-This is Docker based Phalcon API with structured framework and MySQL 8.0 DB. Build is not perfect and has some bugs, but it works and runs. If you find bug and know how to fix it - contact me.
+This is Docker based Phalcon API with structured framework and MySQL 8.0 DB.
 
 #### API includes:
 
@@ -28,4 +28,28 @@ This is Docker based Phalcon API with structured framework and MySQL 8.0 DB. Bui
 
 - DB files are saved in `./data/mysql` and mysql logs in `./data/log`.
 - In Linux distributions you have to `chmod 0777` both dirs.
-- Sometimes only total clearing of these dirs helps. In Linux you can run `sudo ./data/clear.sh` to do it.
+- When rebuilding image, total clearing of these dirs has to be done. In Linux you can run `sudo ./data/clear.sh` to do it.
+
+#### PHP Storm IDE templates
+
+**If you use PHP Storm you can import these settings to automate:**
+- Routes creation
+- Controller creation
+- Service creation
+- Task creation
+- Getters and Setters creation
+
+**Notes:**
+- Only templates will be imported. All other settings should stay the same.
+- I suggest you to create current PHP Storm settings backup before importing my examples.
+
+#### Running PHP Unit and Paratest
+
+* Paratest (full PHP unit testing): run `unit`
+ anywhere (works same as running `vendor/bin/paratest`)
+* Filtered testing: run `unit TestClassOrMethodName` (works same as `vendor/bin/phpunit --filter TestClassOrMethodName`)
+* Running PHP unit with command: `unit --command arguments` (works same as `vendor/bin/phpunit --command arguments`)
+
+#### Running Code Standart testing
+
+* Run `cs` from anywhere to run full `vendor/bin/php-cs-fixer` and `vendor/bin/phpcs` testing for directories `mvc` and `modules`

@@ -57,7 +57,7 @@ class CustomRouter implements RouterInterface
 
         $request = (new RequestEntity())
             ->setMethod(Text::lower($this->app->request->getMethod()))
-            ->setQuery(Variable::restoreTypes($this->app->request->getQuery()))
+            ->setQuery(Variable::restoreArrayTypes($this->app->request->getQuery()))
             ->setPath($urlPath)
         ;
 
@@ -71,12 +71,12 @@ class CustomRouter implements RouterInterface
             $request
                 ->setType($request::REQUEST_TYPE_API)
                 ->setModule(Text::camelize($urlSplitter[2]))
-                ->setParams(Variable::restoreTypes(array_slice($urlSplitter, 3)));
+                ->setParams(Variable::restoreArrayTypes(array_slice($urlSplitter, 3)));
         } else {
             $request
                 ->setType($request::REQUEST_TYPE_VIEW)
                 ->setModule(Text::camelize($urlSplitter[1]))
-                ->setParams(Variable::restoreTypes(array_slice($urlSplitter, 2)));
+                ->setParams(Variable::restoreArrayTypes(array_slice($urlSplitter, 2)));
         }
 
         if (!File::exists($modulesDir . '/' . $request->getModule())) {

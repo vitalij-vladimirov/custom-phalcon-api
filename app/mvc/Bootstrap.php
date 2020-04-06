@@ -10,6 +10,7 @@ use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\View\Simple as View;
 use Phalcon\Url as UrlResolver;
 use Exception;
+use Throwable;
 
 class Bootstrap
 {
@@ -26,7 +27,7 @@ class Bootstrap
         $this->app = new Micro($this->services);
 
         if (!empty($this->config->customRouter)) {
-            if (!isset(class_implements($this->config->customRouter)[\Mvc\RouterInterface::class])) {
+            if (!isset(class_implements($this->config->customRouter)[RouterInterface::class])) {
                 throw new Exception('CustomRouter must implement \Mvc\RouterInterface');
             }
 
@@ -95,7 +96,7 @@ class Bootstrap
                 'charset'  => $config->database->charset
             ];
 
-            if ($config->database->adapter == 'Postgresql') {
+            if ($config->database->adapter === 'Postgresql') {
                 unset($params['charset']);
             }
 
@@ -137,6 +138,10 @@ class Bootstrap
 
         $namespacesCache = file_get_contents($namespacesCacheLocation);
 
-        return json_decode($namespacesCache, true, JSON_PARTIAL_OUTPUT_ON_ERROR, JSON_THROW_ON_ERROR);
+        try {
+            return json_decode($namespacesCache, true, JSON_PARTIAL_OUTPUT_ON_ERROR, JSON_THROW_ON_ERROR);
+        } catch (Throwable $exception) {
+            return $this->config->defaultNamespaces->toArray();
+        }
     }
 }

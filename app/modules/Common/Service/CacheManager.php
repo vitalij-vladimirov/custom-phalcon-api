@@ -11,7 +11,7 @@ class CacheManager extends BaseService
 {
     private const IGNORE_FILES = [
         '.',
-        '..'
+        '..',
     ];
 
     private array $modulesDirectories;
@@ -58,31 +58,20 @@ class CacheManager extends BaseService
 
     private function generateDirectoriesList(string $directory): array
     {
-        $directories = $this->searchForDirectories($directory);
-
-        if (count($directories)) {
-            $subDirectories = $directories;
-            foreach ($subDirectories as $directory) {
-                $directories = array_merge(
-                    $directories,
-                    $this->searchForDirectories($directory)
-                );
-            }
-        }
-
-        return $directories;
-    }
-
-    private function searchForDirectories(string $directory): array
-    {
         $directories = [];
+        $handle = opendir($directory);
 
-        if ($handle = opendir($directory)) {
+        if ($handle) {
             while (false !== ($file = readdir($handle))) {
                 $path = $directory . '/' . $file;
 
                 if (!in_array($file, self::IGNORE_FILES, true) && filetype($path) === 'dir') {
                     $directories[] = $path;
+
+                    $subDirectories = $this->generateDirectoriesList($path);
+                    if (count($subDirectories)) {
+                        $directories = array_merge($directories, $subDirectories);
+                    }
                 }
             }
             closedir($handle);

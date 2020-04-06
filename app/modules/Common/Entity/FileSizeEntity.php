@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-class FileSizeEntity
+use Common\BaseClasses\BaseEntity;
+
+class FileSizeEntity extends BaseEntity
 {
     private int $bytes;
     private string $kilobytes;

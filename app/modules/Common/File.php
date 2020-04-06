@@ -4,19 +4,48 @@ declare(strict_types=1);
 namespace Common;
 
 use Carbon\Carbon;
-use Common\Config\ErrorCodes;
 use Common\Entity\DirectoryEntity;
 use Common\Entity\FileInfoEntity;
 use Common\Entity\FileSizeEntity;
-use Common\Exception\NotFoundException;
+use Common\Exception\InternalErrorException;
 
 class File
 {
-    public static function write(string $file, string $text): void
+    public static function write(string $file, string $text): bool
     {
         self::validateFileDirectoryEntityAndCreateIfNotFound($file);
 
-        file_put_contents($file, $text);
+        $fileWrite = file_put_contents($file, $text);
+
+        return ($fileWrite || $text === '') ?? false;
+    }
+
+    // TODO: write test
+    public static function delete(string $file): bool
+    {
+        if (!self::exists($file)) {
+            throw new InternalErrorException('File not found.');
+        }
+
+        if (is_dir($file)) {
+            return rmdir($file);
+        }
+
+        return unlink($file);
+    }
+
+    // TODO: write test
+    public static function move(string $from, string $to): bool
+    {
+        if (!self::exists($from)) {
+            throw new InternalErrorException('Source file not found.');
+        }
+
+        if (self::exists($to)) {
+            throw new InternalErrorException('Destination file already exists.');
+        }
+
+        return rename($from, $to);
     }
 
     public static function read(string $file): ?string
@@ -43,8 +72,8 @@ class File
             ->setType(mime_content_type($file))
             ->setHash(md5_file($file))
             ->setLastModified(Carbon::createFromTimestamp(filemtime($file)))
-            ->setFileSizeEntity(self::getSize($file))
-            ->setDirectoryEntity(self::getDirectoryEntity($file))
+            ->setFileSize(self::getSize($file))
+            ->setDirectory(self::getDirectory($file))
         ;
 
         $pathSplitter = explode('/', $file);
@@ -77,7 +106,7 @@ class File
         ;
     }
 
-    public static function getDirectoryEntity(string $file): ?DirectoryEntity
+    public static function getDirectory(string $file): ?DirectoryEntity
     {
         $map = [];
         $pathSplitter = explode('/', $file);
@@ -102,16 +131,54 @@ class File
         ;
     }
 
-    public static function validateFileExists(string $file): void
-    {
-        if (!self::exists($file)) {
-            throw new NotFoundException('File not found', ErrorCodes::FILE_NOT_FOUND);
+    // TODO: create test
+    public function readDirectory(
+        string $directory,
+        bool $scanHiddenFiles = true,
+        bool $readSubDirs = false
+    ): array {
+        if (!self::exists($directory)) {
+            throw new InternalErrorException('Directory not found.');
         }
+
+        $directories = [];
+        $files = [];
+
+        $handle = opendir($directory);
+
+        if ($handle) {
+            while (false !== ($file = readdir($handle))) {
+                if (in_array($file, ['.', '..'], true)) {
+                    continue;
+                }
+
+                if (!$scanHiddenFiles && substr($file, 0, 1) === '.') {
+                    continue;
+                }
+
+                $path = $directory . '/' . $file;
+
+                if (filetype($path) === 'dir') {
+                    if ($readSubDirs) {
+                        $directories[$file] = self::readDirectory($path, $scanHiddenFiles, true);
+                        continue;
+                    }
+
+                    $directories[$file] = $path;
+                    continue;
+                }
+
+                $files[$file] = $path;
+            }
+            closedir($handle);
+        }
+
+        return array_merge($directories, $files);
     }
 
     private static function validateFileDirectoryEntityAndCreateIfNotFound(string $file): void
     {
-        $directory = self::getDirectoryEntity($file);
+        $directory = self::getDirectory($file);
 
         if (self::exists($directory->getPath())) {
             return;
