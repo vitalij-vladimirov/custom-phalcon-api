@@ -2,6 +2,22 @@
 
 APP_NAME='phalcon-api'
 
+check_db() {
+  if [ "$(docker exec -ti "$APP_NAME" bash -c "cli Common:CheckDbState" 2>&1)" == 1 ]; then
+    DB_STATUS=1
+  else
+    echo "Waiting for database..."
+    for i in {1..60}; do
+      sleep 1
+      if [ "$(docker exec -ti "$APP_NAME" bash -c "cli Common:CheckDbState" 2>&1)" == 1 ]; then
+        DB_STATUS=1
+        return
+      fi
+    done
+    echo "Couldn't connect to DB."
+  fi
+}
+
 if [ -z "$1" ]; then
 
   echo "
@@ -12,6 +28,9 @@ Docker arguments:
   ${0} down   - stop app
   ${0} build  - rebuild project
   ${0} clear  - clear data folder (may need to be run with sudo on Linux)
+
+CLI:
+  ${0} cli {task} {...params}
 
 Testing arguments:
   ${0} test             - run full test (cs && unit)
@@ -27,7 +46,14 @@ elif [ "$1" == "up" ]; then
 
   docker-compose down
   docker-compose up -d
-  docker exec -ti "$APP_NAME" bash -c "composer install && cli migration:run"
+  docker exec -ti "$APP_NAME" bash -c "composer install"
+
+  check_db
+  if [ "$DB_STATUS" == "1" ]; then
+    docker exec -ti "$APP_NAME" bash -c "cli migration:run"
+  else
+    echo "Please run migration manually."
+  fi
 
 elif [ "$1" == "exec" ]; then
   docker exec -ti "$APP_NAME" bash
@@ -36,8 +62,15 @@ elif [ "$1" == "ps" ]; then
 elif [ "$1" == "build" ]; then
 
   docker-compose down
-  docker-compose up --build
-  docker exec -ti "$APP_NAME" bash -c "composer install && cli migration:run"
+  docker-compose up --build -d
+  docker exec -ti "$APP_NAME" bash -c "composer install"
+
+  check_db
+  if [ "$DB_STATUS" == "1" ]; then
+    docker exec -ti "$APP_NAME" bash -c "cli migration:run"
+  else
+    echo "Please run migration manually."
+  fi
 
 elif [ "$1" == "clear" ]; then
 
@@ -49,15 +82,12 @@ elif [ "$1" == "clear" ]; then
   )
 
   for FILE in $PATH/*; do
-    if [ $FILE != "$PATH/clear.sh" ];
-      then
-        echo "Removing "$FILE;
-        /bin/rm -rf $FILE
-    fi;
+    echo "Removing "$FILE;
+    /bin/rm -rf $FILE
   done;
 
   for DIR in ${STRUCTURE[@]}; do
-    echo "Creating" $DIR;
+    echo "Creating dir" $DIR;
     /bin/mkdir $PATH/$DIR
     /bin/chmod 0777 $PATH/$DIR
     > $PATH/$DIR/.gitkeep
@@ -75,6 +105,24 @@ elif [ "$1" == "unit" ]; then
   docker exec -ti "$APP_NAME" bash -c "unit $2"
 elif [ "$1" == "test" ]; then
   docker exec -ti "$APP_NAME" bash -c "cs && unit"
+elif [ "$1" == "cli" ]; then
+  if [ -z "$2" ]; then
+    docker exec -ti "$APP_NAME" bash -c "$1"
+  elif [ -z "$3" ]; then
+    docker exec -ti "$APP_NAME" bash -c "$1 $2"
+  elif [ -z "$4" ]; then
+    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3"
+  elif [ -z "$5" ]; then
+    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3 $4"
+  elif [ -z "$6" ]; then
+    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3 $4 $5"
+  elif [ -z "$7" ]; then
+    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3 $4 $5 $6"
+  elif [ -z "$8" ]; then
+    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3 $4 $5 $6 $7"
+  elif [ -z "$9" ]; then
+    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3 $4 $5 $6 $7 $8"
+  fi
 else
   echo "Argument \"$1\" not found"
 fi
