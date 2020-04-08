@@ -6,7 +6,6 @@ ENV fpm.pool.pm=ondemand
 ENV fpm.pool.pm.max_children=50
 ENV fpm.pool.pm.process_idle_timeout=10s
 ENV fpm.pool.pm.max_requests=500
-ENV COMPOSER_ALLOW_SUPERUSER 1
 ENV COMPOSER_NO_INTERACTION 1
 
 # Install apps and libs
@@ -16,7 +15,7 @@ RUN apt-get update && apt-get -y install procps mcedit bsdtar libaio1 musl-dev \
 # Configure services ant tools
 COPY .config/nginx/10-location-root.conf /opt/docker/etc/nginx/vhost.common.d/10-location-root.conf
 COPY .config/mcedit/mc.keymap /etc/mc/mc.keymap
-COPY .config/composer/compose_1.9.3.phar /usr/bin/composer.phar
+COPY .config/composer/compose_1.9.3.phar /usr/local/bin/composer
 
 # Configure Phalcon 4.0.4
 COPY .config/php-ext/psr.so /usr/local/lib/php/extensions/no-debug-non-zts-20190902/psr.so
@@ -36,4 +35,4 @@ COPY --chown=www-data:www-data app /app
 WORKDIR /app
 RUN if [ "$APP_ENV" = "development" ]; then composer install; else composer install --no-dev --optimize-autoloader; fi
 RUN (crontab -l ; echo "* * * * * /usr/local/bin/php /app/mvc/cron.php "$APP_ENV" >> /dev/null 2>&1") | crontab
-RUN (/usr/local/bin/php /app/mvc/cli.php Common:CacheNamespaces)
+RUN /usr/local/bin/php /app/mvc/cli.php Common:CacheNamespaces

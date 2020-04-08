@@ -5,7 +5,11 @@ use Phalcon\Config;
 use Common\Service\CustomRouter;
 use Dotenv\Dotenv;
 
-(Dotenv::createImmutable('/app/'))->load();
+if (file_exists('/app/.env')) {
+    (Dotenv::createImmutable('/app/'))->load();
+} else {
+    (Dotenv::createImmutable('/app/mvc/', '.env.development'))->load();
+}
 
 return new Config([
 

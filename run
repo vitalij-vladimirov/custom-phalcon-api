@@ -1,0 +1,80 @@
+#!/bin/bash -e
+
+APP_NAME='phalcon-api'
+
+if [ -z "$1" ]; then
+
+  echo "
+Docker arguments:
+  ${0} up     - run app
+  ${0} exec   - exec to $APP_NAME
+  ${0} ps     - docker ps -a
+  ${0} down   - stop app
+  ${0} build  - rebuild project
+  ${0} clear  - clear data folder (may need to be run with sudo on Linux)
+
+Testing arguments:
+  ${0} test             - run full test (cs && unit)
+  ${0} cs               - run Code Sniffers tests
+  ${0} cs fix           - run code autofix
+  ${0} cs {dir}         - run Code Sniffers in exact directory
+  ${0} unit             - run paratest
+  ${0} unit {test_name} - run exact test class or test method
+"
+  exit
+
+elif [ "$1" == "up" ]; then
+
+  docker-compose down
+  docker-compose up -d
+  docker exec -ti "$APP_NAME" bash -c "composer install && cli migration:run"
+
+elif [ "$1" == "exec" ]; then
+  docker exec -ti "$APP_NAME" bash
+elif [ "$1" == "ps" ]; then
+  docker ps -a
+elif [ "$1" == "build" ]; then
+
+  docker-compose down
+  docker-compose up --build
+  docker exec -ti "$APP_NAME" bash -c "composer install && cli migration:run"
+
+elif [ "$1" == "clear" ]; then
+
+  PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/data"
+
+  STRUCTURE=(
+    "mysql"
+    "log"
+  )
+
+  for FILE in $PATH/*; do
+    if [ $FILE != "$PATH/clear.sh" ];
+      then
+        echo "Removing "$FILE;
+        /bin/rm -rf $FILE
+    fi;
+  done;
+
+  for DIR in ${STRUCTURE[@]}; do
+    echo "Creating" $DIR;
+    /bin/mkdir $PATH/$DIR
+    /bin/chmod 0777 $PATH/$DIR
+    > $PATH/$DIR/.gitkeep
+  done
+
+elif [ "$1" == "down" ]; then
+  docker-compose down
+elif [ "$1" == "cs" ] && [ -z "$2" ]; then
+  docker exec -ti "$APP_NAME" bash -c "cs"
+elif [ "$1" == "cs" ]; then
+  docker exec -ti "$APP_NAME" bash -c "cs $2"
+elif [ "$1" == "unit" ] && [ -z "$2" ]; then
+  docker exec -ti "$APP_NAME" bash -c "unit"
+elif [ "$1" == "unit" ]; then
+  docker exec -ti "$APP_NAME" bash -c "unit $2"
+elif [ "$1" == "test" ]; then
+  docker exec -ti "$APP_NAME" bash -c "cs && unit"
+else
+  echo "Argument \"$1\" not found"
+fi

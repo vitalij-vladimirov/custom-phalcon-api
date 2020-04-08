@@ -33,10 +33,6 @@ class CacheNamespacesTask extends Task
 
                 sleep(15);
             }
-
-            return;
         }
-
-        return;
     }
 }
