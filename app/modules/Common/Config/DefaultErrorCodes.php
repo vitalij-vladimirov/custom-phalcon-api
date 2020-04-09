@@ -12,5 +12,6 @@ class DefaultErrorCodes
     public const METHOD_NOT_ALLOWED = 'method_not_allowed'; // 405
     public const CONFLICT = 'conflict';                     // 409
     public const TOO_MANY_REQUESTS = 'too_many_requests';   // 429
-    public const INTERNAL_ERROR = 'internal_error';
+    public const LOGIC_EXCEPTION = 'logic_exception';
+    public const DATABASE_EXCEPTION = 'database_exception';
 }

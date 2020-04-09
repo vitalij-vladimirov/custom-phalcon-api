@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Common;
 
-use Common\Exception\InternalErrorException;
+use Common\Exception\LogicException;
 use Phalcon\Text as PhalconText;
 
 class Text extends PhalconText
@@ -77,7 +77,7 @@ class Text extends PhalconText
     public static function toPascalCase(string $value): string
     {
         if (empty(trim($value))) {
-            throw new InternalErrorException('Can\'t convert empty string.');
+            throw new LogicException('Can\'t convert empty string.');
         }
 
         $stringType = self::detectStringType($value);
@@ -106,7 +106,7 @@ class Text extends PhalconText
         );
 
         if (empty(trim($value))) {
-            throw new InternalErrorException('No valid characters found.');
+            throw new LogicException('No valid characters found.');
         }
 
         return $value;
@@ -120,7 +120,7 @@ class Text extends PhalconText
     public static function toKebabCase(string $value, bool $url = false): string
     {
         if (empty(trim($value))) {
-            throw new InternalErrorException('Can\'t convert empty string.');
+            throw new LogicException('Can\'t convert empty string.');
         }
 
         $stringType = self::detectStringType($value);
@@ -150,7 +150,7 @@ class Text extends PhalconText
         $value = self::convertRawAndTextToKebabCase($value, $stringType, $url);
 
         if (empty(trim($value))) {
-            throw new InternalErrorException('No valid characters found.');
+            throw new LogicException('No valid characters found.');
         }
 
         return $value;
@@ -222,7 +222,7 @@ class Text extends PhalconText
      * @param string $value
      * @param string|null $delimiter
      * @return string
-     * @throws InternalErrorException
+     * @throws LogicException
      */
     public static function camelize(string $value, $delimiter = null): string
     {
@@ -235,7 +235,7 @@ class Text extends PhalconText
      * @param string $value
      * @param string $delimiter
      * @return string
-     * @throws InternalErrorException
+     * @throws LogicException
      */
     public static function uncamelize(string $value, $delimiter = '_'): string
     {

@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Common\Entity\DirectoryEntity;
 use Common\Entity\FileInfoEntity;
 use Common\Entity\FileSizeEntity;
-use Common\Exception\InternalErrorException;
+use Common\Exception\LogicException;
 
 class File
 {
@@ -24,7 +24,7 @@ class File
     public static function delete(string $file): bool
     {
         if (!self::exists($file)) {
-            throw new InternalErrorException('File not found.');
+            throw new LogicException('File not found.');
         }
 
         if (is_dir($file)) {
@@ -38,11 +38,11 @@ class File
     public static function move(string $from, string $to): bool
     {
         if (!self::exists($from)) {
-            throw new InternalErrorException('Source file not found.');
+            throw new LogicException('Source file not found.');
         }
 
         if (self::exists($to)) {
-            throw new InternalErrorException('Destination file already exists.');
+            throw new LogicException('Destination file already exists.');
         }
 
         return rename($from, $to);
@@ -138,7 +138,7 @@ class File
         bool $readSubDirs = false
     ): array {
         if (!self::exists($directory)) {
-            throw new InternalErrorException('Directory not found.');
+            throw new LogicException('Directory not found.');
         }
 
         $directories = [];

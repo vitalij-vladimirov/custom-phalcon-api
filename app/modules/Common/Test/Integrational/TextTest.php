@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Common\Integrational\Test;
 
 use Common\BaseClasses\BaseTestCase;
-use Common\Exception\InternalErrorException;
+use Common\Exception\LogicException;
 use Common\Text;
 
 class TextTest extends BaseTestCase
@@ -130,13 +130,13 @@ class TextTest extends BaseTestCase
 
     public function testWillTryToConvertEmptyStringAndThrowException(): void
     {
-        $this->expectException(InternalErrorException::class);
+        $this->expectException(LogicException::class);
         Text::toText('  ');
     }
 
     public function testWillTryToConvertStringWithBadCharactersAndThrowException(): void
     {
-        $this->expectException(InternalErrorException::class);
+        $this->expectException(LogicException::class);
         Text::toText('"!\/"');
     }
 

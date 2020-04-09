@@ -10,7 +10,7 @@ return [
     'paths' => [
         'migrations' => '/app/db/migrations'
     ],
-    'migration_base_class' => '\Common\Config\Database\Migration',
+    'migration_base_class' => '\Common\BaseClasses\BaseMigration',
     'environments' => [
         'default_migration_table' => 'migration',
         'default_database' => 'default',

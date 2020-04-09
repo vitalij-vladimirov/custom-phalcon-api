@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Common\Task;
 
-use Common\Exception\InternalErrorException;
+use Common\Exception\LogicException;
 use Phalcon\Cli\Task;
 use Common\Service\CacheManager;
 
@@ -12,7 +12,7 @@ class CacheNamespacesTask extends Task
     public function mainAction(string $type = null): void
     {
         if ($type !== null && $type !== 'cron') {
-            throw new InternalErrorException('Argument $type must be empty or \'cron\'.');
+            throw new LogicException('Argument $type must be empty or \'cron\'.');
         }
 
         /**

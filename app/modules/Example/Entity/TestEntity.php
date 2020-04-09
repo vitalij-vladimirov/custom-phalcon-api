@@ -1,10 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\Entity;
+namespace Example\Entity;
 
 use Carbon\Carbon;
 use Common\BaseClasses\BaseEntity;
+use Common\Entity\DirectoryEntity;
 
 class TestEntity extends BaseEntity
 {

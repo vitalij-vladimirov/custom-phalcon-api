@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Schema\Blueprint;
-use Common\Config\Database\Migration;
+use Common\BaseClasses\BaseMigration;
 use Common\Interfaces\MigrationCreateInterface;
 
 /**
@@ -20,12 +20,14 @@ use Common\Interfaces\MigrationCreateInterface;
  * Laravel migration standards should be used to specify schema:
  * https://laravel.com/docs/7.x/migrations#creating-columns
  */
-class CreateCronTable extends Migration implements MigrationCreateInterface
+class CreateExampleTable extends BaseMigration implements MigrationCreateInterface
 {
-    protected string $table = 'cron';
+    protected string $table = 'example';
 
     public function createSchema(Blueprint $table): void
     {
-        $table->string('column_name', 55);
+        $table->string('lib_name', 255);
+        $table->string('lib_url', 255);
+        $table->text('description');
     }
 }

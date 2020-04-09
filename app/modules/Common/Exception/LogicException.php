@@ -5,11 +5,11 @@ namespace Common\Exception;
 
 use Common\Config\DefaultErrorCodes;
 
-final class InternalErrorException extends DefaultException
+final class LogicException extends DefaultException
 {
     public function __construct(
-        string $message = 'Internal error',
-        string $code = DefaultErrorCodes::INTERNAL_ERROR
+        string $message,
+        string $code = DefaultErrorCodes::LOGIC_EXCEPTION
     ) {
         parent::__construct($message, $code);
     }

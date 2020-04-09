@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Schema\Blueprint;
-use Common\Config\Database\Migration;
+use Common\BaseClasses\BaseMigration;
 use Common\Interfaces\MigrationUpdateInterface;
 
 /**
@@ -16,19 +16,19 @@ use Common\Interfaces\MigrationUpdateInterface;
  * Laravel migration standards should be used to specify schema:
  * https://laravel.com/docs/7.x/migrations#creating-columns
  */
-class AddFieldsToCronTable extends Migration implements MigrationUpdateInterface
+class AddVersionToExampleTable extends BaseMigration implements MigrationUpdateInterface
 {
-    protected string $table = 'cron';
+    protected string $table = 'example';
 
     public function updateSchema(Blueprint $table): void
     {
-        $table->string('new_column', 55)
-            ->after('column_name')
+        $table->float('version', 8, 4)
+            ->after('lib_url')
         ;
     }
 
     public function rollbackSchema(Blueprint $table): void
     {
-        $table->dropColumn('new_column');
+        $table->dropColumn('version');
     }
 }

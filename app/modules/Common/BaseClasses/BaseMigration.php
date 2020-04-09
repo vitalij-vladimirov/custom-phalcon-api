@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\Config\Database;
+namespace Common\BaseClasses;
 
 use Phalcon\Config;
 use Phalcon\Db\Adapter\Pdo\AbstractPdo;
@@ -9,11 +9,11 @@ use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
 use Phinx\Migration\AbstractMigration;
-use Common\Exception\InternalErrorException;
+use Common\Exception\LogicException;
 use Common\Interfaces\MigrationCreateInterface;
 use Common\Interfaces\MigrationUpdateInterface;
 
-abstract class Migration extends AbstractMigration
+abstract class BaseMigration extends AbstractMigration
 {
     protected string $table;
     protected Capsule $capsule;
@@ -21,7 +21,7 @@ abstract class Migration extends AbstractMigration
 
     private Config $config;
 
-    protected function init()
+    protected function init(): void
     {
         $this->config = $GLOBALS['app']->di->getShared('config');
 
@@ -45,7 +45,7 @@ abstract class Migration extends AbstractMigration
     public function up(): void
     {
         if (empty($this->table)) {
-            throw new InternalErrorException('$table name must be specified.');
+            throw new LogicException('$table name must be specified.');
         }
 
         if (isset(class_implements($this)[MigrationCreateInterface::class])) {
@@ -75,7 +75,7 @@ abstract class Migration extends AbstractMigration
             return;
         }
 
-        throw new InternalErrorException(
+        throw new LogicException(
             'Migration must implement migration \'create\' or \'update\' interface.'
         );
     }
@@ -83,7 +83,7 @@ abstract class Migration extends AbstractMigration
     public function down(): void
     {
         if (empty($this->table)) {
-            throw new InternalErrorException('$table name must be specified.');
+            throw new LogicException('$table name must be specified.');
         }
 
         if (isset(class_implements($this)[MigrationCreateInterface::class])) {

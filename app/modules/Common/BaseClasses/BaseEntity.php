@@ -5,7 +5,7 @@ namespace Common\BaseClasses;
 
 use ReflectionMethod;
 use Carbon\Carbon;
-use Common\Exception\InternalErrorException;
+use Common\Exception\LogicException;
 use Common\Json;
 use Common\Regex;
 use Common\Text;
@@ -83,7 +83,7 @@ abstract class BaseEntity
                         $array[Text::uncamelizeMethod($key)] = $value;
                     }
                 } catch (Throwable $exception) {
-                    throw new InternalErrorException('Can\'t convert $data object.');
+                    throw new LogicException('Can\'t convert $data object.');
                 }
             }
         }
@@ -93,7 +93,7 @@ abstract class BaseEntity
         }
 
         if (!isset($array)) {
-            throw new InternalErrorException('$data type must be array or object.');
+            throw new LogicException('$data type must be array or object.');
         }
 
         $array = Variable::restoreArrayTypes($data);

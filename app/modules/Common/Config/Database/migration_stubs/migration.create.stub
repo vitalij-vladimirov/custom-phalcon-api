@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Schema\Blueprint;
-use Common\Config\Database\Migration;
+use Common\BaseClasses\BaseMigration;
 use Common\Interfaces\MigrationCreateInterface;
 
 /**
@@ -20,12 +20,12 @@ use Common\Interfaces\MigrationCreateInterface;
  * Laravel migration standards should be used to specify schema:
  * https://laravel.com/docs/7.x/migrations#creating-columns
  */
-class {{ class }} extends Migration implements MigrationCreateInterface
+class {{ class }} extends BaseMigration implements MigrationCreateInterface
 {
     protected string $table = '{{ table }}';
 
     public function createSchema(Blueprint $table): void
     {
-        // $table->string('column_name', 55);
+//        $table->string('column_name', 55);
     }
 }

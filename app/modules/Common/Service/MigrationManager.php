@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Phinx\Console\PhinxApplication;
 use Common\BaseClasses\BaseService;
-use Common\Exception\InternalErrorException;
+use Common\Exception\LogicException;
 use Common\File;
 use Common\Regex;
 
@@ -46,11 +46,11 @@ class MigrationManager extends BaseService
     public function createMigration(string $table = null): string
     {
         if ($table === null) {
-            throw new InternalErrorException('Argument $table must be specified.');
+            throw new LogicException('Argument $table must be specified.');
         }
 
         if (in_array($table, self::FORBIDDEN_TABLE_NAMES, true)) {
-            throw new InternalErrorException('Table name \'' . $table . '\' is forbidden.');
+            throw new LogicException('Table name \'' . $table . '\' is forbidden.');
         }
 
         return $this->correctMigrationName(
@@ -66,15 +66,15 @@ class MigrationManager extends BaseService
     public function updateMigration(string $table = null, string $action = null): string
     {
         if ($table === null) {
-            throw new InternalErrorException('Argument $table must be string, null given.');
+            throw new LogicException('Argument $table must be string, null given.');
         }
 
         if ($action === null) {
-            throw new InternalErrorException('Argument $action must be string, null given.');
+            throw new LogicException('Argument $action must be string, null given.');
         }
 
         if (!$this->ensurePrimaryMigrationExist($table)) {
-            throw new InternalErrorException('Table \'' . $table . '\' not found in migrations.');
+            throw new LogicException('Table \'' . $table . '\' not found in migrations.');
         }
 
         list($prefix) = explode('_', $action);
@@ -90,7 +90,7 @@ class MigrationManager extends BaseService
                 $actionDirection = '_from_';
                 break;
             default:
-                throw new InternalErrorException(
+                throw new LogicException(
                     '$action must start with one of these prefixes: \'add_\', \'update_\', \'remove_\''
                 );
         }
@@ -108,7 +108,7 @@ class MigrationManager extends BaseService
     public function runMigrations(string $date = null): void
     {
         if ($date !== null && !Regex::isValidPattern($date, '/^[0-9]{4,14}$/')) {
-            throw new InternalErrorException('Argument $date must contain exactly 14 numerical characters.');
+            throw new LogicException('Argument $date must contain exactly 14 numerical characters.');
         }
 
         if ($date !== null) {
@@ -123,7 +123,7 @@ class MigrationManager extends BaseService
     public function rollbackMigration(string $date = null): void
     {
         if ($date === null || !Regex::isValidPattern($date, '/^[0-9]{4,14}$/')) {
-            throw new InternalErrorException(
+            throw new LogicException(
                 'Argument $date is required and must contains from 4 to 14 numerical characters.'
             );
         }
