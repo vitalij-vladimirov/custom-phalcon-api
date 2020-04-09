@@ -36,6 +36,7 @@ class BaseSeeder
 
         if ($tableRowsCount !== 0) {
             echo Console::warning('Table \'' . $this->table . '\' was not seeded because it contains data.');
+            return;
         }
 
         $this->seedTable();

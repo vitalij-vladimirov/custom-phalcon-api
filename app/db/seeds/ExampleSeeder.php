@@ -20,41 +20,51 @@ class ExampleSeeder extends BaseSeeder
 
     protected function seedTable(): void
     {
-//        TODO: finish with seeds configuration
-//        $data = [
-//            [
-//                "lib_name" => "PHP .env",
-//                "lib_url" => "vlucas/phpdotenv",
-//                "version" => "4.1",
-//                "environment" => "production",
-//                "description" => "Env configuration reader",
-//            ], [
-//                "lib_name" => "PHP Cron scheduler",
-//                "lib_url" => "peppeocchi/php-cron-scheduler",
-//                "version" => "3.0",
-//                "environment" => "production",
-//                "description" => "Cronjobs scheduler",
-//            ], [
-//                "lib_name" => "Dice",
-//                "lib_url" => "level-2/dice",
-//                "version" => "4.0",
-//                "environment" => "production",
-//                "description" => "Depenency injection container generator",
-//            ], [
-//                "lib_name" => "Carbon",
-//                "lib_url" => "nesbot/carbon",
-//                "version" => "2.31",
-//                "environment" => "production",
-//                "description" => "Time manipulation lib",
-//            ], [
-//                "lib_name" => "Guzzle",
-//                "lib_url" => "guzzlehttp/guzzle",
-//                "version" => "6.5",
-//                "environment" => "production",
-//                "description" => "Http/Curl requests lib",
-//            ],
-//        ];
+        $data = [
+            [
+                "lib_name" => "PHP .env",
+                "lib_url" => "vlucas/phpdotenv",
+                "version" => "4.1",
+                "environment" => "production",
+                "description" => "Env configuration reader",
+            ], [
+                "lib_name" => "PHP Cron scheduler",
+                "lib_url" => "peppeocchi/php-cron-scheduler",
+                "version" => "3.0",
+                "environment" => "production",
+                "description" => "Cronjobs scheduler",
+            ], [
+                "lib_name" => "Dice",
+                "lib_url" => "level-2/dice",
+                "version" => "4.0",
+                "environment" => "production",
+                "description" => "Depenency injection container generator",
+            ], [
+                "lib_name" => "Carbon",
+                "lib_url" => "nesbot/carbon",
+                "version" => "2.31",
+                "environment" => "production",
+                "description" => "Time manipulation lib",
+            ], [
+                "lib_name" => "Guzzle",
+                "lib_url" => "guzzlehttp/guzzle",
+                "version" => "6.5",
+                "environment" => "production",
+                "description" => "Http/Curl requests lib",
+            ],
+        ];
+
+//        TODO: create easy and understandable insertion, maybe use Laravel ORM
+//        $keys = '`' . implode('`,`', array_keys($data[0])) . '`';
 //
-//        $this->db->insert($this->table, $data);
+//        $values = '';
+//        foreach ($data as $row) {
+//            if (!empty($values)) {
+//                $values .= ',';
+//            }
+//            $values .= '(\'' . implode('\',\'', $row) . '\')';
+//        }
+//
+//        $this->db->execute('INSERT INTO `' . $this->table . '` (' . $keys . ') VALUES ' . $values);
     }
 }
