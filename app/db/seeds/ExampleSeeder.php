@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Seeds;
 
 use Common\BaseClasses\BaseSeeder;
+use Illuminate\Database\Capsule\Manager;
 
 /**
  * Seeds will be created only if table is empty.
@@ -53,6 +54,25 @@ class ExampleSeeder extends BaseSeeder
                 "description" => "Http/Curl requests lib",
             ],
         ];
+
+//      TODO: Setup Eloquent globally since it works much better than native Phalcon PDO
+        $config = $GLOBALS['app']->di->getShared('config');
+
+        $capsule = new Manager();
+        $capsule->addConnection([
+            'driver' => $config->database->adapter,
+            'host' => $config->database->host,
+            'username' => $config->database->username,
+            'password' => $config->database->password,
+            'database' => $config->database->dbname,
+            'prefix' => '',
+            'charset' => $config->database->charset,
+            'collation' => $config->database->collation,
+        ]);
+        $capsule->setAsGlobal();  //this is important
+        $capsule->bootEloquent();
+
+        $capsule::table($this->table)->insert($data);
 
 //        TODO: create easy and understandable insertion, maybe use Laravel ORM
 //        $keys = '`' . implode('`,`', array_keys($data[0])) . '`';
