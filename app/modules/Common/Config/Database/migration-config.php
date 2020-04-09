@@ -8,7 +8,7 @@ $config = $GLOBALS['app']->di->getShared('config');
 
 return [
     'paths' => [
-        'migrations' => '/app/db/migrations'
+        'migrations' => $config->application->migrationsDir
     ],
     'migration_base_class' => '\Common\BaseClasses\BaseMigration',
     'environments' => [

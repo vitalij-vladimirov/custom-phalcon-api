@@ -18,6 +18,7 @@ abstract class BaseMigration extends AbstractMigration
     protected string $table;
     protected Capsule $capsule;
     protected Builder $schema;
+    protected AbstractPdo $db;
 
     private Config $config;
 
@@ -48,7 +49,13 @@ abstract class BaseMigration extends AbstractMigration
             throw new LogicException('$table name must be specified.');
         }
 
+        $this->loadPhalconDbAdapter();
+
         if (isset(class_implements($this)[MigrationCreateInterface::class])) {
+            if (method_exists($this, 'beforeMigration')) {
+                $this->beforeMigration();
+            }
+
             $this->schema->create($this->table, function (Blueprint $table) {
                 $table->id();
 
@@ -62,15 +69,27 @@ abstract class BaseMigration extends AbstractMigration
 
             $this->correctUpdatedAtField();
 
+            if (method_exists($this, 'afterMigration')) {
+                $this->afterMigration();
+            }
+
             return;
         }
 
         if (isset(class_implements($this)[MigrationUpdateInterface::class])) {
+            if (method_exists($this, 'beforeMigration')) {
+                $this->beforeMigration();
+            }
+
             $this->schema->table($this->table, function (Blueprint $table) {
                 $this->updateSchema($table);
             });
 
             $this->correctUpdatedAtField();
+
+            if (method_exists($this, 'afterMigration')) {
+                $this->afterMigration();
+            }
 
             return;
         }
@@ -101,11 +120,16 @@ abstract class BaseMigration extends AbstractMigration
         }
     }
 
+    private function loadPhalconDbAdapter(): void
+    {
+        $this->db = $GLOBALS['app']->di->getShared('db');
+    }
+
     /**
      * Updating field `updated_at` to "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
      * has been tested only with MySql, so I return this method at the stat if other DB is used.
      */
-    protected function correctUpdatedAtField(): void
+    private function correctUpdatedAtField(): void
     {
         if (strtolower($this->config->database->adapter) !== 'mysql') {
             return;
@@ -114,10 +138,7 @@ abstract class BaseMigration extends AbstractMigration
         $getDefault = 'CURRENT_TIMESTAMP';
         $getExtra = 'DEFAULT_GENERATED on update CURRENT_TIMESTAMP';
 
-        /** @var AbstractPdo $this->config */
-        $db = $GLOBALS['app']->di->getShared('db');
-
-        $updatedAt = $db->query('
+        $updatedAt = $this->db->query('
             SHOW COLUMNS
             FROM ' . $this->config->database->dbname . '.' . $this->table . '
             WHERE `field` = \'updated_at\'
@@ -127,7 +148,7 @@ abstract class BaseMigration extends AbstractMigration
             return;
         }
 
-        $db->query('
+        $this->db->query('
             ALTER TABLE ' . $this->config->database->dbname . '.' . $this->table . '
             CHANGE COLUMN `updated_at` `updated_at`
             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

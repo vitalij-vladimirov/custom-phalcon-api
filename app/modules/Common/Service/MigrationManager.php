@@ -15,8 +15,8 @@ use Common\Regex;
 
 class MigrationManager extends BaseService
 {
-    private const STUDS_PATH = '/app/modules/Common/Config/Database/migration_stubs';
-    private const PHINX_CONFIG = '/app/modules/Common/Config/Database/phinx-config.php';
+    private const STUB_PATH = '/app/modules/Common/Config/Database/migration_stubs';
+    private const PHINX_CONFIG = '/app/modules/Common/Config/Database/migration-config.php';
     private const FORBIDDEN_TABLE_NAMES = ['migration', 'phinx'];
 
     private MigrationCreator $migrationCreator;
@@ -35,7 +35,7 @@ class MigrationManager extends BaseService
         $this->consoleOutput = $consoleOutput;
         $this->phinxApplication = $phinxApplication;
 
-        $this->migrationCreator = new MigrationCreator($filesystem, self::STUDS_PATH);
+        $this->migrationCreator = new MigrationCreator($filesystem, self::STUB_PATH);
 
         $this->migrationsDir = $this->config->application->migrationsDir;
         if (substr($this->migrationsDir, -1) === '/') {
@@ -108,7 +108,7 @@ class MigrationManager extends BaseService
     public function runMigrations(string $date = null): void
     {
         if ($date !== null && !Regex::isValidPattern($date, '/^[0-9]{4,14}$/')) {
-            throw new LogicException('Argument $date must contain exactly 14 numerical characters.');
+            throw new LogicException('Argument $date must contain from 4 to 14 numerical characters.');
         }
 
         if ($date !== null) {
@@ -124,7 +124,7 @@ class MigrationManager extends BaseService
     {
         if ($date === null || !Regex::isValidPattern($date, '/^[0-9]{4,14}$/')) {
             throw new LogicException(
-                'Argument $date is required and must contains from 4 to 14 numerical characters.'
+                'Argument $date is required and must contain from 4 to 14 numerical characters.'
             );
         }
 
@@ -133,7 +133,7 @@ class MigrationManager extends BaseService
         $this->phinxApplication->doRun($input, $this->consoleOutput);
     }
 
-    private function ensurePrimaryMigrationExist(string $table): bool
+    public function ensurePrimaryMigrationExist(string $table): bool
     {
         $fileName = 'create_' . $table . '_table';
 

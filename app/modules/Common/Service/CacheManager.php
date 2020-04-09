@@ -22,6 +22,7 @@ class CacheManager extends BaseService
 
         $this->modulesDirectories = [
             $this->config->application->mvcDir => 'Mvc',
+            $this->config->application->seedsDir => 'Seeds',
             $this->config->application->modulesDir => '',
         ];
     }

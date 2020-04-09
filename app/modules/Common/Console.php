@@ -65,7 +65,7 @@ class Console
         return "\e[" . $styling . 'm' . $text . "\e[0m";
     }
 
-    public static function error(string $text, bool $eolInTheEnt = true): string
+    public static function error(string $text, bool $eolAtTheEnd = true): string
     {
         return self::output(
             $text,
@@ -74,10 +74,10 @@ class Console
             [
                 self::STYLE_BOLD
             ]
-        ) . ($eolInTheEnt ? PHP_EOL : '');
+        ) . ($eolAtTheEnd ? PHP_EOL : '');
     }
 
-    public static function warning(string $text, bool $eolInTheEnt = true): string
+    public static function warning(string $text, bool $eolAtTheEnd = true): string
     {
         return self::output(
             $text,
@@ -86,10 +86,10 @@ class Console
             [
                 self::STYLE_BOLD
             ]
-        ) . ($eolInTheEnt ? PHP_EOL : '');
+        ) . ($eolAtTheEnd ? PHP_EOL : '');
     }
 
-    public static function success(string $text, bool $eolInTheEnt = true): string
+    public static function success(string $text, bool $eolAtTheEnd = true): string
     {
         return self::output(
             $text,
@@ -98,23 +98,23 @@ class Console
             [
                 self::STYLE_BOLD
             ]
-        ) . ($eolInTheEnt ? PHP_EOL : '');
+        ) . ($eolAtTheEnd ? PHP_EOL : '');
     }
 
     public static function messageHeader(
         string $text,
-        bool $eolInTheEnt = false,
+        bool $eolAtTheEnd = false,
         int $textColor = self::COLOR_DEFAULT,
         int $bgColor = self::COLOR_DARK_GRAY,
         array $styles = [self::STYLE_BOLD]
     ): string {
         return self::output(PHP_EOL . $text, $textColor, $bgColor, $styles) .
-            ($eolInTheEnt ? PHP_EOL : '');
+            ($eolAtTheEnd ? PHP_EOL : '');
     }
 
     public static function message(
         string $text,
-        bool $eolInTheEnt = true,
+        bool $eolAtTheEnd = true,
         int $textColor = self::COLOR_DEFAULT,
         int $bgColor = self::COLOR_DARK_GRAY,
         array $styles = []
@@ -127,6 +127,6 @@ class Console
         }
 
         return self::output($text, $textColor, $bgColor, $styles) . PHP_EOL .
-            ($eolInTheEnt ? PHP_EOL : '');
+            ($eolAtTheEnd ? PHP_EOL : '');
     }
 }

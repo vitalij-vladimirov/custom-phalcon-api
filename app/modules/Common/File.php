@@ -21,6 +21,20 @@ class File
     }
 
     // TODO: write test
+    public static function copy(string $from, string $to): bool
+    {
+        if (!self::exists($from)) {
+            throw new LogicException('Source file not found.');
+        }
+
+        if (self::exists($to)) {
+            throw new LogicException('Destination file already exists.');
+        }
+
+        return copy($from, $to);
+    }
+
+    // TODO: write test
     public static function delete(string $file): bool
     {
         if (!self::exists($file)) {
@@ -132,7 +146,7 @@ class File
     }
 
     // TODO: create test
-    public function readDirectory(
+    public static function readDirectory(
         string $directory,
         bool $scanHiddenFiles = true,
         bool $readSubDirs = false

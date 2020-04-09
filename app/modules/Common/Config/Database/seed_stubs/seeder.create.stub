@@ -1,0 +1,27 @@
+<?php
+declare(strict_types=1);
+
+namespace Seeds;
+
+use Common\BaseClasses\BaseSeeder;
+
+/**
+ * Seeds will be created only if table is empty.
+ * One table can have only one seeds file.
+ *
+ * Seeds should be used in development or testing process, so they can not be
+ * created in production. If you need to add some information to production
+ * database use migration method afterMigration() to call seeder or update
+ * table data manually.
+ */
+class {{ class }} extends BaseSeeder
+{
+    protected string $table = '{{ table }}';
+
+    protected function seedTable(): void
+    {
+        $data = [];
+
+        $this->db->insert($this->table, $data);
+    }
+}

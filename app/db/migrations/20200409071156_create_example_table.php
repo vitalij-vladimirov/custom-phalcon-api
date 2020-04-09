@@ -17,6 +17,12 @@ use Common\Interfaces\MigrationCreateInterface;
  * rollback is settled automatically, you do not need to write any additional
  * logic like `drop()` method.
  *
+ * If you need to run some actions before migration, implement logic in method
+ * beforeMigration(). Any logic can be implemented here.
+ *
+ * If you need to seed table after migration, create new seeder and run it from
+ * method afterMigration(). Any other logic can be implemented here.
+ *
  * Laravel migration standards should be used to specify schema:
  * https://laravel.com/docs/7.x/migrations#creating-columns
  */
@@ -28,6 +34,17 @@ class CreateExampleTable extends BaseMigration implements MigrationCreateInterfa
     {
         $table->string('lib_name', 255);
         $table->string('lib_url', 255);
+        $table->string('version', 10);
         $table->text('description');
+    }
+
+    public function beforeMigration(): void
+    {
+        //
+    }
+
+    public function afterMigration(): void
+    {
+        //(new ExampleSeeder())->run();
     }
 }

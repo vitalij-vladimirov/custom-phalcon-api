@@ -18,21 +18,6 @@ class BaseModel extends Model
     protected Carbon $created_at;
     protected Carbon $updated_at;
 
-    public function getTableName(): string
-    {
-        if (!empty($this->table)) {
-            return $this->table;
-        }
-
-        $this->table = Text::toSnakeCase(get_class($this));
-
-        if (Regex::isValidPattern($this->table, '/(_model)$/')) {
-            $this->table = substr($this->table, 0, -6);
-        }
-
-        return $this->table;
-    }
-
     public function getId(): int
     {
         if ($this->id === null) {
@@ -68,9 +53,24 @@ class BaseModel extends Model
         return $this->updated_at;
     }
 
-    protected function dateTimeToCarbon(string $date): Carbon
+    protected function getTableName(): string
     {
-        return Carbon::createFromFormat('Y-m-d H:i:s', $date);
+        if (!empty($this->table)) {
+            return $this->table;
+        }
+
+        $this->table = Text::toSnakeCase(get_class($this));
+
+        if (Regex::isValidPattern($this->table, '/(_model)$/')) {
+            $this->table = substr($this->table, 0, -6);
+        }
+
+        return $this->table;
+    }
+
+    protected function dateTimeToCarbon(string $dateTime): Carbon
+    {
+        return Carbon::createFromFormat('Y-m-d H:i:s', $dateTime);
     }
 
     protected function dateToCarbon(string $date): Carbon

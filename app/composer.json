@@ -3,7 +3,6 @@
         "vlucas/phpdotenv": "^4.1",
         "peppeocchi/php-cron-scheduler": "^3.0",
         "level-2/dice": "^4.0",
-        "brick/math": "^0.8.14",
         "ext-json": "*",
         "ext-fileinfo": "*",
         "nesbot/carbon": "^2.31",

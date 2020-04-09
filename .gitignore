@@ -6,3 +6,4 @@ data
 .env
 .php_cs.cache
 app/modules/*/Task/TestTask.php
+app/modules/Common/Config/Database/seed_stubs/migration.create.stub

@@ -13,6 +13,8 @@ if (file_exists('/app/.env')) {
 
 return new Config([
 
+    'environment' => getenv('APP_ENV') ?? 'production',
+
     /*
      * Specify cli commands shortcuts he to avoid Writing long command paths
      * Shortcut must specify full command path: Module:Task:command
@@ -23,8 +25,9 @@ return new Config([
      *      Will run:   cli Example:Test:run
      */
     'cliShortcuts' => [
-        'test' => 'Common:Test',
+        'test' => 'Common:Test', // TestTask is ignored by GIT, so create new to use it
         'migration' => 'Common:Migration',
+        'seed' => 'Common:Seed',
     ],
 
     /*

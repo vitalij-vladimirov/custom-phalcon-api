@@ -25,15 +25,16 @@ use Common\Interfaces\MigrationUpdateInterface;
  * Laravel migration standards should be used to specify schema:
  * https://laravel.com/docs/7.x/migrations#creating-columns
  */
-class {{ class }} extends BaseMigration implements MigrationUpdateInterface
+class AddEnvironmentToExampleTable extends BaseMigration implements MigrationUpdateInterface
 {
-    protected string $table = '{{ table }}';
+    protected string $table = 'example';
 
     public function updateSchema(Blueprint $table): void
     {
-        //$table->string('column_name', 55)
-        //    ->after('past_created_column')
-        //;
+        $table->string('environment', 10)
+            ->after('version')
+            ->default('production')
+        ;
     }
 
     public function beforeMigration(): void
@@ -48,6 +49,6 @@ class {{ class }} extends BaseMigration implements MigrationUpdateInterface
 
     public function rollbackSchema(Blueprint $table): void
     {
-        //$table->dropColumn('column_name');
+        $table->dropColumn('version');
     }
 }
