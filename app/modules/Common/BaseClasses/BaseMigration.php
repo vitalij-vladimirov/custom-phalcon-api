@@ -10,17 +10,23 @@ use Illuminate\Database\Capsule\Manager as EloquentManager;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
 use Common\Exception\LogicException;
-use Common\Interfaces\MigrationCreateInterface;
-use Common\Interfaces\MigrationUpdateInterface;
+use Common\Regex;
+use Common\Text;
 
 abstract class BaseMigration extends AbstractMigration
 {
+    private const MIGRATION_CREATE = 'create';
+    private const MIGRATION_UPDATE = 'update';
+
     protected string $table;
     protected EloquentManager $eloquent;
     protected Builder $schema;
     protected AbstractPdo $db;
 
     private Config $config;
+    private string $migrationType;
+
+    abstract protected function migrationSchema(Blueprint $table): void;
 
     public function up(): void
     {
@@ -30,52 +36,32 @@ abstract class BaseMigration extends AbstractMigration
 
         $this->loadGlobalServices();
 
-        if (isset(class_implements($this)[MigrationCreateInterface::class])) {
-            if (method_exists($this, 'beforeMigration')) {
-                $this->beforeMigration();
-            }
+        if (method_exists($this, 'beforeMigration')) {
+            $this->beforeMigration();
+        }
 
+        if ($this->migrationType === self::MIGRATION_CREATE) {
             $this->schema->create($this->table, function (Blueprint $table) {
                 $table->id();
 
-                $this->createSchema($table);
+                $this->migrationSchema($table);
 
                 $table->timestamp('created_at')
                     ->useCurrent();
                 $table->timestamp('updated_at')
                     ->useCurrent();
             });
-
-            $this->correctUpdatedAtField();
-
-            if (method_exists($this, 'afterMigration')) {
-                $this->afterMigration();
-            }
-
-            return;
-        }
-
-        if (isset(class_implements($this)[MigrationUpdateInterface::class])) {
-            if (method_exists($this, 'beforeMigration')) {
-                $this->beforeMigration();
-            }
-
+        } elseif ($this->migrationType === self::MIGRATION_UPDATE) {
             $this->schema->table($this->table, function (Blueprint $table) {
-                $this->updateSchema($table);
+                $this->migrationSchema($table);
             });
-
-            $this->correctUpdatedAtField();
-
-            if (method_exists($this, 'afterMigration')) {
-                $this->afterMigration();
-            }
-
-            return;
         }
 
-        throw new LogicException(
-            'Migration must implement \'MigrationCreateInterface\' or \'MigrationUpdateInterface\'.'
-        );
+        $this->correctUpdatedAtField();
+
+        if (method_exists($this, 'afterMigration')) {
+            $this->afterMigration();
+        }
     }
 
     public function down(): void
@@ -84,18 +70,12 @@ abstract class BaseMigration extends AbstractMigration
             throw new LogicException('$table name must be specified.');
         }
 
-        if (isset(class_implements($this)[MigrationCreateInterface::class])) {
+        if ($this->migrationType === self::MIGRATION_CREATE) {
             $this->schema->dropIfExists($this->table);
-
-            return;
-        }
-
-        if (isset(class_implements($this)[MigrationUpdateInterface::class])) {
+        } else {
             $this->schema->table($this->table, function (Blueprint $table) {
                 $this->rollbackSchema($table);
             });
-
-            return;
         }
     }
 
@@ -104,12 +84,32 @@ abstract class BaseMigration extends AbstractMigration
         $this->loadGlobalServices();
     }
 
+    private function setMigrationType(): string
+    {
+        $className = get_class($this);
+
+        $tableNameInPascal = Text::toPascalCase($this->table);
+
+        if ($className === 'Create' . $tableNameInPascal . 'Table') {
+            return $this->migrationType = self::MIGRATION_CREATE;
+        }
+
+        $updateClassPattern = '/^(Add|Remove|Update)+[A-Za-z0-9]+(To|From|On)+' . $tableNameInPascal . 'Table$/';
+        if (Regex::isValidPattern($className, $updateClassPattern)) {
+            return $this->migrationType = self::MIGRATION_UPDATE;
+        }
+
+        throw new LogicException('Migration type can not be detected.');
+    }
+
     private function loadGlobalServices(): void
     {
         $this->config = $GLOBALS['app']->di->getShared('config');
         $this->db = $GLOBALS['app']->di->getShared('db');
         $this->eloquent = $GLOBALS['app']->di->getShared('eloquent');
         $this->schema = $this->eloquent::schema();
+
+        $this->setMigrationType();
     }
 
     /**

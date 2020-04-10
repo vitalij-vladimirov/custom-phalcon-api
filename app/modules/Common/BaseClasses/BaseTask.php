@@ -3,18 +3,19 @@ declare(strict_types=1);
 
 namespace Common\BaseClasses;
 
-use Phalcon\Cli\Task;
 use Phalcon\Config;
 use Dice\Dice;
 
-abstract class BaseTask extends Task
+abstract class BaseTask
 {
     protected Config $config;
     protected Dice $inject;
 
-    public function onConstruct(): void
+    public function __construct()
     {
-        $this->config = $this->di->getShared('config');
+        $this->config = $GLOBALS['app']->di->getShared('config');
         $this->inject = new Dice();
     }
+
+    abstract public function mainAction(): void;
 }

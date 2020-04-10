@@ -22,6 +22,8 @@ abstract class BaseSeeder
         $this->eloquent = $GLOBALS['app']->di->getShared('eloquent');
     }
 
+    abstract protected function seedTable(): void;
+
     public function run(): void
     {
         if (empty($this->table)) {

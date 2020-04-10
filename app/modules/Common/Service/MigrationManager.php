@@ -77,7 +77,7 @@ class MigrationManager extends BaseService
             throw new LogicException('Table \'' . $table . '\' not found in migrations.');
         }
 
-        list($prefix) = explode('_', $action);
+        [$prefix] = explode('_', $action);
 
         switch ($prefix) {
             case 'add':

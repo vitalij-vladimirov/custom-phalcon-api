@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 use Illuminate\Database\Schema\Blueprint;
 use Common\BaseClasses\BaseMigration;
-use Common\Interfaces\MigrationCreateInterface;
 
 /**
- * Specify fields you want to create in new table in method `createSchema()`.
+ * Specify fields you want to create in new table in method `migrationSchema()`.
  *
  * IMPORTANT: Autoincrement field `id` in the start of table
  * and fields `created_at` and `updated_at` in the end of table
@@ -26,11 +25,11 @@ use Common\Interfaces\MigrationCreateInterface;
  * Laravel migration standards should be used to specify schema:
  * https://laravel.com/docs/7.x/migrations#creating-columns
  */
-class CreateExampleTable extends BaseMigration implements MigrationCreateInterface
+class CreateExampleTable extends BaseMigration
 {
     protected string $table = 'example';
 
-    public function createSchema(Blueprint $table): void
+    protected function migrationSchema(Blueprint $table): void
     {
         $table->string('lib_name', 255);
         $table->string('lib_url', 255);
@@ -38,12 +37,12 @@ class CreateExampleTable extends BaseMigration implements MigrationCreateInterfa
         $table->text('description');
     }
 
-    public function beforeMigration(): void
+    protected function beforeMigration(): void
     {
         //
     }
 
-    public function afterMigration(): void
+    protected function afterMigration(): void
     {
         //(new ExampleSeeder())->run();
     }

@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 use Illuminate\Database\Schema\Blueprint;
 use Common\BaseClasses\BaseMigration;
-use Common\Interfaces\MigrationUpdateInterface;
 
 /**
- * Specify fields you want to update/add/remove in method `updateSchema()`.
+ * Specify fields you want to update/add/remove in method `migrationSchema()`.
  *
- * One migration can update only one schema.
+ * One migration can update only one table.
  *
  * IMPORTANT: Specify method `rollbackSchema()` correctly to revert updates
  * in case if you will need to rollback current database changes.
@@ -25,11 +24,11 @@ use Common\Interfaces\MigrationUpdateInterface;
  * Laravel migration standards should be used to specify schema:
  * https://laravel.com/docs/7.x/migrations#creating-columns
  */
-class AddEnvironmentToExampleTable extends BaseMigration implements MigrationUpdateInterface
+class AddEnvironmentToExampleTable extends BaseMigration
 {
     protected string $table = 'example';
 
-    public function updateSchema(Blueprint $table): void
+    protected function migrationSchema(Blueprint $table): void
     {
         $table->string('environment', 10)
             ->after('version')
@@ -37,18 +36,18 @@ class AddEnvironmentToExampleTable extends BaseMigration implements MigrationUpd
         ;
     }
 
-    public function beforeMigration(): void
+    protected function beforeMigration(): void
     {
         //
     }
 
-    public function afterMigration(): void
+    protected function afterMigration(): void
     {
         //(new TableSeeder())->run();
     }
 
-    public function rollbackSchema(Blueprint $table): void
+    protected function rollbackSchema(Blueprint $table): void
     {
-        $table->dropColumn('version');
+        $table->dropColumn('environment');
     }
 }
