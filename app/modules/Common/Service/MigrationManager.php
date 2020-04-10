@@ -16,7 +16,7 @@ use Common\Regex;
 class MigrationManager extends BaseService
 {
     private const STUB_PATH = '/app/modules/Common/Config/Database/migration_stubs';
-    private const ORM_CONFIG = '/app/modules/Common/Config/Database/laravel-orm-config.php';
+    private const MIGRATION_CONFIG = '/app/modules/Common/Config/Database/migration-config.php';
     private const FORBIDDEN_TABLE_NAMES = ['migration', 'phinx'];
 
     private MigrationCreator $migrationCreator;
@@ -112,9 +112,9 @@ class MigrationManager extends BaseService
         }
 
         if ($date !== null) {
-            $input = new ArgvInput([null, 'migrate', '-d', $date, '-c', self::ORM_CONFIG]);
+            $input = new ArgvInput([null, 'migrate', '-d', $date, '-c', self::MIGRATION_CONFIG]);
         } else {
-            $input = new ArgvInput([null, 'migrate', '-c', self::ORM_CONFIG]);
+            $input = new ArgvInput([null, 'migrate', '-c', self::MIGRATION_CONFIG]);
         }
 
         $this->phinxApplication->doRun($input, $this->consoleOutput);
@@ -128,7 +128,7 @@ class MigrationManager extends BaseService
             );
         }
 
-        $input = new ArgvInput(['phinx', 'rollback', '-d', $date, '-c', self::ORM_CONFIG]);
+        $input = new ArgvInput(['phinx', 'rollback', '-d', $date, '-c', self::MIGRATION_CONFIG]);
 
         $this->phinxApplication->doRun($input, $this->consoleOutput);
     }

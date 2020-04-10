@@ -8,6 +8,7 @@ use Phalcon\Loader;
 use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\View\Simple as View;
 use Phalcon\Url as UrlResolver;
+use Illuminate\Database\Capsule\Manager as EloquentManager;
 use Throwable;
 
 class Bootstrap
@@ -60,6 +61,24 @@ class Bootstrap
             }
 
             return new $class($params);
+        });
+
+        $this->services->setShared('eloquent', function () use ($config) {
+            $eloquent = new EloquentManager();
+            $eloquent->addConnection([
+                'driver' => $config->database->adapter,
+                'host' => $config->database->host,
+                'username' => $config->database->username,
+                'password' => $config->database->password,
+                'database' => $config->database->dbname,
+                'prefix' => '',
+                'charset' => $config->database->charset,
+                'collation' => $config->database->collation,
+            ]);
+            $eloquent->setAsGlobal();
+            $eloquent->bootEloquent();
+
+            return $eloquent;
         });
 
         return $this->services;

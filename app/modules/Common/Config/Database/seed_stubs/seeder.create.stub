@@ -22,6 +22,6 @@ class {{ class }} extends BaseSeeder
     {
         $data = [];
 
-        $this->db->insert($this->table, $data);
+        $this->eloquent::table($this->table)->insert($data);
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Seeds;
 
 use Common\BaseClasses\BaseSeeder;
-use Illuminate\Database\Capsule\Manager;
 
 /**
  * Seeds will be created only if table is empty.
@@ -23,68 +22,38 @@ class ExampleSeeder extends BaseSeeder
     {
         $data = [
             [
-                "lib_name" => "PHP .env",
-                "lib_url" => "vlucas/phpdotenv",
-                "version" => "4.1",
-                "environment" => "production",
-                "description" => "Env configuration reader",
+                'lib_name' => 'PHP .env',
+                'lib_url' => 'vlucas/phpdotenv',
+                'version' => '4.1',
+                'environment' => 'production',
+                'description' => 'Env configuration reader',
             ], [
-                "lib_name" => "PHP Cron scheduler",
-                "lib_url" => "peppeocchi/php-cron-scheduler",
-                "version" => "3.0",
-                "environment" => "production",
-                "description" => "Cronjobs scheduler",
+                'lib_name' => 'PHP Cron scheduler',
+                'lib_url' => 'peppeocchi/php-cron-scheduler',
+                'version' => '3.0',
+                'environment' => 'production',
+                'description' => 'Cronjobs scheduler',
             ], [
-                "lib_name" => "Dice",
-                "lib_url" => "level-2/dice",
-                "version" => "4.0",
-                "environment" => "production",
-                "description" => "Depenency injection container generator",
+                'lib_name' => 'Dice',
+                'lib_url' => 'level-2/dice',
+                'version' => '4.0',
+                'environment' => 'production',
+                'description' => 'Depenency injection container generator',
             ], [
-                "lib_name" => "Carbon",
-                "lib_url" => "nesbot/carbon",
-                "version" => "2.31",
-                "environment" => "production",
-                "description" => "Time manipulation lib",
+                'lib_name' => 'Carbon',
+                'lib_url' => 'nesbot/carbon',
+                'version' => '2.31',
+                'environment' => 'production',
+                'description' => 'Time manipulation lib',
             ], [
-                "lib_name" => "Guzzle",
-                "lib_url" => "guzzlehttp/guzzle",
-                "version" => "6.5",
-                "environment" => "production",
-                "description" => "Http/Curl requests lib",
+                'lib_name' => 'Guzzle',
+                'lib_url' => 'guzzlehttp/guzzle',
+                'version' => '6.5',
+                'environment' => 'production',
+                'description' => 'Http/Curl requests lib',
             ],
         ];
 
-//      TODO: Setup Eloquent globally since it works much better than native Phalcon PDO
-        $config = $GLOBALS['app']->di->getShared('config');
-
-        $capsule = new Manager();
-        $capsule->addConnection([
-            'driver' => $config->database->adapter,
-            'host' => $config->database->host,
-            'username' => $config->database->username,
-            'password' => $config->database->password,
-            'database' => $config->database->dbname,
-            'prefix' => '',
-            'charset' => $config->database->charset,
-            'collation' => $config->database->collation,
-        ]);
-        $capsule->setAsGlobal();  //this is important
-        $capsule->bootEloquent();
-
-        $capsule::table($this->table)->insert($data);
-
-//        TODO: create easy and understandable insertion, maybe use Laravel ORM
-//        $keys = '`' . implode('`,`', array_keys($data[0])) . '`';
-//
-//        $values = '';
-//        foreach ($data as $row) {
-//            if (!empty($values)) {
-//                $values .= ',';
-//            }
-//            $values .= '(\'' . implode('\',\'', $row) . '\')';
-//        }
-//
-//        $this->db->execute('INSERT INTO `' . $this->table . '` (' . $keys . ') VALUES ' . $values);
+        $this->eloquent::table($this->table)->insert($data);
     }
 }

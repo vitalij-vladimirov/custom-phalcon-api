@@ -3,20 +3,23 @@ declare(strict_types=1);
 
 namespace Common\BaseClasses;
 
+use Phalcon\Db\Adapter\Pdo\AbstractPdo;
+use Illuminate\Database\Capsule\Manager as EloquentManager;
 use Common\Console;
 use Common\Exception\DatabaseException;
 use Common\Exception\LogicException;
-use Phalcon\Db\Adapter\Pdo\AbstractPdo;
 use Throwable;
 
 class BaseSeeder
 {
     protected string $table;
     protected AbstractPdo $db;
+    protected EloquentManager $eloquent;
 
     public function __construct()
     {
         $this->db = $GLOBALS['app']->di->getShared('db');
+        $this->eloquent = $GLOBALS['app']->di->getShared('eloquent');
     }
 
     public function run(): void

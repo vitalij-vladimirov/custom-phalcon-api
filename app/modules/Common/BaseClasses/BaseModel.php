@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Common\BaseClasses;
 
-use Common\Regex;
-use Common\Text;
 use Phalcon\Mvc\Model;
 use Carbon\Carbon;
+use Common\Regex;
+use Common\Text;
 use Common\Exception\DatabaseException;
 use Common\Variable;
 

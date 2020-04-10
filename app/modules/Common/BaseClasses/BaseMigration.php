@@ -5,10 +5,10 @@ namespace Common\BaseClasses;
 
 use Phalcon\Config;
 use Phalcon\Db\Adapter\Pdo\AbstractPdo;
+use Phinx\Migration\AbstractMigration;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
-use Phinx\Migration\AbstractMigration;
 use Common\Exception\LogicException;
 use Common\Interfaces\MigrationCreateInterface;
 use Common\Interfaces\MigrationUpdateInterface;
