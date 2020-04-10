@@ -6,7 +6,7 @@ namespace Common\BaseClasses;
 use Phalcon\Config;
 use Phalcon\Db\Adapter\Pdo\AbstractPdo;
 use Phinx\Migration\AbstractMigration;
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Capsule\Manager as EloquentManager;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
 use Common\Exception\LogicException;
@@ -16,32 +16,11 @@ use Common\Interfaces\MigrationUpdateInterface;
 abstract class BaseMigration extends AbstractMigration
 {
     protected string $table;
-    protected Capsule $capsule;
+    protected EloquentManager $eloquent;
     protected Builder $schema;
     protected AbstractPdo $db;
 
     private Config $config;
-
-    protected function init(): void
-    {
-        $this->config = $GLOBALS['app']->di->getShared('config');
-
-        $this->capsule = new Capsule;
-        $this->capsule->addConnection([
-            'driver'    => $this->config->database->adapter,
-            'host'      => $this->config->database->host,
-            'port'      => $this->config->database->port,
-            'database'  => $this->config->database->dbname,
-            'username'  => $this->config->database->username,
-            'password'  => $this->config->database->password,
-            'charset'   => $this->config->database->charset,
-            'collation' => $this->config->database->collation,
-        ]);
-
-        $this->capsule->bootEloquent();
-        $this->capsule->setAsGlobal();
-        $this->schema = $this->capsule->schema();
-    }
 
     public function up(): void
     {
@@ -49,7 +28,7 @@ abstract class BaseMigration extends AbstractMigration
             throw new LogicException('$table name must be specified.');
         }
 
-        $this->loadPhalconDbAdapter();
+        $this->loadGlobalServices();
 
         if (isset(class_implements($this)[MigrationCreateInterface::class])) {
             if (method_exists($this, 'beforeMigration')) {
@@ -95,7 +74,7 @@ abstract class BaseMigration extends AbstractMigration
         }
 
         throw new LogicException(
-            'Migration must implement migration \'create\' or \'update\' interface.'
+            'Migration must implement \'MigrationCreateInterface\' or \'MigrationUpdateInterface\'.'
         );
     }
 
@@ -120,14 +99,23 @@ abstract class BaseMigration extends AbstractMigration
         }
     }
 
-    private function loadPhalconDbAdapter(): void
+    protected function init(): void
     {
+        $this->loadGlobalServices();
+    }
+
+    private function loadGlobalServices(): void
+    {
+        $this->config = $GLOBALS['app']->di->getShared('config');
         $this->db = $GLOBALS['app']->di->getShared('db');
+        $this->eloquent = $GLOBALS['app']->di->getShared('eloquent');
+        $this->schema = $this->eloquent::schema();
     }
 
     /**
      * Updating field `updated_at` to "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
-     * has been tested only with MySql, so I return this method at the stat if other DB is used.
+     * has been tested only with MySql, so I return this method at the start if other DB is used.
+     * Update this method in case of using other DB than MySql.
      */
     private function correctUpdatedAtField(): void
     {
@@ -140,7 +128,7 @@ abstract class BaseMigration extends AbstractMigration
 
         $updatedAt = $this->db->query('
             SHOW COLUMNS
-            FROM ' . $this->config->database->dbname . '.' . $this->table . '
+            FROM `' . $this->config->database->dbname . '`.`' . $this->table . '`
             WHERE `field` = \'updated_at\'
         ')->fetch();
 

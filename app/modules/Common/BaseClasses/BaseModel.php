@@ -10,7 +10,7 @@ use Common\Text;
 use Common\Exception\DatabaseException;
 use Common\Variable;
 
-class BaseModel extends Model
+abstract class BaseModel extends Model
 {
     protected string $table;
 

@@ -10,7 +10,7 @@ use Common\Exception\DatabaseException;
 use Common\Exception\LogicException;
 use Throwable;
 
-class BaseSeeder
+abstract class BaseSeeder
 {
     protected string $table;
     protected AbstractPdo $db;
