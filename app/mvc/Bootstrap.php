@@ -9,44 +9,50 @@ use Phalcon\Mvc\Micro;
 use Phalcon\Mvc\View\Simple as View;
 use Phalcon\Url as UrlResolver;
 use Illuminate\Database\Capsule\Manager as EloquentManager;
+use Dotenv\Dotenv;
 use Throwable;
 
 class Bootstrap
 {
-    private FactoryDefault $services;
-    private Loader $loader;
+    private FactoryDefault $di;
 
     public function runApp(): Micro
     {
-        $this->setupServices();
+        $this->setupDi();
         $this->setupLoader();
 
-        return new Micro($this->services);
+        return new Micro($this->di);
     }
 
-    private function setupServices(): FactoryDefault
+    private function setupDi(): FactoryDefault
     {
-        $this->services = new FactoryDefault();
+        $this->di = new FactoryDefault();
 
-        $this->services->setShared('config', function () {
-            return include '/app/mvc/config.php';
+        $this->di->set('config', function () {
+            if (file_exists('/app/.env')) {
+                (Dotenv::createImmutable('/app/'))->load();
+            } else {
+                (Dotenv::createImmutable('/app/config/', '.env.development'))->load();
+            }
+
+            return include '/app/config/config.php';
         });
 
-        $config = $this->services->getShared('config');
+        $config = $this->di->get('config');
 
-        $this->services->setShared('view', function () use ($config) {
+        $this->di->set('view', function () use ($config) {
             $view = new View();
             $view->setViewsDir($config->application->viewsDir);
             return $view;
         });
 
-        $this->services->setShared('url', function () use ($config) {
+        $this->di->set('url', function () use ($config) {
             $url = new UrlResolver();
             $url->setBaseUri($config->application->baseUri);
             return $url;
         });
 
-        $this->services->setShared('db', function () use ($config) {
+        $this->di->set('db', function () use ($config) {
             $class = 'Phalcon\Db\Adapter\Pdo\\' . $config->database->adapter;
             $params = [
                 'host'     => $config->database->host,
@@ -63,7 +69,7 @@ class Bootstrap
             return new $class($params);
         });
 
-        $this->services->setShared('eloquent', function () use ($config) {
+        $this->di->set('eloquent', function () use ($config) {
             $eloquent = new EloquentManager();
             $eloquent->addConnection([
                 'driver' => $config->database->adapter,
@@ -81,29 +87,29 @@ class Bootstrap
             return $eloquent;
         });
 
-        return $this->services;
+        return $this->di;
     }
 
     private function setupLoader(): Loader
     {
-        $this->loader = new Loader();
+        $loader = new Loader();
 
-        $this->loader->registerDirs([
-            $this->services->getShared('config')->application->modulesDir,
-            $this->services->getShared('config')->application->mvcDir,
+        $loader->registerDirs([
+            $this->di->get('config')->application->modulesDir,
+            $this->di->get('config')->application->mvcDir,
         ])->register();
 
-        $this->loader->registerNamespaces($this->getNamespaces());
+        $loader->registerNamespaces($this->getNamespaces());
 
-        return $this->loader;
+        return $loader;
     }
 
     private function getNamespaces(): array
     {
-        $namespacesCacheLocation = $this->services->getShared('config')->application->namespacesCache;
+        $namespacesCacheLocation = $this->di->get('config')->application->namespacesCache;
 
         if (!file_exists($namespacesCacheLocation)) {
-            return $this->services->getShared('config')->defaultNamespaces->toArray();
+            return $this->di->get('config')->defaultNamespaces->toArray();
         }
 
         $namespacesCache = file_get_contents($namespacesCacheLocation);
@@ -111,7 +117,7 @@ class Bootstrap
         try {
             return json_decode($namespacesCache, true, JSON_PARTIAL_OUTPUT_ON_ERROR, JSON_THROW_ON_ERROR);
         } catch (Throwable $exception) {
-            return $this->services->getShared('config')->defaultNamespaces->toArray();
+            return $this->di->get('config')->defaultNamespaces->toArray();
         }
     }
 }

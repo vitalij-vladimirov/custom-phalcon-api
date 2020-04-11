@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
-use Common\Text;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Common\BaseClasses\BaseService;
 use Common\Exception\LogicException;
+use Common\Text;
 use Common\File;
 
 class SeedManager extends BaseService

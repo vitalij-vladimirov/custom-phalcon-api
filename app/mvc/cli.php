@@ -32,7 +32,7 @@ class Cli
     public function __construct(array $args, Micro $app)
     {
         $this->cli = new PhalconCli();
-        $this->config = $app->di->getShared('config');
+        $this->config = $app->di->get('config');
         $this->args = array_slice($args, 1);
 
         $this->collectArguments();

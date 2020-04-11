@@ -13,7 +13,7 @@ include '../mvc/Bootstrap.php';
 try {
     $app = (new Bootstrap())->runApp();
 
-    $router = $app->di->getShared('config')->customRouter ?? Routes::class;
+    $router = $app->di->get('config')->customRouter ?? Routes::class;
 
     if (!isset(class_implements($router)[RouterInterface::class])) {
         throw new Exception('Router must implement \Mvc\RouterInterface');

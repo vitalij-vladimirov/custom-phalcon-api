@@ -48,7 +48,7 @@ class CustomRouter implements RouterInterface
 
     private function getRequest(): RequestEntity
     {
-        $modulesDir = $this->app->di->getShared('config')->application->modulesDir;
+        $modulesDir = $this->app->di->get('config')->application->modulesDir;
 
         list($urlPath) = explode('?', $this->app->request->getURI());
 

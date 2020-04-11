@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Common\Integrational\Test;
 
+use Phalcon\Text as PhalconText;
+use DateTimeImmutable;
+use DateTime;
+use Carbon\Carbon;
 use Common\BaseClasses\BaseTestCase;
 use Common\Variable;
-use Carbon\Carbon;
-use DateTime;
-use DateTimeImmutable;
-use Dice\Dice;
 
 class VariableTest extends BaseTestCase
 {
@@ -325,7 +325,7 @@ class VariableTest extends BaseTestCase
         self::assertTrue(Variable::isDateTimeObject(new DateTimeImmutable()));
 
         // Not DateTime object
-        self::assertFalse(Variable::isDateTimeObject(new Dice()));
+        self::assertFalse(Variable::isDateTimeObject(new PhalconText()));
         self::assertFalse(Variable::isDateTimeObject(self::VAR_INT));
         self::assertFalse(Variable::isDateTimeObject(self::VAR_STRING));
         self::assertFalse(Variable::isDateTimeObject(self::VAR_ARRAY));

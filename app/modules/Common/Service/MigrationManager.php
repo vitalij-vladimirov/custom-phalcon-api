@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
+use Phinx\Console\PhinxApplication;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Phinx\Console\PhinxApplication;
 use Common\BaseClasses\BaseService;
 use Common\Exception\LogicException;
 use Common\File;

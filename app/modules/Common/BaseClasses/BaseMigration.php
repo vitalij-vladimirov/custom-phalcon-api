@@ -6,9 +6,10 @@ namespace Common\BaseClasses;
 use Phalcon\Config;
 use Phalcon\Db\Adapter\Pdo\AbstractPdo;
 use Phinx\Migration\AbstractMigration;
-use Illuminate\Database\Capsule\Manager as EloquentManager;
+use Illuminate\Database\Capsule\Manager as EloquentDb;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
+use Common\Service\InjectionService;
 use Common\Exception\LogicException;
 use Common\Regex;
 use Common\Text;
@@ -19,7 +20,9 @@ abstract class BaseMigration extends AbstractMigration
     private const MIGRATION_UPDATE = 'update';
 
     protected string $table;
-    protected EloquentManager $eloquent;
+
+    protected InjectionService $injectionService;
+    protected EloquentDb $eloquent;
     protected Builder $schema;
     protected AbstractPdo $db;
 
@@ -84,6 +87,11 @@ abstract class BaseMigration extends AbstractMigration
         $this->loadGlobalServices();
     }
 
+    protected function inject(string $class): object
+    {
+        return $this->injectionService->inject($class);
+    }
+
     private function setMigrationType(): string
     {
         $className = get_class($this);
@@ -104,9 +112,12 @@ abstract class BaseMigration extends AbstractMigration
 
     private function loadGlobalServices(): void
     {
-        $this->config = $GLOBALS['app']->di->getShared('config');
-        $this->db = $GLOBALS['app']->di->getShared('db');
-        $this->eloquent = $GLOBALS['app']->di->getShared('eloquent');
+        $this->injectionService = new InjectionService();
+
+        $this->config = $this->injectionService->getConfig();
+        $this->db = $this->injectionService->getDb();
+        $this->eloquent = $this->injectionService->getEloquent();
+
         $this->schema = $this->eloquent::schema();
 
         $this->setMigrationType();

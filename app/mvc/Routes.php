@@ -9,10 +9,6 @@ class Routes implements RouterInterface
 {
     public function getRoutes(Micro $app)
     {
-        $app->get('/api/example', function () use ($app) {
-            return $app['view']->render('index');
-        });
-
         $app->get('/', function () use ($app) {
             return $app['view']->render('index');
         });

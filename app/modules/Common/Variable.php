@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Common;
 
+use Common\Service\InjectionService;
 use Carbon\Carbon;
-use Dice\Dice;
 use DateTimeImmutable;
 use DateTime;
 use Exception;
@@ -306,7 +306,7 @@ class Variable
 
         if (self::isString($instanceOf)) {
             try {
-                $object = (new Dice())->create($instanceOf);
+                $object = (new InjectionService())->inject($instanceOf);
             } catch (Throwable $exception) {
                 return false;
             }
