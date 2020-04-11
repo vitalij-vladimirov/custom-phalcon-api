@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
-use Common\BaseClasses\BaseService;
+use Common\BaseClasses\Injectable;
 use Common\File;
 use Common\Json;
 
-class CacheManager extends BaseService
+class CacheManager extends Injectable
 {
     private const IGNORE_FILES = [
         '.',

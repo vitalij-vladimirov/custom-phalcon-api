@@ -3,9 +3,7 @@ declare(strict_types=1);
 
 namespace Example\Controller;
 
-use Common\BaseClasses\BaseController;
-
-class ExampleController extends BaseController
+class ExampleController
 {
     public function getLibs(): array
     {

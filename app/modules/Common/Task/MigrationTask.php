@@ -12,11 +12,11 @@ class MigrationTask extends BaseTask
     /** @var MigrationManager|object */
     private object $migrationManager;
 
-    public function onConstruct(): void
+    public function __construct()
     {
-        parent::onConstruct();
+        parent::__construct();
 
-        $this->migrationManager = $this->inject->create(MigrationManager::class);
+        $this->migrationManager = $this->inject(MigrationManager::class);
     }
 
     public function mainAction(): void

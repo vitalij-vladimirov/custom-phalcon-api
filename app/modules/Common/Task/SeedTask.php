@@ -12,11 +12,11 @@ class SeedTask extends BaseTask
     /** @var SeedManager|object */
     private object $seedManager;
 
-    public function onConstruct(): void
+    public function __construct()
     {
-        parent::onConstruct();
+        parent::__construct();
 
-        $this->seedManager = $this->inject->create(SeedManager::class);
+        $this->seedManager = $this->inject(SeedManager::class);
     }
 
     public function mainAction(): void

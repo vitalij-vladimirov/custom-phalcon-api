@@ -11,7 +11,7 @@ class CheckDbStateTask extends BaseTask
     public function mainAction(): void
     {
         try {
-            $this->di->getShared('db');
+            $this->db->connect();
             echo 1;
         } catch (Throwable $throwable) {
             echo 0;

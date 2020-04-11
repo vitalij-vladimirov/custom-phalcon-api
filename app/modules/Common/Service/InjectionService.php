@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
-use Common\BaseClasses\BaseService;
-use Illuminate\Database\Capsule\Manager;
-use Phalcon\Config;
-use Phalcon\Db\Adapter\Pdo\AbstractPdo;
+use Common\BaseClasses\Injectable;
 use Phalcon\Mvc\Micro;
+use Phalcon\Config;
+use Phalcon\Db\Adapter\Pdo\AbstractPdo as PhalconDb;
+use Illuminate\Database\Capsule\Manager as EloquentDb;
 
-class InjectionService extends BaseService
+class InjectionService extends Injectable
 {
     public function inject(string $class): object
     {
@@ -26,12 +26,12 @@ class InjectionService extends BaseService
         return $this->config;
     }
 
-    public function getDb(): AbstractPdo
+    public function getDb(): PhalconDb
     {
         return $this->db;
     }
 
-    public function getEloquent(): Manager
+    public function getEloquent(): EloquentDb
     {
         return $this->eloquent;
     }

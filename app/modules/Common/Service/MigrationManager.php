@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
+use Common\BaseClasses\Injectable;
 use Phinx\Console\PhinxApplication;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Common\BaseClasses\BaseService;
 use Common\Exception\LogicException;
 use Common\File;
 use Common\Regex;
 
-class MigrationManager extends BaseService
+class MigrationManager extends Injectable
 {
     private const STUB_PATH = '/app/modules/Common/Config/Database/migration_stubs';
     private const MIGRATION_CONFIG = '/app/modules/Common/Config/Database/migration-config.php';
