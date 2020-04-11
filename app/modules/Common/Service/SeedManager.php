@@ -10,7 +10,7 @@ use Common\Exception\LogicException;
 use Common\Text;
 use Common\File;
 
-class SeedManager extends Injectable
+final class SeedManager extends Injectable
 {
     private const STUB_PATH = '/app/modules/Common/Config/Database/seed_stubs';
 

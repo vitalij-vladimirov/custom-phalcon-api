@@ -9,8 +9,10 @@ use Common\Service\CacheManager;
 
 class CacheNamespacesTask extends Task
 {
-    public function mainAction(string $type = null): void
+    public function mainAction(array $params = []): void
     {
+        $type = $params[0] ?? null;
+
         if ($type !== null && $type !== 'cron') {
             throw new LogicException('Argument $type must be empty or \'cron\'.');
         }
@@ -31,7 +33,9 @@ class CacheNamespacesTask extends Task
             for ($i = 1; $i <= 4; ++$i) {
                 (new CacheManager())->cacheNamespaces();
 
-                sleep(15);
+                if ($i < 4) {
+                    sleep(15);
+                }
             }
         }
     }

@@ -9,17 +9,14 @@ use Common\Console;
 
 class MigrationTask extends BaseTask
 {
-    /** @var MigrationManager|object */
-    private object $migrationManager;
+    private MigrationManager $migrationManager;
 
-    public function __construct()
+    public function __construct(MigrationManager $migrationManager)
     {
-        parent::__construct();
-
-        $this->migrationManager = $this->inject(MigrationManager::class);
+        $this->migrationManager = $migrationManager;
     }
 
-    public function mainAction(): void
+    public function mainAction(array $params = []): void
     {
         $this->helpAction();
     }
@@ -78,23 +75,31 @@ class MigrationTask extends BaseTask
         );
     }
 
-    public function createAction(string $table = null): void
+    public function createAction(array $params = []): void
     {
+        $table = $params[0];
+
         echo Console::success($this->migrationManager->createMigration($table));
     }
 
-    public function updateAction(string $table = null, string $action = null): void
+    public function updateAction(array $params = []): void
     {
+        [$table, $action] = $params;
+
         echo Console::success($this->migrationManager->updateMigration($table, $action));
     }
 
-    public function runAction(string $date = null): void
+    public function runAction(array $params = []): void
     {
+        $date = $params[0];
+
         $this->migrationManager->runMigrations($date);
     }
 
-    public function rollbackAction(string $date = null): void
+    public function rollbackAction(array $params = []): void
     {
+        $date = $params[0];
+
         $this->migrationManager->rollbackMigration($date);
     }
 }

@@ -26,7 +26,7 @@ abstract class BaseSeeder extends Injectable
                 ->fetch()['count']
             ;
         } catch (Throwable $throwable) {
-            throw new DatabaseException('Table \'' . $this->table . '\' not found or database error happen.');
+            throw new DatabaseException('Table \'' . $this->table . '\' not found in DB.');
         }
 
         if ($tableRowsCount !== 0) {

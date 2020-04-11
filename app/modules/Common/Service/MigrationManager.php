@@ -13,7 +13,7 @@ use Common\Exception\LogicException;
 use Common\File;
 use Common\Regex;
 
-class MigrationManager extends Injectable
+final class MigrationManager extends Injectable
 {
     private const STUB_PATH = '/app/modules/Common/Config/Database/migration_stubs';
     private const MIGRATION_CONFIG = '/app/modules/Common/Config/Database/migration-config.php';

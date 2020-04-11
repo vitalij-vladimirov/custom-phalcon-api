@@ -9,17 +9,14 @@ use Common\Service\SeedManager;
 
 class SeedTask extends BaseTask
 {
-    /** @var SeedManager|object */
-    private object $seedManager;
+    private SeedManager $seedManager;
 
-    public function __construct()
+    public function __construct(SeedManager $seedManager)
     {
-        parent::__construct();
-
-        $this->seedManager = $this->inject(SeedManager::class);
+        $this->seedManager = $seedManager;
     }
 
-    public function mainAction(): void
+    public function mainAction(array $params = []): void
     {
         $this->helpAction();
     }
@@ -34,13 +31,17 @@ class SeedTask extends BaseTask
         );
     }
 
-    public function createAction(string $table = null): void
+    public function createAction(array $params = []): void
     {
+        $table = $params[0];
+
         echo Console::success($this->seedManager->createSeed($table));
     }
 
-    public function runAction(string $table = null): void
+    public function runAction(array $params = []): void
     {
+        $table = $params[0];
+
         $this->seedManager->runSeeds($table);
     }
 }

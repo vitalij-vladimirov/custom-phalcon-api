@@ -11,11 +11,6 @@ use Illuminate\Database\Capsule\Manager as EloquentDb;
 
 class InjectionService extends Injectable
 {
-    public function inject(string $class): object
-    {
-        return parent::inject($class);
-    }
-
     public function getApp(): Micro
     {
         return $this->app;
@@ -34,5 +29,10 @@ class InjectionService extends Injectable
     public function getEloquent(): EloquentDb
     {
         return $this->eloquent;
+    }
+
+    public function inject(string $class): object
+    {
+        return parent::inject($class);
     }
 }

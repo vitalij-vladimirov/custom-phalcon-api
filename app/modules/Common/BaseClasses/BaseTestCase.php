@@ -6,11 +6,13 @@ namespace Common\BaseClasses;
 use Phalcon\Config;
 use Phalcon\Db\Adapter\Pdo\AbstractPdo as PhalconDb;
 use Illuminate\Database\Capsule\Manager as EloquentDb;
+use Phalcon\Mvc\Micro;
 use PHPUnit\Framework\TestCase;
 use Common\Service\InjectionService;
 
 abstract class BaseTestCase extends TestCase
 {
+    protected Micro $app;
     protected Config $config;
     protected PhalconDb $db;
     protected EloquentDb $eloquent;
@@ -23,6 +25,7 @@ abstract class BaseTestCase extends TestCase
 
         $this->injectionService = new InjectionService();
 
+        $this->app = $this->injectionService->getApp();
         $this->config = $this->injectionService->getConfig();
         $this->db = $this->injectionService->getDb();
         $this->eloquent = $this->injectionService->getEloquent();

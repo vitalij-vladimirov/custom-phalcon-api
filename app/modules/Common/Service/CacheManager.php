@@ -7,7 +7,7 @@ use Common\BaseClasses\Injectable;
 use Common\File;
 use Common\Json;
 
-class CacheManager extends Injectable
+final class CacheManager extends Injectable
 {
     private const IGNORE_FILES = [
         '.',

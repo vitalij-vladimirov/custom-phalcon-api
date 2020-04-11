@@ -1,15 +1,13 @@
-#!/usr/bin/env php
+#!/usr/local/bin/php
 <?php
 declare(strict_types=1);
 
 namespace Mvc;
 
-use Phalcon\Config;
-use Phalcon\Di\FactoryDefault\Cli as PhalconCli;
-use Phalcon\Cli\Console as PhalconConsole;
-use Common\Console;
-use Phalcon\Cli\Dispatcher;
 use Phalcon\Mvc\Micro;
+use Phalcon\Config;
+use Common\Service\InjectionService;
+use Common\Console;
 use Throwable;
 
 // phpcs:disable
@@ -18,22 +16,23 @@ include '/app/mvc/Bootstrap.php';
 
 $app = (new Bootstrap())->runApp();
 
-new Cli($argv, $app);
+new cli($argv, $app);
 // phpcs:enable
 
-class Cli
+class cli
 {
-    private PhalconCli $cli;
     private Config $config;
-    private array $args;
-    private string $module;
     private array $arguments;
+    private string $module;
+    private ?string $task;
+    private string $taskClass;
+    private ?string $action;
+    private array $parameters;
 
-    public function __construct(array $args, Micro $app)
+    public function __construct(array $arguments, Micro $app)
     {
-        $this->cli = new PhalconCli();
         $this->config = $app->di->get('config');
-        $this->args = array_slice($args, 1);
+        $this->arguments = $arguments;
 
         $this->collectArguments();
         $this->validateArguments();
@@ -42,62 +41,57 @@ class Cli
 
     private function collectArguments(): void
     {
-        if (!count($this->args) || in_array($this->args[0], ['-help', '--help', '-h'], true)) {
+        if (count($this->arguments) === 1 || in_array($this->arguments[1], ['-help', '--help', '-h'], true)) {
             $this->showHelp();
         }
 
-        $command = $this->findCommand($this->args[0]);
+        [$this->module, $this->task, $this->action] = explode(':', $this->findCommand($this->arguments[1]));
 
-        list($this->module, $this->arguments['task'], $this->arguments['action']) = explode(':', $command);
-
-        if (!empty($this->arguments['task']) && substr($this->arguments['task'], -4) === 'Task') {
-            $this->arguments['task'] = substr($this->arguments['task'], 0, -4);
+        if (empty($this->task)) {
+            $this->task = 'Common';
         }
 
-        if (!empty($this->arguments['action']) && substr($this->arguments['action'], -6) === 'Action') {
-            $this->arguments['action'] = substr($this->arguments['action'], 0, -6);
+        if (!empty($this->task) && substr($this->task, -4) === 'Task') {
+            $this->task = substr($this->task, 0, -4);
         }
 
-        if (count($this->args) > 1) {
-            for ($i = 1; $i < count($this->args); ++$i) {
-                $this->arguments['params'][] = $this->args[$i];
-            }
+        if (!empty($this->action) && substr($this->action, -6) === 'Action') {
+            $this->action = substr($this->action, 0, -6);
         }
 
-        if (!empty($this->arguments['task']) && empty($this->arguments['action'])) {
-            $this->arguments['action'] = 'main';
+        if (!empty($this->task) && empty($this->action)) {
+            $this->action = 'main';
         }
+
+        $this->taskClass = '\\' . $this->module . '\Task\\' . ucfirst($this->task) . 'Task';
+
+        $this->parameters = array_slice($this->arguments, 2);
     }
 
     private function validateArguments(): void
     {
         if (!file_exists('/app/modules/' . $this->module)) {
-            echo 'Module "' . $this->module . '" not found' . PHP_EOL;
+            echo Console::error('Module "' . $this->module . '" not found');
             exit;
         }
 
-        $taskClass = $this->module . '\Task\\' . ucfirst($this->arguments['task']) . 'Task';
-        if (!class_exists($taskClass)) {
-            echo 'Task "' . $this->arguments['task'] . '" not found' . PHP_EOL;
+        if (!class_exists($this->taskClass)) {
+            echo Console::error('Task "' . $this->task . '" not found');
             exit;
         }
 
-        if (!method_exists($taskClass, $this->arguments['action'] . 'Action')) {
-            echo 'Action "' . $this->arguments['action'] . '" not found' . PHP_EOL;
+        if (!method_exists($this->taskClass, $this->action . 'Action')) {
+            echo Console::error('Action "' . $this->action . '" not found');
             exit;
         }
     }
 
     private function runTask(): void
     {
-        $console = new PhalconConsole($this->cli);
-        $dispatcher = new Dispatcher();
-
-        $dispatcher->setNamespaceName($this->module . '\Task');
-        $this->cli->setShared('dispatcher', $dispatcher);
-
         try {
-            $console->handle($this->arguments);
+            $taskCall = (new InjectionService())->inject($this->taskClass);
+            $actionMethod = $this->action . 'Action';
+            $taskCall->$actionMethod($this->parameters);
             exit;
         } catch (Throwable $exception) {
             echo Console::error($exception->getMessage());

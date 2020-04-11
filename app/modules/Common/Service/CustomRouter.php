@@ -13,7 +13,7 @@ use Common\File;
 use Common\Text;
 use Common\Variable;
 
-class CustomRouter implements RouterInterface
+final class CustomRouter implements RouterInterface
 {
     private Micro $app;
 
