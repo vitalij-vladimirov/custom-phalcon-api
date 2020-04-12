@@ -9,7 +9,8 @@
         "guzzlehttp/guzzle": "^6.5",
         "illuminate/database": "^7.4",
         "illuminate/filesystem": "^7.4",
-        "robmorgan/phinx": "^0.11.5"
+        "robmorgan/phinx": "^0.11.5",
+        "illuminate/pagination": "^7.5"
     },
     "require-dev": {
         "phalcon/ide-stubs": "^4.0",

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Schema\Blueprint;
 use Common\BaseClasses\BaseMigration;
+use Seeds\VendorSeeder;
 
 /**
  * Specify fields you want to create in new table in method `migrationSchema()`.
@@ -25,25 +26,21 @@ use Common\BaseClasses\BaseMigration;
  * Laravel migration standards should be used to specify schema:
  * https://laravel.com/docs/7.x/migrations#creating-columns
  */
-class CreateExampleTable extends BaseMigration
+class CreateVendorTable extends BaseMigration
 {
-    protected string $table = 'example';
+    protected string $table = 'vendor';
 
     protected function migrationSchema(Blueprint $table): void
     {
         $table->string('lib_name', 255);
         $table->string('lib_url', 255);
         $table->string('version', 10);
+        $table->string('environment', 20);
         $table->text('description');
-    }
-
-    protected function beforeMigration(): void
-    {
-        //
     }
 
     protected function afterMigration(): void
     {
-        //(new ExampleSeeder())->run();
+        (new VendorSeeder())->run();
     }
 }

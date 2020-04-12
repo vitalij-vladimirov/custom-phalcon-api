@@ -20,6 +20,7 @@ class Bootstrap
     {
         $this->setupDi();
         $this->setupLoader();
+        $this->defineGlobals();
 
         return new Micro($this->di);
     }
@@ -119,5 +120,10 @@ class Bootstrap
         } catch (Throwable $exception) {
             return $this->di->get('config')->defaultNamespaces->toArray();
         }
+    }
+
+    private function defineGlobals(): void
+    {
+        define('APP_ENV', $this->di->get('config')->environment ?? 'production');
     }
 }

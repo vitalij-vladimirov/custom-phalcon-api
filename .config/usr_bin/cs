@@ -8,6 +8,9 @@ if [ -z "$1" ]; then
   /app/vendor/bin/php-cs-fixer fix /app/modules --dry-run --diff --verbose
   /app/vendor/bin/phpcs -p
 elif [ "$1" == "fix" ]; then
+  /app/vendor/bin/php-cs-fixer fix /app/mvc --diff --verbose
+  /app/vendor/bin/php-cs-fixer fix /app/db --diff --verbose
+  /app/vendor/bin/php-cs-fixer fix /app/modules --diff --verbose
   /app/vendor/bin/phpcbf -p
 else
   /app/vendor/bin/php-cs-fixer fix "$1" --dry-run --diff --verbose
