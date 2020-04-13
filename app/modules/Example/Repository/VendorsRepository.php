@@ -8,8 +8,8 @@ use Example\Model\VendorModel;
 
 class VendorsRepository extends BaseRepository
 {
-    public function getModelClass(): string
+    protected function setModel(): void
     {
-        return VendorModel::class;
+        $this->model = new VendorModel();
     }
 }

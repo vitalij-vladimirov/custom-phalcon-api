@@ -3,20 +3,49 @@ declare(strict_types=1);
 
 namespace Common\BaseClasses;
 
-use Common\Regex;
-use Common\Text;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Support\Collection;
 use Closure;
+use Common\Regex;
+use Common\Text;
 
 /**
+ * phpcs:disable
+ *
  * @property int $id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  *
+ * @method static EloquentBuilder|BaseModel whereId($value)
+ * @method static EloquentBuilder|BaseModel whereIdNot($value)
+ * @method static EloquentBuilder|BaseModel whereCreatedAt($value)
+ * @method static EloquentBuilder|BaseModel whereUpdatedAt($value)
+ *
+ * @method static Collection|BaseModel all()
+ * @method static Collection|BaseModel median($key = null)
+ * @method static Collection|BaseModel diff($items)
+ * @method static Collection|BaseModel diffUsing($items, callable $callback)
+ * @method static Collection|BaseModel diffKeys($items)
+ * @method static Collection|BaseModel diffKeysUsing($items, callable $callback)
+ * @method static Collection|BaseModel duplicates($callback = null, $strict = false)
+ * @method static Collection|BaseModel duplicatesStrict($callback = null)
+ * @method static Collection|BaseModel duplicateComparator($strict)
+ * @method static Collection|BaseModel except($keys)
+ * @method static Collection|BaseModel filter(callable $callback = null)
+ * @method static Collection|BaseModel keyBy($keyBy)
+ * @method static Collection|BaseModel last(callable $callback = null, $default = null)
+ * @method static Collection|BaseModel merge($items)
+ * @method static Collection|BaseModel random($number = null)
+ * @method static Collection|BaseModel sort($callback = null)
+ * @method static Collection|BaseModel sortDesc($options = SORT_REGULAR)
+ * @method static Collection|BaseModel sortBy($callback, $options = SORT_REGULAR, $descending = false)
+ * @method static Collection|BaseModel sortByDesc($callback, $options = SORT_REGULAR)
+ * @method static Collection|BaseModel sortKeys($options = SORT_REGULAR, $descending = false)
+ * @method static Collection|BaseModel sortKeysDesc($options = SORT_REGULAR)
  * @method static EloquentBuilder|BaseModel query()
  * @method static EloquentBuilder|BaseModel fromQuery($query, array $bindings = [])
  * @method static EloquentBuilder|BaseModel where(string $column, $operator = null, $value = null, string $boolean = 'and')
@@ -41,7 +70,6 @@ use Closure;
  * @method static EloquentBuilder|BaseModel with($relations)
  * @method static EloquentBuilder|BaseModel without($relations)
  * @method static EloquentBuilder|BaseModel getModel()
- *
  * @method static QueryBuilder|BaseModel select(array $columns = ['*'])
  * @method static QueryBuilder|BaseModel selectSub($query, $as)
  * @method static QueryBuilder|BaseModel selectRaw($expression, array $bindings = [])
@@ -98,26 +126,23 @@ use Closure;
  * @method static QueryBuilder|BaseModel forPageAfterId($perPage = 15, $lastId = 0, $column = 'id')
  * @method static QueryBuilder|BaseModel removeExistingOrdersFor($column)
  * @method static QueryBuilder|BaseModel toSql()
- * @method static QueryBuilder|BaseModel exists()
- * @method static QueryBuilder|BaseModel doesntExist()
- * @method static QueryBuilder|BaseModel count($columns = '*')
- * @method static QueryBuilder|BaseModel min($column)
- * @method static QueryBuilder|BaseModel max($column)
- * @method static QueryBuilder|BaseModel sum($column)
- * @method static QueryBuilder|BaseModel avg($column)
- * @method static QueryBuilder|BaseModel average($column)
- * @method static QueryBuilder|BaseModel insert(array $values)
- * @method static QueryBuilder|BaseModel insertOrIgnore(array $values)
- * @method static QueryBuilder|BaseModel insertGetId(array $values, $sequence = null)
- * @method static QueryBuilder|BaseModel insertUsing($columns, $query)
- * @method static QueryBuilder|BaseModel updateOrInsert($attributes, array $values = [])
- * @method static QueryBuilder|BaseModel dd()
+ * @method static bool exists()
+ * @method static bool doesntExist()
+ * @method static int count($columns = '*')
+ * @method static int min($column)
+ * @method static int max($column)
+ * @method static int|float sum($column)
+ * @method static int|float avg($column)
+ * @method static int|float average($column)
+ * @method static BaseModel insert(array $values)
+ * @method static BaseModel insertOrIgnore(array $values)
+ * @method static int insertGetId(array $values, $sequence = null)
+ * @method static BaseModel updateOrInsert($attributes, array $values = [])
+ * @method static dd()
  *
- * @method static EloquentBuilder|BaseModel whereId($value)
- * @method static EloquentBuilder|BaseModel whereIdNot($value)
- * @method static EloquentBuilder|BaseModel whereCreatedAtNot($value)
- * @method static EloquentBuilder|BaseModel whereUpdatedAtNot($value)
  * @mixin Model
+ *
+ * phpcs:enable
  */
 abstract class BaseModel extends Model
 {
@@ -145,21 +170,6 @@ abstract class BaseModel extends Model
     public function getUpdatedAt(): ?Carbon
     {
         return $this->updated_at ?? null;
-    }
-
-    public function toClearedArray(array $removeFields = ['id', 'created_at', 'updated_at']): array
-    {
-        $array = $this->toArray();
-
-        if (count($removeFields) === 0) {
-            return $array;
-        }
-
-        foreach ($removeFields as $field) {
-            unset($array[$field]);
-        }
-
-        return $array;
     }
 
     private function setTableName(): void

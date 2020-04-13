@@ -21,17 +21,12 @@ abstract class BaseSeeder extends Injectable
         }
 
         try {
-            $tableRowsCount = (int)$this->db
-                ->query('SELECT COUNT(1) as `count` FROM ' . $this->table)
-                ->fetch()['count']
-            ;
+            if ($this->eloquent::table($this->table)->count() !== 0) {
+                echo Console::warning('Table \'' . $this->table . '\' was not seeded because it contains data.');
+                return;
+            }
         } catch (Throwable $throwable) {
             throw new DatabaseException('Table \'' . $this->table . '\' not found in DB.');
-        }
-
-        if ($tableRowsCount !== 0) {
-            echo Console::warning('Table \'' . $this->table . '\' was not seeded because it contains data.');
-            return;
         }
 
         $this->seedTable();

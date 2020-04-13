@@ -13,10 +13,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $version
  * @property string $environment
  * @property string $description
+ *
  * @method static Builder|VendorModel whereLibName($value)
  * @method static Builder|VendorModel whereLibUrl($value)
  * @method static Builder|VendorModel whereEnvironment($value)
  * @method static Builder|VendorModel whereDescription($value)
+ *
  * @mixin Model
  */
 class VendorModel extends BaseModel

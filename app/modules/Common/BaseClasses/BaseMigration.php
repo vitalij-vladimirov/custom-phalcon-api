@@ -50,8 +50,10 @@ abstract class BaseMigration extends AbstractMigration
                 $this->migrationSchema($table);
 
                 $table->timestamp('created_at')
+                    ->index()
                     ->useCurrent();
                 $table->timestamp('updated_at')
+                    ->index()
                     ->useCurrent();
             });
         } elseif ($this->migrationType === self::MIGRATION_UPDATE) {
@@ -125,7 +127,7 @@ abstract class BaseMigration extends AbstractMigration
 
     /**
      * Updating field `updated_at` to "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
-     * has been tested only with MySql, so I return this method at the start if other DB is used.
+     * has been tested only with MySql, so method is returned at the start if other DB is used.
      * Update this method in case of using other DB than MySql.
      */
     private function correctUpdatedAtField(): void
@@ -148,7 +150,7 @@ abstract class BaseMigration extends AbstractMigration
         }
 
         $this->db->query('
-            ALTER TABLE ' . $this->config->database->dbname . '.' . $this->table . '
+            ALTER TABLE `' . $this->config->database->dbname . '`.`' . $this->table . '`
             CHANGE COLUMN `updated_at` `updated_at`
             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         ')->execute();
