@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Common;
 
-use Common\Service\InjectionService;
 use Carbon\Carbon;
 use DateTimeImmutable;
 use DateTime;
 use Exception;
+use Common\Service\InjectionService;
 use Throwable;
 
 class Variable
@@ -40,23 +40,29 @@ class Variable
      * @param bool $trimString      - trim strings
      * @param bool $convertToNull   - convert empty values to null
      * @param bool $convertToBool   - convert [0 & 1] to [false & true]
+     * @param string[] $fields          - fields that have to be restored
      * @return array
      */
     public static function restoreArrayTypes(
         array $variables,
         bool $trimString = true,
         bool $convertToNull = true,
-        bool $convertToBool = false
+        bool $convertToBool = false,
+        array $fields = ['*']
     ): array {
         $restoredVariables = [];
 
         foreach ($variables as $key => $variable) {
-            $restoredVariables[$key] = self::restoreVariableType(
-                $variable,
-                $trimString,
-                $convertToNull,
-                $convertToBool
-            );
+            $restoredVariables[$key] = $variable;
+
+            if ((count($fields) === 1 && $fields[0] === '*') || isset($fields[$key])) {
+                $restoredVariables[$key] = self::restoreVariableType(
+                    $variable,
+                    $trimString,
+                    $convertToNull,
+                    $convertToBool
+                );
+            }
         }
 
         return $restoredVariables;

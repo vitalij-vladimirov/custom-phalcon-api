@@ -80,8 +80,9 @@ class VendorModel extends BaseModel
         return $this->description;
     }
 
-    public function setDescription(string $description): void
+    public function setDescription(string $description): VendorModel
     {
         $this->description = $description;
+        return $this;
     }
 }
