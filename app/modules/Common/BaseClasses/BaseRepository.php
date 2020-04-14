@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Common\BaseClasses;
 
-use Phalcon\Di\Injectable;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,7 +14,7 @@ use Common\Entity\PaginationEntity;
 use Common\Exception\DatabaseException;
 use Throwable;
 
-abstract class BaseRepository extends Injectable
+abstract class BaseRepository
 {
     protected const DEFAULT_ORDER_BY = 'id';
     protected const ORDER_ASC = 'ASC';
