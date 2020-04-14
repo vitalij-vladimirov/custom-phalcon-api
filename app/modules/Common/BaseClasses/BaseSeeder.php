@@ -6,11 +6,13 @@ namespace Common\BaseClasses;
 use Common\Console;
 use Common\Exception\DatabaseException;
 use Common\Exception\LogicException;
+use Illuminate\Database\Capsule\Manager;
 use Throwable;
 
 abstract class BaseSeeder extends Injectable
 {
     protected string $table;
+    protected Manager $eloquent;
 
     abstract protected function seedTable(): void;
 
@@ -19,6 +21,8 @@ abstract class BaseSeeder extends Injectable
         if (empty($this->table)) {
             throw new LogicException('$table name must be specified.');
         }
+
+        $this->eloquent = $this->di->get('eloquent');
 
         try {
             if ($this->eloquent::table($this->table)->count() !== 0) {

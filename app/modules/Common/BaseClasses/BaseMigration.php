@@ -9,7 +9,6 @@ use Phinx\Migration\AbstractMigration;
 use Illuminate\Database\Capsule\Manager as EloquentDb;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
-use Common\Service\InjectionService;
 use Common\Exception\LogicException;
 use Common\Regex;
 use Common\Text;
@@ -21,7 +20,7 @@ abstract class BaseMigration extends AbstractMigration
 
     protected string $table;
 
-    protected InjectionService $injectionService;
+    protected Injectable $injectable;
     protected EloquentDb $eloquent;
     protected Builder $schema;
     protected AbstractPdo $db;
@@ -91,7 +90,7 @@ abstract class BaseMigration extends AbstractMigration
 
     protected function inject(string $class): object
     {
-        return $this->injectionService->inject($class);
+        return $this->injectable->inject($class);
     }
 
     private function setMigrationType(): string
@@ -114,11 +113,11 @@ abstract class BaseMigration extends AbstractMigration
 
     private function loadGlobalServices(): void
     {
-        $this->injectionService = new InjectionService();
+        $this->injectable = new Injectable();
 
-        $this->config = $this->injectionService->getConfig();
-        $this->db = $this->injectionService->getDb();
-        $this->eloquent = $this->injectionService->getEloquent();
+        $this->config = $this->injectable->di->get('config');
+        $this->db = $this->injectable->di->get('db');
+        $this->eloquent = $this->injectable->di->get('eloquent');
 
         $this->schema = $this->eloquent::schema();
 

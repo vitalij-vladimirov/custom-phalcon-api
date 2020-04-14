@@ -6,6 +6,7 @@ namespace Common\Service;
 use Common\BaseClasses\Injectable;
 use Common\File;
 use Common\Json;
+use Phalcon\Config;
 
 final class CacheManager extends Injectable
 {
@@ -14,11 +15,12 @@ final class CacheManager extends Injectable
         '..',
     ];
 
+    private Config $config;
     private array $modulesDirectories;
 
     public function __construct()
     {
-        parent::__construct();
+        $this->config = $this->di->get('config');
 
         $this->modulesDirectories = [
             $this->config->application->mvcDir => 'Mvc',
@@ -48,9 +50,9 @@ final class CacheManager extends Injectable
 
         $namespacesJson = Json::encode($namespaces);
 
-        $fileExists = File::exists($this->config->application->namespacesCache);
-        if ($fileExists && File::getInfo($this->config->application->namespacesCache)
-                ->getHash() === md5($namespacesJson)) {
+        if (File::exists($this->config->application->namespacesCache)
+            && File::getInfo($this->config->application->namespacesCache)->getHash() === md5($namespacesJson)
+        ) {
             return;
         }
 

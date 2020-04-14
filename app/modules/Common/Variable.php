@@ -4,10 +4,10 @@ declare(strict_types=1);
 namespace Common;
 
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use DateTimeImmutable;
 use DateTime;
-use Exception;
-use Common\Service\InjectionService;
+use Common\BaseClasses\Injectable;
 use Throwable;
 
 class Variable
@@ -131,11 +131,10 @@ class Variable
     }
 
     /**
-     * @param Carbon|DateTime|DateTimeImmutable $object
+     * @param Carbon|CarbonInterface|DateTime|DateTimeImmutable $object
      * @param bool $toTimestamp
      * @param string $format
      * @return int|string
-     * @throws Exception
      */
     public static function convertTimeObjectToString(
         $object,
@@ -157,7 +156,7 @@ class Variable
 
     public static function getType($variable, bool $defaultCheck = false): string
     {
-        if ($variable === null || gettype($variable) === 'NULL') {
+        if ($variable === null) {
             return self::VAR_TYPE_NULL;
         }
 
@@ -237,11 +236,7 @@ class Variable
 
         $variable = (float)str_replace(',', '.', $variable);
 
-        if ($variable !== (float)(int)$variable) {
-            return true;
-        }
-
-        return false;
+        return $variable !== (float)(int)$variable;
     }
 
     public static function isInteger($variable, bool $defaultCheck = false): bool
@@ -262,11 +257,7 @@ class Variable
 
         $variable = (float)str_replace(',', '.', $variable);
 
-        if ($variable === (float)(int)$variable) {
-            return true;
-        }
-
-        return false;
+        return $variable === (float)(int)$variable;
     }
 
     public static function isBool($variable, bool $defaultCheck = true): bool
@@ -298,7 +289,7 @@ class Variable
      */
     public static function isObject($variable, $instanceOf = null): bool
     {
-        if (gettype($variable) !== self::VAR_TYPE_OBJECT) {
+        if (!is_object($variable)) {
             return false;
         }
 
@@ -306,13 +297,13 @@ class Variable
             return true;
         }
 
-        if (gettype($instanceOf) === self::VAR_TYPE_OBJECT) {
+        if (is_object($instanceOf)) {
             return $variable instanceof $instanceOf;
         }
 
         if (self::isString($instanceOf)) {
             try {
-                $object = (new InjectionService())->inject($instanceOf);
+                $object = (new Injectable())->inject($instanceOf);
             } catch (Throwable $exception) {
                 return false;
             }

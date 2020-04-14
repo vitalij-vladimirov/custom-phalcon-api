@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace Mvc;
 
+use Phalcon\Di\Injectable;
 use Phalcon\Mvc\Micro;
 
-class Routes implements RouterInterface
+class Routes extends Injectable implements RouterInterface
 {
-    public function getRoutes(Micro $app)
+    public function getRoutes(Micro $app): void
     {
         $app->get('/', function () use ($app) {
             return $app['view']->render('index');

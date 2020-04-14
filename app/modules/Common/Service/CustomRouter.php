@@ -6,6 +6,7 @@ namespace Common\Service;
 use Phalcon\Mvc\Micro;
 use Phalcon\Http\Response;
 use Mvc\RouterInterface;
+use Common\BaseClasses\Injectable;
 use Common\ApiException\ApiException;
 use Common\ApiException\NotFoundApiException;
 use Common\Entity\RequestEntity;
@@ -13,17 +14,12 @@ use Common\File;
 use Common\Text;
 use Common\Variable;
 
-final class CustomRouter implements RouterInterface
+final class CustomRouter extends Injectable implements RouterInterface
 {
-    private Micro $app;
-
-    public function getRoutes(Micro $app): Micro
+    public function getRoutes(Micro $app): void
     {
-        $this->app = $app;
-
         try {
-            $request = $this->getRequest();
-            $response = $this->runRequest($request);
+            $this->runRequest($this->getRequest(), $app);
         } catch (ApiException $exception) {
             $response = [
                 'code' => $exception->getCode(),
@@ -42,19 +38,17 @@ final class CustomRouter implements RouterInterface
 
             exit;
         }
-
-        return $response;
     }
 
     private function getRequest(): RequestEntity
     {
-        $modulesDir = $this->app->di->get('config')->application->modulesDir;
+        $modulesDir = $this->di->get('config')->application->modulesDir;
 
-        list($urlPath) = explode('?', $this->app->request->getURI());
+        [$urlPath] = explode('?', $this->request->getURI());
 
         $request = (new RequestEntity())
-            ->setMethod(Text::lower($this->app->request->getMethod()))
-            ->setQuery(Variable::restoreArrayTypes($this->app->request->getQuery()))
+            ->setMethod(Text::lower($this->request->getMethod()))
+            ->setQuery(Variable::restoreArrayTypes($this->request->getQuery()))
             ->setPath($urlPath)
         ;
 
@@ -68,12 +62,14 @@ final class CustomRouter implements RouterInterface
             $request
                 ->setType($request::REQUEST_TYPE_API)
                 ->setModule(Text::camelize($urlSplitter[2]))
-                ->setParams(Variable::restoreArrayTypes(array_slice($urlSplitter, 3)));
+                ->setParams(Variable::restoreArrayTypes(array_slice($urlSplitter, 3)))
+            ;
         } else {
             $request
                 ->setType($request::REQUEST_TYPE_VIEW)
                 ->setModule(Text::camelize($urlSplitter[1]))
-                ->setParams(Variable::restoreArrayTypes(array_slice($urlSplitter, 2)));
+                ->setParams(Variable::restoreArrayTypes(array_slice($urlSplitter, 2)))
+            ;
         }
 
         if (!File::exists($modulesDir . '/' . $request->getModule())) {
@@ -83,26 +79,26 @@ final class CustomRouter implements RouterInterface
         return $request;
     }
 
-    private function runRequest(RequestEntity $request): Micro
+    private function runRequest(RequestEntity $request, Micro $app): Micro
     {
         $routesClass = '\\' . $request->getModule() . '\\Config\Routes';
         if (!class_exists($routesClass)) {
             throw new NotFoundApiException();
         }
 
-        $app = $this->app;
         $responseData = (new $routesClass($request))->get();
 
-        $this->app->{$request->getMethod()}(
+        $app->{$request->getMethod()}(
             $request->getPath(),
-            function () use ($app, $responseData) {
+            static function () use ($app, $responseData) {
                 // TODO: describe different data types
                 $app->response
                     ->setJsonContent($responseData)
-                    ->send();
+                    ->send()
+                ;
             }
         );
 
-        return $this->app;
+        return $app;
     }
 }

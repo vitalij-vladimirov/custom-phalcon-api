@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-use Phalcon\Config;
+use Common\BaseClasses\Injectable;
+use Common\BaseClasses\BaseMigration;
 
-/** @var Config $config */
-$config = $GLOBALS['app']->di->get('config');
+$config = (new Injectable())->di->get('config');
 
 return [
     'paths' => [
         'migrations' => $config->application->migrationsDir
     ],
-    'migration_base_class' => '\Common\BaseClasses\BaseMigration',
+    'migration_base_class' => BaseMigration::class,
     'environments' => [
         'default_migration_table' => 'migration',
         'default_database' => 'default',

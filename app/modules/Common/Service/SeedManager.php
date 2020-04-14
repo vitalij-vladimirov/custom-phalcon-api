@@ -23,13 +23,11 @@ final class SeedManager extends Injectable
         Filesystem $filesystem,
         MigrationManager $migrationManager
     ) {
-        parent::__construct();
-
         $this->migrationManager = $migrationManager;
 
         $this->migrationCreator = new MigrationCreator($filesystem, self::STUB_PATH);
 
-        $this->seedsDir = $this->config->application->seedsDir;
+        $this->seedsDir = $this->di->get('config')->application->seedsDir;
         if (substr($this->seedsDir, -1) === '/') {
             $this->seedsDir = substr($this->seedsDir, 0, -1);
         }
@@ -77,7 +75,7 @@ final class SeedManager extends Injectable
 
     public function runSeeds(string $table = null): void
     {
-        if ($this->config->environment === 'production') {
+        if ($this->di->get('config')->environment === 'production') {
             throw new LogicException('Seeds can\'t be used in production environment.');
         }
 

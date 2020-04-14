@@ -30,14 +30,12 @@ final class MigrationManager extends Injectable
         ConsoleOutput $consoleOutput,
         PhinxApplication $phinxApplication
     ) {
-        parent::__construct();
-
         $this->consoleOutput = $consoleOutput;
         $this->phinxApplication = $phinxApplication;
 
         $this->migrationCreator = new MigrationCreator($filesystem, self::STUB_PATH);
 
-        $this->migrationsDir = $this->config->application->migrationsDir;
+        $this->migrationsDir = $this->di->get('config')->application->migrationsDir;
         if (substr($this->migrationsDir, -1) === '/') {
             $this->migrationsDir = substr($this->migrationsDir, 0, -1);
         }

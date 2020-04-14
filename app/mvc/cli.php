@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Mvc;
 
-use Phalcon\Mvc\Micro;
+use Common\BaseClasses\Injectable;
 use Phalcon\Config;
-use Common\Service\InjectionService;
 use Common\Console;
 use Throwable;
 
@@ -14,9 +13,9 @@ use Throwable;
 include '/app/vendor/autoload.php';
 include '/app/mvc/Bootstrap.php';
 
-$app = (new Bootstrap())->runApp();
+(new Bootstrap())->runApp();
 
-new cli($argv, $app);
+new cli($argv);
 // phpcs:enable
 
 class cli
@@ -28,10 +27,13 @@ class cli
     private string $taskClass;
     private ?string $action;
     private array $parameters;
+    private Injectable $injectable;
 
-    public function __construct(array $arguments, Micro $app)
+    public function __construct(array $arguments)
     {
-        $this->config = $app->di->get('config');
+        $this->injectable = new Injectable();
+
+        $this->config = $this->injectable->di->get('config');
         $this->arguments = $arguments;
 
         $this->collectArguments();
@@ -89,7 +91,7 @@ class cli
     private function runTask(): void
     {
         try {
-            $taskCall = (new InjectionService())->inject($this->taskClass);
+            $taskCall = $this->injectable->inject($this->taskClass);
             $actionMethod = $this->action . 'Action';
             $taskCall->$actionMethod($this->parameters);
             exit;
