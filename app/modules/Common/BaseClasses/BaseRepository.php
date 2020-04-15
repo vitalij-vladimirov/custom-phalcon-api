@@ -5,13 +5,15 @@ namespace Common\BaseClasses;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Common\Exception\LogicException;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Collection;
 use Common\Regex;
 use Common\Variable;
 use Common\Entity\PaginationEntity;
+use Common\Exception\LogicException;
 use Common\Exception\DatabaseException;
+use Common\Exception\ForbiddenException;
 use Throwable;
 
 abstract class BaseRepository
@@ -37,111 +39,125 @@ abstract class BaseRepository
     abstract protected function setModel(): void;
 
     /**
-     * @param string[] $getColumns
+     * @param string[] $columns
      *
      * @return Collection|BaseModel[]
      */
-    public function all(array $getColumns = ['*']): Collection
+    public function all(array $columns = ['*']): Collection
     {
-        return $this->model::get($getColumns);
+        return $this->model::get($columns);
     }
 
     /**
      * @param array $credentials
-     * @param string[] $getColumns
+     * @param string[] $columns
      *
-     * @return Builder|BaseModel|null
+     * @return EloquentBuilder|BaseModel|null
      * @throws LogicException
      */
-    public function first(array $credentials = [], array $getColumns = ['*']): ?BaseModel
+    public function first(array $credentials = [], array $columns = ['*']): ?BaseModel
     {
         return $this
             ->queryBuilder($credentials)
             ->orderBy('id', 'ASC')
-            ->first($getColumns)
+            ->first($columns)
         ;
     }
 
     /**
      * @param array $credentials
-     * @param string[] $getColumns
+     * @param string[] $columns
      *
-     * @return Builder|BaseModel|null
+     * @return EloquentBuilder|BaseModel|null
      * @throws LogicException
      */
-    public function firstUpdated(array $credentials = [], array $getColumns = ['*']): ?BaseModel
+    public function firstUpdated(array $credentials = [], array $columns = ['*']): ?BaseModel
     {
         return $this
             ->queryBuilder($credentials)
             ->orderBy('updated_at', 'ASC')
-            ->first($getColumns)
+            ->first($columns)
         ;
     }
 
     /**
      * @param array $credentials
-     * @param string[] $getColumns
+     * @param string[] $columns
      *
-     * @return Builder|BaseModel|null
+     * @return EloquentBuilder|BaseModel|null
      * @throws LogicException
      */
-    public function last(array $credentials = [], array $getColumns = ['*']): ?BaseModel
+    public function last(array $credentials = [], array $columns = ['*']): ?BaseModel
     {
         return $this
             ->queryBuilder($credentials)
             ->orderBy('id', 'DESC')
-            ->first($getColumns)
+            ->first($columns)
         ;
     }
 
     /**
      * @param array $credentials
-     * @param string[] $getColumns
-     *
-     * @return Builder|BaseModel|null
+     * @param array $columns
+     * 
+     * @return QueryBuilder|BaseModel|null
      * @throws LogicException
      */
-    public function lastUpdated(array $credentials = [], array $getColumns = ['*']): ?BaseModel
+    public function lastUpdated(array $credentials = [], array $columns = ['*']): ?BaseModel
     {
         return $this
             ->queryBuilder($credentials)
             ->orderBy('updated_by', 'ASC')
-            ->first($getColumns)
+            ->first($columns)
         ;
     }
 
-    public function findOneById(int $id, array $getColumns = ['*']): ?BaseModel
+    /**
+     * @param int $id
+     * @param string[] $columns
+     * 
+     * @return QueryBuilder|BaseModel|null
+     */
+    public function findOneById(int $id, array $columns = ['*']): ?BaseModel
     {
-        return $this->model::whereId($id)->first($getColumns);
+        return $this->model::whereId($id)->first($columns);
     }
 
-    public function findOneByCredentials(array $credentials = [], array $getColumns = ['*']): ?BaseModel
+    /**
+     * @param array $credentials
+     * @param array $columns
+     * 
+     * @return QueryBuilder|BaseModel|null
+     * @throws LogicException
+     */
+    public function findOneByCredentials(array $credentials, array $columns = ['*']): ?BaseModel
     {
-        return $this->queryBuilder($credentials)->first($getColumns);
+        return $this->queryBuilder($credentials)->first($columns);
     }
 
     /**
      * @param string $column
-     * @param string|int|float|array|mixed $values
-     * @param array $getColumns
-     * @return BaseModel|null
+     * @param string|int|float|array $values
+     * @param string[] $columns
+     * 
+     * @return QueryBuilder|EloquentBuilder|BaseModel|null
      */
-    public function findOneBy(string $column, $values, array $getColumns = ['*']): ?BaseModel
+    public function findOneBy(string $column, $values, array $columns = ['*']): ?BaseModel
     {
         if (Variable::isArray($values)) {
-            return $this->model::whereIn($column, $values)->first($getColumns);
+            return $this->model::whereIn($column, $values)->first($columns);
         }
 
-        return $this->model::where($column, '=', $values)->first($getColumns);
+        return $this->model::where($column, '=', $values)->first($columns);
     }
 
     /**
-     * @param array $ids
+     * @param int[] $ids
      * @param int $offset
      * @param int|null $limit
      * @param string $orderBy
-     * @param string $order
-     * @param string[] $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return Collection|BaseModel[]
      */
@@ -150,11 +166,11 @@ abstract class BaseRepository
         int $offset = 0,
         int $limit = null,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): Collection {
         $query = $this->model::whereIn('id', $ids)
-            ->orderBy($orderBy, strtoupper($order))
+            ->orderBy($orderBy, strtoupper($orderDir))
         ;
 
         if ($limit !== null) {
@@ -164,7 +180,7 @@ abstract class BaseRepository
             ;
         }
 
-        return $query->get($getColumns);
+        return $query->get($columns);
     }
 
     /**
@@ -173,8 +189,8 @@ abstract class BaseRepository
      * @param int $offset
      * @param int|null $limit
      * @param string $orderBy
-     * @param string $order
-     * @param string[] $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return Collection|BaseModel[]
      */
@@ -184,14 +200,14 @@ abstract class BaseRepository
         int $offset = 0,
         int $limit = null,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): Collection {
         if ($to === null) {
             $to = $this->model::max('id');
         }
 
-        return $this->findManyBetween('id', $from, $to, $offset, $limit, $orderBy, $order, $getColumns);
+        return $this->findManyBetween('id', $from, $to, $offset, $limit, $orderBy, $orderDir, $columns);
     }
 
     /**
@@ -200,8 +216,8 @@ abstract class BaseRepository
      * @param int $offset
      * @param int|null $limit
      * @param string $orderBy
-     * @param string $order
-     * @param string[] $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return Collection|BaseModel[]
      */
@@ -211,8 +227,8 @@ abstract class BaseRepository
         int $offset = 0,
         int $limit = null,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): Collection {
         if (Variable::isArray($values)) {
             $query = $this->model::whereIn($column, $values);
@@ -220,7 +236,7 @@ abstract class BaseRepository
             $query = $this->model::where($column, $values);
         }
 
-        $query->orderBy($orderBy, strtoupper($order));
+        $query->orderBy($orderBy, strtoupper($orderDir));
 
         if ($limit !== null) {
             $query
@@ -229,7 +245,7 @@ abstract class BaseRepository
             ;
         }
 
-        return $query->get($getColumns);
+        return $query->get($columns);
     }
 
     /**
@@ -238,8 +254,8 @@ abstract class BaseRepository
      * @param int $offset
      * @param int|null $limit
      * @param string $orderBy
-     * @param string $order
-     * @param string[] $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return Collection|BaseModel[]
      */
@@ -249,14 +265,14 @@ abstract class BaseRepository
         int $offset = 0,
         int $limit = null,
         string $orderBy = 'created_at',
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): Collection {
         if ($to === null) {
             $to = Carbon::now();
         }
 
-        return $this->findManyBetween('created_at', $from, $to, $offset, $limit, $orderBy, $order, $getColumns);
+        return $this->findManyBetween('created_at', $from, $to, $offset, $limit, $orderBy, $orderDir, $columns);
     }
 
     /**
@@ -265,8 +281,8 @@ abstract class BaseRepository
      * @param int $offset
      * @param int|null $limit
      * @param string $orderBy
-     * @param string $order
-     * @param string[] $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return Collection|BaseModel[]
      */
@@ -276,14 +292,14 @@ abstract class BaseRepository
         int $offset = 0,
         int $limit = null,
         string $orderBy = 'updated_at',
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): Collection {
         if ($to === null) {
             $to = Carbon::now();
         }
 
-        return $this->findManyBetween('updated_at', $from, $to, $offset, $limit, $orderBy, $order, $getColumns);
+        return $this->findManyBetween('updated_at', $from, $to, $offset, $limit, $orderBy, $orderDir, $columns);
     }
 
     /**
@@ -293,8 +309,8 @@ abstract class BaseRepository
      * @param int $offset
      * @param int|null $limit
      * @param string $orderBy
-     * @param string $order
-     * @param string[] $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return Collection|BaseModel[]
      */
@@ -305,11 +321,11 @@ abstract class BaseRepository
         int $offset = 0,
         int $limit = null,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): Collection {
         $query = $this->model::whereBetween($column, [$from, $to])
-            ->orderBy($orderBy, strtoupper($order))
+            ->orderBy($orderBy, strtoupper($orderDir))
         ;
 
         if ($limit !== null) {
@@ -319,7 +335,7 @@ abstract class BaseRepository
             ;
         }
 
-        return $query->get($getColumns);
+        return $query->get($columns);
     }
 
     /**
@@ -327,8 +343,8 @@ abstract class BaseRepository
      * @param int $offset
      * @param int|null $limit
      * @param string $orderBy
-     * @param string $order
-     * @param string[] $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return Collection|BaseModel[]
      * @throws LogicException
@@ -338,12 +354,12 @@ abstract class BaseRepository
         int $offset = 0,
         int $limit = null,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): Collection {
         $query = $this
             ->queryBuilder($credentials)
-            ->orderBy($orderBy, strtoupper($order))
+            ->orderBy($orderBy, strtoupper($orderDir))
         ;
 
         if ($limit !== null) {
@@ -353,15 +369,15 @@ abstract class BaseRepository
             ;
         }
 
-        return $query->get($getColumns);
+        return $query->get($columns);
     }
 
     /**
      * @param int $perPage
      * @param int $page
      * @param string $orderBy
-     * @param string $order
-     * @param array $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return PaginationEntity
      */
@@ -369,22 +385,22 @@ abstract class BaseRepository
         int $perPage = 10,
         int $page = 1,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): PaginationEntity {
         $builder = $this->model::where('id', '>', 0);
 
-        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $order, $getColumns);
+        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
      * @param string $column
-     * @param string|int|float|array|mixed $values
+     * @param string|int|float|array $values
      * @param int $perPage
      * @param int $page
      * @param string $orderBy
-     * @param string $order
-     * @param array $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return PaginationEntity
      */
@@ -394,8 +410,8 @@ abstract class BaseRepository
         int $perPage = 10,
         int $page = 1,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): PaginationEntity {
         if (Variable::isArray($values)) {
             $builder = $this->model::whereIn($column, $values);
@@ -403,16 +419,16 @@ abstract class BaseRepository
             $builder = $this->model::where($column, '=', $values);
         }
 
-        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $order, $getColumns);
+        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
-     * @param array $ids
+     * @param int[] $ids
      * @param int $perPage
      * @param int $page
      * @param string $orderBy
-     * @param string $order
-     * @param array $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return PaginationEntity
      */
@@ -421,13 +437,13 @@ abstract class BaseRepository
         int $perPage = 10,
         int $page = 1,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): PaginationEntity {
         $builder = $this->model::where('id', '>', 0)
             ->whereIn('id', $ids);
 
-        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $order, $getColumns);
+        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
@@ -436,8 +452,8 @@ abstract class BaseRepository
      * @param int $perPage
      * @param int $page
      * @param string $orderBy
-     * @param string $order
-     * @param array $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return PaginationEntity
      */
@@ -447,8 +463,8 @@ abstract class BaseRepository
         int $perPage = 10,
         int $page = 1,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): PaginationEntity {
         if ($to === null) {
             $to = $this->model::max('id');
@@ -457,7 +473,7 @@ abstract class BaseRepository
         $builder = $this->model::where('id', '>', 0)
             ->whereBetween('id', [$from, $to]);
 
-        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $order, $getColumns);
+        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
@@ -465,8 +481,8 @@ abstract class BaseRepository
      * @param int $perPage
      * @param int $page
      * @param string $orderBy
-     * @param string $order
-     * @param array $getColumns
+     * @param string $orderDir
+     * @param string[] $columns
      *
      * @return PaginationEntity
      * @throws LogicException
@@ -476,12 +492,12 @@ abstract class BaseRepository
         int $perPage = 10,
         int $page = 1,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): PaginationEntity {
         $builder = $this->queryBuilder($credentials);
 
-        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $order, $getColumns);
+        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
@@ -554,6 +570,12 @@ abstract class BaseRepository
         );
     }
 
+    /**
+     * @param array $data
+     *
+     * @return BaseModel
+     * @throws ForbiddenException
+     */
     public function create(array $data): BaseModel
     {
         $this->validateFieldsCanBeUpdated($data);
@@ -565,7 +587,7 @@ abstract class BaseRepository
      * @param array $data
      *
      * @return Collection|BaseModel[]
-     * @throws LogicException
+     * @throws ForbiddenException
      */
     public function createMany(array $data): Collection
     {
@@ -590,6 +612,13 @@ abstract class BaseRepository
         return $this->findManyByIdsRange($firstId, $lastId);
     }
 
+    /**
+     * @param BaseModel $model
+     *
+     * @return BaseModel
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
     public function saveModel(BaseModel $model): BaseModel
     {
         $this->validateFieldsCanBeUpdated($model->toArray());
@@ -603,6 +632,14 @@ abstract class BaseRepository
         return $model;
     }
 
+    /**
+     * @param int $id
+     * @param array $data
+     *
+     * @return BaseModel
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
     public function updateOneById(int $id, array $data): BaseModel
     {
         $this->validateFieldsCanBeUpdated($data);
@@ -618,6 +655,15 @@ abstract class BaseRepository
         }
     }
 
+    /**
+     * @param string $column
+     * @param string|int|float $value
+     * @param array $data
+     *
+     * @return EloquentBuilder|BaseModel
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
     public function updateOneBy(string $column, $value, array $data): BaseModel
     {
         $this->validateFieldsCanBeUpdated($data);
@@ -635,6 +681,14 @@ abstract class BaseRepository
         }
     }
 
+    /**
+     * @param array $credentials
+     * @param array $data
+     *
+     * @return BaseModel
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
     public function updateOneByCredentials(array $credentials, array $data = []): BaseModel
     {
         $this->validateFieldsCanBeUpdated($data);
@@ -651,13 +705,13 @@ abstract class BaseRepository
     }
 
     /**
-     * @param array $ids
+     * @param int[] $ids
      * @param array $data
      * @param int $limit
      *
      * @return Collection|BaseModel[]
      * @throws DatabaseException
-     * @throws LogicException
+     * @throws ForbiddenException
      */
     public function updateManyByIds(array $ids, array $data, int $limit = 1000): Collection
     {
@@ -683,7 +737,7 @@ abstract class BaseRepository
      *
      * @return Collection|BaseModel[]
      * @throws DatabaseException
-     * @throws LogicException
+     * @throws ForbiddenException
      */
     public function updateManyByIdsRange(int $from, int $to, array $data, int $limit = 1000): Collection
     {
@@ -702,13 +756,13 @@ abstract class BaseRepository
 
     /**
      * @param string $column
-     * @param $values
+     * @param string|int|float|array $values
      * @param array $data
      * @param int $limit
      *
      * @return Collection|BaseModel[]
      * @throws DatabaseException
-     * @throws LogicException
+     * @throws ForbiddenException
      */
     public function updateManyBy(string $column, $values, array $data, int $limit = 1000): Collection
     {
@@ -739,7 +793,7 @@ abstract class BaseRepository
      *
      * @return Collection|BaseModel[]
      * @throws DatabaseException
-     * @throws LogicException
+     * @throws ForbiddenException
      */
     public function updateManyByCredentials(array $credentials, array $data = [], int $limit = 1000): Collection
     {
@@ -759,6 +813,12 @@ abstract class BaseRepository
         }
     }
 
+    /**
+     * @param BaseModel $model
+     *
+     * @return bool
+     * @throws DatabaseException
+     */
     public function deleteModel(BaseModel $model): bool
     {
         try {
@@ -768,6 +828,12 @@ abstract class BaseRepository
         }
     }
 
+    /**
+     * @param int $id
+     *
+     * @return bool
+     * @throws DatabaseException
+     */
     public function deleteOneById(int $id): bool
     {
         try {
@@ -777,6 +843,13 @@ abstract class BaseRepository
         }
     }
 
+    /**
+     * @param string $column
+     * @param string|int|float $value
+     *
+     * @return bool
+     * @throws DatabaseException
+     */
     public function deleteOneBy(string $column, $value): bool
     {
         try {
@@ -789,6 +862,12 @@ abstract class BaseRepository
         }
     }
 
+    /**
+     * @param array $credentials
+     *
+     * @return bool
+     * @throws DatabaseException
+     */
     public function deleteOneByCredentials(array $credentials): bool
     {
         try {
@@ -801,6 +880,14 @@ abstract class BaseRepository
         }
     }
 
+    /**
+     * @param array $ids
+     * @param int $limit
+     *
+     * @return int
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
     public function deleteManyByIds(array $ids, int $limit = 1000): int
     {
         $this->validateDeleteMany();
@@ -820,12 +907,12 @@ abstract class BaseRepository
 
     /**
      * @param string $column
-     * @param string|int|float|array|mixed $values
+     * @param string|int|float|array $values
      * @param int $limit
      *
      * @return int
      * @throws DatabaseException
-     * @throws LogicException
+     * @throws ForbiddenException
      */
     public function deleteManyBy(string $column, $values, int $limit = 1000): int
     {
@@ -848,6 +935,15 @@ abstract class BaseRepository
         }
     }
 
+    /**
+     * @param int $from
+     * @param int $to
+     * @param int $limit
+     *
+     * @return int
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
     public function deleteManyByIdsRange(int $from, int $to, int $limit = 1000): int
     {
         $this->validateDeleteMany();
@@ -865,6 +961,14 @@ abstract class BaseRepository
         }
     }
 
+    /**
+     * @param array $credentials
+     * @param int $limit
+     *
+     * @return int
+     * @throws DatabaseException
+     * @throws ForbiddenException
+     */
     public function deleteManyByCredentials(array $credentials, int $limit = 1000): int
     {
         $this->validateDeleteMany();
@@ -904,14 +1008,14 @@ abstract class BaseRepository
      *              AND something LIKE '%text'
      *
      * @param array $credentials
-     * @return Builder
+     * @return QueryBuilder|EloquentBuilder|BaseModel
      * @throws LogicException
      */
-    protected function queryBuilder(array $credentials): Builder
+    protected function queryBuilder(array $credentials)
     {
         $builder = $this->model::where('id', '>', 0);
         if (count($credentials) === 0) {
-            return $builder;
+            return $this->model;
         }
 
         foreach ($credentials as $key => $value) {
@@ -959,21 +1063,31 @@ abstract class BaseRepository
         return $builder;
     }
 
+    /**
+     * @param QueryBuilder|EloquentBuilder $builder
+     * @param int $perPage
+     * @param int $page
+     * @param string $orderBy
+     * @param string $orderDir
+     * @param array $columns
+     *
+     * @return PaginationEntity
+     */
     protected function getPaginatedData(
-        Builder $builder,
+        $builder,
         int $perPage,
         int $page,
         string $orderBy = self::DEFAULT_ORDER_BY,
-        string $order = self::ORDER_ASC,
-        array $getColumns = ['*']
+        string $orderDir = self::ORDER_ASC,
+        array $columns = ['*']
     ): PaginationEntity {
         $total = $builder->count();
 
         $data = $builder
             ->offset($perPage * $page - $perPage)
             ->limit($perPage)
-            ->orderBy($orderBy, $order)
-            ->get($getColumns)
+            ->orderBy($orderBy, $orderDir)
+            ->get($columns)
         ;
 
         return (new PaginationEntity())
@@ -985,6 +1099,11 @@ abstract class BaseRepository
             ;
     }
 
+    /**
+     * @param Collection $models
+     *
+     * @return int[]
+     */
     private function getIds(Collection $models): array
     {
         $ids = [];
@@ -996,12 +1115,17 @@ abstract class BaseRepository
         return $ids;
     }
 
+    /**
+     * @param array $data
+     *
+     * @throws ForbiddenException
+     */
     private function validateFieldsCanBeUpdated(array $data): void
     {
         if (count($data) >= 1 && Variable::isArray($data[0])) {
             foreach ($data as $row) {
                 if (isset($row['id']) || isset($row['created_at']) || isset($row['updated_at'])) {
-                    throw new LogicException(
+                    throw new ForbiddenException(
                         'Fields `id`, `created_at` and `updated_at` can not be updated manually.'
                     );
                 }
@@ -1009,23 +1133,29 @@ abstract class BaseRepository
         }
 
         if (isset($data['id']) || isset($data['created_at']) || isset($data['updated_at'])) {
-            throw new LogicException(
+            throw new ForbiddenException(
                 'Fields `id`, `created_at` and `updated_at` can not be updated manually.'
             );
         }
     }
 
+    /**
+     * @throws ForbiddenException
+     */
     private function validateUpdateMany(): void
     {
         if ($this->allowUpdateMany === false) {
-            throw new LogicException('Updating Many fields with single action is disabled.');
+            throw new ForbiddenException('Updating Many fields with single action is disabled.');
         }
     }
 
+    /**
+     * @throws ForbiddenException
+     */
     private function validateDeleteMany(): void
     {
         if ($this->allowDeleteMany === false) {
-            throw new LogicException('Deleting Many fields with single action is disabled.');
+            throw new ForbiddenException('Deleting Many fields with single action is disabled.');
         }
     }
 }
