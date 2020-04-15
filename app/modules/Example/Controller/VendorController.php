@@ -22,9 +22,8 @@ class VendorController
 
     public function getAll(): array
     {
-        $test = $this->vendorsRepository->min('id');
+        $test = $this->vendorsRepository->all();
 
         dd($test);
-        dd($test->toArray());
     }
 }

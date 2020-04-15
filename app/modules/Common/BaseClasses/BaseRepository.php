@@ -1015,7 +1015,7 @@ abstract class BaseRepository
     {
         $builder = $this->model::where('id', '>', 0);
         if (count($credentials) === 0) {
-            return $this->model;
+            return $builder;
         }
 
         foreach ($credentials as $key => $value) {
