@@ -65,6 +65,10 @@ final class CustomRouter extends Injectable implements RouterInterface
                 ->setParams(Variable::restoreArrayTypes(array_slice($urlSplitter, 3)))
             ;
         } else {
+            if (empty($urlSplitter[1])) {
+                $urlSplitter[1] = 'index';
+            }
+
             $request
                 ->setType($request::REQUEST_TYPE_VIEW)
                 ->setModule(Text::camelize($urlSplitter[1]))
@@ -90,7 +94,7 @@ final class CustomRouter extends Injectable implements RouterInterface
 
         $app->{$request->getMethod()}(
             $request->getPath(),
-            static function () use ($app, $responseData) {
+            function () use ($app, $responseData) {
                 // TODO: describe different data types
                 $app->response
                     ->setJsonContent($responseData)

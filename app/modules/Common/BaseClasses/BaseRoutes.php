@@ -12,8 +12,6 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
 
     public function __construct(RequestEntity $request)
     {
-        parent::__construct();
-
         $this->request = $request;
     }
 

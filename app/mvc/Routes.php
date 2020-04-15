@@ -15,7 +15,7 @@ class Routes extends Injectable implements RouterInterface
         });
 
         $app->notFound(function () use ($app) {
-            $app->response->setStatusCode(404, "Not Found")->sendHeaders();
+            $app->response->setStatusCode(404, 'Not Found')->sendHeaders();
             return $app['view']->render('404');
         });
     }
