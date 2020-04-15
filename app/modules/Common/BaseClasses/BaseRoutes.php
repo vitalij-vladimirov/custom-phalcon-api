@@ -45,6 +45,8 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
 
     public function get(): void
     {
+        $data = $this->request->getData();
+
         $route = $this->findRoute();
 
         /*
@@ -55,6 +57,31 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
         if (APP_ENV !== 'production') {
             $this->validateRoute($route);
         }
+
+        if (count($route->getPermissions()) !== 0) {
+            // validate permissions
+        }
+
+        if ($route->getValidator() !== null) {
+            $validator = $route->getValidator();
+            (new $validator())->validateData($data);
+        }
+
+        if ($route->getRequestMapper()) {
+            // Map data
+        }
+
+        if (count($route->getResolvers()) !== 0) {
+            // Resolve parameters
+        }
+
+        // Call controller
+
+        if ($route->getResponseMapper() !== null) {
+            // Map response data
+        }
+
+        // return response
     }
 
     private function findRoute(): Route
