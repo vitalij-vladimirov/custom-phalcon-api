@@ -33,7 +33,7 @@ abstract class BaseMigration extends AbstractMigration
     public function up(): void
     {
         if (empty($this->table)) {
-            throw new LogicException('$table name must be specified.');
+            throw new LogicException('Parameter $table empty.');
         }
 
         $this->loadGlobalServices();
@@ -71,7 +71,7 @@ abstract class BaseMigration extends AbstractMigration
     public function down(): void
     {
         if (empty($this->table)) {
-            throw new LogicException('$table name must be specified.');
+            throw new LogicException('Parameter $table empty.');
         }
 
         if ($this->migrationType === self::MIGRATION_CREATE) {
@@ -108,7 +108,7 @@ abstract class BaseMigration extends AbstractMigration
             return $this->migrationType = self::MIGRATION_UPDATE;
         }
 
-        throw new LogicException('Migration type can not be detected.');
+        throw new LogicException('Couldn\'t resolve migration type.');
     }
 
     private function loadGlobalServices(): void

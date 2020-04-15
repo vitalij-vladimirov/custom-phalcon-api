@@ -5,9 +5,9 @@ namespace Common\Integrational\Test;
 
 use Carbon\Carbon;
 use Common\BaseClasses\BaseTestCase;
-use Common\Entity\DirectoryEntity;
-use Common\Entity\FileInfoEntity;
-use Common\Entity\FileSizeEntity;
+use Common\Entity\DirectoryData;
+use Common\Entity\FileData;
+use Common\Entity\FileSizeData;
 use Common\File;
 
 class FileTest extends BaseTestCase
@@ -56,7 +56,7 @@ class FileTest extends BaseTestCase
             ->setLastModified($timeNow);
 
         self::assertEquals(
-            (new FileInfoEntity())
+            (new FileData())
                 ->setName('test_file')
                 ->setExt('txt')
                 ->setFullName('test_file.txt')
@@ -64,7 +64,7 @@ class FileTest extends BaseTestCase
                 ->setHash(md5(self::EXAMPLE_TEXT))
                 ->setLastModified($timeNow)
                 ->setDirectory(
-                    (new DirectoryEntity())
+                    (new DirectoryData())
                         ->setName('last_dir')
                         ->setPath(self::EXAMPLE_DIRECTORY)
                         ->setMap(
@@ -72,7 +72,7 @@ class FileTest extends BaseTestCase
                         )
                 )
                 ->setFileSize(
-                    (new FileSizeEntity())
+                    (new FileSizeData())
                         ->setBytes(21)
                         ->setKilobytes('0.02')
                         ->setMegabytes('0.00')

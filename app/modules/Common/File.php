@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Common;
 
 use Carbon\Carbon;
-use Common\Entity\DirectoryEntity;
-use Common\Entity\FileInfoEntity;
-use Common\Entity\FileSizeEntity;
+use Common\Entity\DirectoryData;
+use Common\Entity\FileData;
+use Common\Entity\FileSizeData;
 use Common\Exception\LogicException;
 
 class File
@@ -76,13 +76,13 @@ class File
         return file_exists($file);
     }
 
-    public static function getInfo(string $file): ?FileInfoEntity
+    public static function getInfo(string $file): ?FileData
     {
         if (!self::exists($file)) {
             return null;
         }
 
-        $fileInfo = (new FileInfoEntity())
+        $fileInfo = (new FileData())
             ->setType(mime_content_type($file))
             ->setHash(md5_file($file))
             ->setLastModified(Carbon::createFromTimestamp(filemtime($file)))
@@ -104,7 +104,7 @@ class File
         return $fileInfo;
     }
 
-    public static function getSize(string $file): ?FileSizeEntity
+    public static function getSize(string $file): ?FileSizeData
     {
         if (!self::exists($file)) {
             return null;
@@ -112,7 +112,7 @@ class File
 
         $bytes = filesize($file);
 
-        return (new FileSizeEntity())
+        return (new FileSizeData())
             ->setBytes($bytes)
             ->setKilobytes((string)number_format($bytes/1024, 2, '.', ''))
             ->setMegabytes((string)number_format($bytes/1024/1024, 2, '.', ''))
@@ -120,7 +120,7 @@ class File
         ;
     }
 
-    public static function getDirectory(string $file): ?DirectoryEntity
+    public static function getDirectory(string $file): ?DirectoryData
     {
         $map = [];
         $pathSplitter = explode('/', $file);
@@ -138,7 +138,7 @@ class File
             $path .= '/' . $location;
         }
 
-        return (new DirectoryEntity())
+        return (new DirectoryData())
             ->setName($name)
             ->setPath($path)
             ->setMap($map)

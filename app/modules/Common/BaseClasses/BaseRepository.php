@@ -10,7 +10,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
 use Common\Regex;
 use Common\Variable;
-use Common\Entity\PaginationEntity;
+use Common\Entity\PaginatedResult;
 use Common\Exception\LogicException;
 use Common\Exception\DatabaseException;
 use Common\Exception\ForbiddenException;
@@ -99,7 +99,7 @@ abstract class BaseRepository
     /**
      * @param array $credentials
      * @param array $columns
-     * 
+     *
      * @return QueryBuilder|BaseModel|null
      * @throws LogicException
      */
@@ -115,7 +115,7 @@ abstract class BaseRepository
     /**
      * @param int $id
      * @param string[] $columns
-     * 
+     *
      * @return QueryBuilder|BaseModel|null
      */
     public function findOneById(int $id, array $columns = ['*']): ?BaseModel
@@ -126,7 +126,7 @@ abstract class BaseRepository
     /**
      * @param array $credentials
      * @param array $columns
-     * 
+     *
      * @return QueryBuilder|BaseModel|null
      * @throws LogicException
      */
@@ -139,7 +139,7 @@ abstract class BaseRepository
      * @param string $column
      * @param string|int|float|array $values
      * @param string[] $columns
-     * 
+     *
      * @return QueryBuilder|EloquentBuilder|BaseModel|null
      */
     public function findOneBy(string $column, $values, array $columns = ['*']): ?BaseModel
@@ -379,7 +379,7 @@ abstract class BaseRepository
      * @param string $orderDir
      * @param string[] $columns
      *
-     * @return PaginationEntity
+     * @return PaginatedResult
      */
     public function paginate(
         int $perPage = 10,
@@ -387,7 +387,7 @@ abstract class BaseRepository
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
-    ): PaginationEntity {
+    ): PaginatedResult {
         $builder = $this->model::where('id', '>', 0);
 
         return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
@@ -402,7 +402,7 @@ abstract class BaseRepository
      * @param string $orderDir
      * @param string[] $columns
      *
-     * @return PaginationEntity
+     * @return PaginatedResult
      */
     public function paginateBy(
         string $column,
@@ -412,7 +412,7 @@ abstract class BaseRepository
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
-    ): PaginationEntity {
+    ): PaginatedResult {
         if (Variable::isArray($values)) {
             $builder = $this->model::whereIn($column, $values);
         } else {
@@ -430,7 +430,7 @@ abstract class BaseRepository
      * @param string $orderDir
      * @param string[] $columns
      *
-     * @return PaginationEntity
+     * @return PaginatedResult
      */
     public function paginateByIds(
         array $ids,
@@ -439,7 +439,7 @@ abstract class BaseRepository
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
-    ): PaginationEntity {
+    ): PaginatedResult {
         $builder = $this->model::where('id', '>', 0)
             ->whereIn('id', $ids);
 
@@ -455,7 +455,7 @@ abstract class BaseRepository
      * @param string $orderDir
      * @param string[] $columns
      *
-     * @return PaginationEntity
+     * @return PaginatedResult
      */
     public function paginateByIdsRange(
         int $from = 0,
@@ -465,7 +465,7 @@ abstract class BaseRepository
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
-    ): PaginationEntity {
+    ): PaginatedResult {
         if ($to === null) {
             $to = $this->model::max('id');
         }
@@ -484,7 +484,7 @@ abstract class BaseRepository
      * @param string $orderDir
      * @param string[] $columns
      *
-     * @return PaginationEntity
+     * @return PaginatedResult
      * @throws LogicException
      */
     public function paginateByCredentials(
@@ -494,7 +494,7 @@ abstract class BaseRepository
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
-    ): PaginationEntity {
+    ): PaginatedResult {
         $builder = $this->queryBuilder($credentials);
 
         return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
@@ -1071,7 +1071,7 @@ abstract class BaseRepository
      * @param string $orderDir
      * @param array $columns
      *
-     * @return PaginationEntity
+     * @return PaginatedResult
      */
     protected function getPaginatedData(
         $builder,
@@ -1080,7 +1080,7 @@ abstract class BaseRepository
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
-    ): PaginationEntity {
+    ): PaginatedResult {
         $total = $builder->count();
 
         $data = $builder
@@ -1090,7 +1090,7 @@ abstract class BaseRepository
             ->get($columns)
         ;
 
-        return (new PaginationEntity())
+        return (new PaginatedResult())
             ->setTotalResults($total)
             ->setTotalPages((int)ceil($total / $perPage))
             ->setCurrentPage($page)

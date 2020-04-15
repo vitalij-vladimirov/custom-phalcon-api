@@ -6,7 +6,7 @@ namespace Common\Entity;
 use Illuminate\Database\Eloquent\Collection;
 use Common\BaseClasses\BaseEntity;
 
-class PaginationEntity extends BaseEntity
+class PaginatedResult extends BaseEntity
 {
     private int $totalResults;
     private int $totalPages;
@@ -19,7 +19,7 @@ class PaginationEntity extends BaseEntity
         return $this->totalResults;
     }
 
-    public function setTotalResults(int $totalResults): PaginationEntity
+    public function setTotalResults(int $totalResults): PaginatedResult
     {
         $this->totalResults = $totalResults;
         return $this;
@@ -30,7 +30,7 @@ class PaginationEntity extends BaseEntity
         return $this->totalPages;
     }
 
-    public function setTotalPages(int $totalPages): PaginationEntity
+    public function setTotalPages(int $totalPages): PaginatedResult
     {
         $this->totalPages = $totalPages;
         return $this;
@@ -41,7 +41,7 @@ class PaginationEntity extends BaseEntity
         return $this->currentPage;
     }
 
-    public function setCurrentPage(int $currentPage): PaginationEntity
+    public function setCurrentPage(int $currentPage): PaginatedResult
     {
         $this->currentPage = $currentPage;
         return $this;
@@ -52,7 +52,7 @@ class PaginationEntity extends BaseEntity
         return $this->resultsPerPage;
     }
 
-    public function setResultsPerPage(int $resultsPerPage): PaginationEntity
+    public function setResultsPerPage(int $resultsPerPage): PaginatedResult
     {
         $this->resultsPerPage = $resultsPerPage;
         return $this;
@@ -63,7 +63,7 @@ class PaginationEntity extends BaseEntity
         return $this->data;
     }
 
-    public function setData(Collection $data): PaginationEntity
+    public function setData(Collection $data): PaginatedResult
     {
         $this->data = $data;
         return $this;

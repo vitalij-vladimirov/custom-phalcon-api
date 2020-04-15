@@ -20,10 +20,23 @@ class VendorController
         $this->vendorsRepository = $vendorsRepository;
     }
 
-    public function getAll(): array
+    public function getVendors(): void
     {
-        $test = $this->vendorsRepository->all();
+    }
 
-        dd($test);
+    public function getVendor(): void
+    {
+    }
+
+    public function createVendor(): void
+    {
+    }
+
+    public function updateVendor(): void
+    {
+    }
+
+    public function deleteVendor(): void
+    {
     }
 }
