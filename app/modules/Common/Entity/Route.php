@@ -20,25 +20,26 @@ class Route extends BaseEntity
     ];
 
     private string $status = self::STATUS_ACTIVE;
+    private bool $isSecured = true;
     private string $controller;
     private string $action;
     private array $permissions;
+    private ?string $validator = null;
     private array $resolvers = [];
     private ?string $requestMapper = null;
-    private ?string $validator = null;
     private ?string $responseMapper = null;
     private RouteDoc $documentation;
-
-    public function getStatus(): string
-    {
-        return $this->status;
-    }
 
     public function __construct(bool $documentation = true)
     {
         if (!$documentation) {
             $this->setDocumentation(new RouteDoc(false));
         }
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
     }
 
     public function setStatus(string $status): Route
@@ -48,6 +49,17 @@ class Route extends BaseEntity
         }
 
         $this->status = $status;
+        return $this;
+    }
+
+    public function isSecured(): bool
+    {
+        return $this->isSecured;
+    }
+
+    public function setIsSecured(bool $isSecured): Route
+    {
+        $this->isSecured = $isSecured;
         return $this;
     }
 
@@ -84,6 +96,17 @@ class Route extends BaseEntity
         return $this;
     }
 
+    public function getValidator(): ?string
+    {
+        return $this->validator;
+    }
+
+    public function setValidator(?string $validator): Route
+    {
+        $this->validator = $validator;
+        return $this;
+    }
+
     public function getResolvers(): array
     {
         return $this->resolvers;
@@ -103,17 +126,6 @@ class Route extends BaseEntity
     public function setRequestMapper(?string $requestMapper): Route
     {
         $this->requestMapper = $requestMapper;
-        return $this;
-    }
-
-    public function getValidator(): ?string
-    {
-        return $this->validator;
-    }
-
-    public function setValidator(?string $validator): Route
-    {
-        $this->validator = $validator;
         return $this;
     }
 

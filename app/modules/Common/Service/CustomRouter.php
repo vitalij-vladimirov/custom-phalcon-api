@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
+use Common\Exception\LogicException;
+use Common\Interfaces\RoutesInterface;
 use Phalcon\Mvc\Micro;
 use Phalcon\Http\Response;
 use Mvc\RouterInterface;
@@ -141,8 +143,8 @@ final class CustomRouter extends Injectable implements RouterInterface
 
     private function runRequest(RequestData $request, Micro $app): Micro
     {
-        if (isset($request->getParams()[0])) {
-            $pathRoutes = Text::toPascalCase($request->getParams()[1]);
+        if ($request->getParam(1) !== null) {
+            $pathRoutes = Text::toPascalCase($request->getParam(1));
             $routesClass =  $routesClass = '\\' . $request->getModule() . '\\Route\\' . $pathRoutes . 'Routes';
         }
 
@@ -154,7 +156,14 @@ final class CustomRouter extends Injectable implements RouterInterface
             throw new NotFoundApiException();
         }
 
-        $responseData = (new $routesClass($request))->get();
+        if (!in_array(RoutesInterface::class, class_implements($routesClass), true)) {
+            throw new LogicException('Routes class must implement RoutesInterface.');
+        }
+
+        /** @var RoutesInterface $routes */
+        $routes = $this->inject($routesClass);
+
+        $responseData = $routes->get($request);
 
         $app->{$request->getMethod()}(
             $request->getPath(),

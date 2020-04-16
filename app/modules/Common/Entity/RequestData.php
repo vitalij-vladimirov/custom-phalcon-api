@@ -68,11 +68,11 @@ class RequestData extends BaseEntity
 
     /**
      * @param int $key
-     * @return string|int|float
+     * @return string|int|float|null
      */
     public function getParam(int $key)
     {
-        return $this->params[$key];
+        return $this->params[$key] ?? null;
     }
 
     public function setParams(array $params): RequestData

@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Example\Resolver;
 
 use Common\ApiException\NotFoundApiException;
-use Common\Interfaces\ResolverInterface;
+use Common\BaseClasses\BaseResolver;
 use Documentation\Entity\ParameterDoc;
 use Example\Config\ErrorCodes;
 use Example\Model\VendorModel;
 use Example\Repository\VendorsRepository;
 
-class VendorResolver implements ResolverInterface
+class VendorResolver extends BaseResolver
 {
     private VendorsRepository $vendorRepository;
 
@@ -19,6 +19,12 @@ class VendorResolver implements ResolverInterface
         $this->vendorRepository = $vendorRepository;
     }
 
+    /**
+     * @param int|string $parameter
+     *
+     * @return VendorModel
+     * @throws NotFoundApiException
+     */
     public function resolveParameter($parameter): VendorModel
     {
         /** @var VendorModel $vendor */

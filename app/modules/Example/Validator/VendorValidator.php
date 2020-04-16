@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Example\Validator;
 
-use Common\Interfaces\ValidatorInterface;
+use Common\BaseClasses\BaseValidator;
 
-class VendorValidator implements ValidatorInterface
+class VendorValidator extends BaseValidator
 {
     public function validateData(array $data): void
     {

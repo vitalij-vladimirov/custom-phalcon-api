@@ -4,28 +4,24 @@ declare(strict_types=1);
 namespace Example\Controller;
 
 use Common\ApiException\NotFoundApiException;
-use Example\Repository\VendorsRepository;
+use Example\Model\VendorModel;
 
 class VendorController
 {
-    private VendorsRepository $vendorsRepository;
-
-    public function __construct(
-        VendorsRepository $vendorsRepository
-    ) {
+    public function __construct()
+    {
         if (APP_ENV === 'production') {
             throw new NotFoundApiException();
         }
-
-        $this->vendorsRepository = $vendorsRepository;
     }
 
     public function getVendors(): void
     {
     }
 
-    public function getVendor(): void
+    public function getVendor(VendorModel $vendorModel): VendorModel
     {
+        return $vendorModel;
     }
 
     public function createVendor(): void
