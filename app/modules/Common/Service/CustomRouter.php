@@ -163,14 +163,14 @@ final class CustomRouter extends Injectable implements RouterInterface
         /** @var RoutesInterface $routes */
         $routes = $this->inject($routesClass);
 
-        $responseData = $routes->get($request);
+        $response = $routes->get($request);
 
         $app->{$request->getMethod()}(
             $request->getPath(),
-            function () use ($app, $responseData) {
+            function () use ($app, $response) {
                 // TODO: describe different data types
                 $app->response
-                    ->setJsonContent($responseData)
+                    ->setJsonContent($response)
                     ->send()
                 ;
             }

@@ -264,8 +264,10 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
         $controllerParameters = [];
 
         if ($this->route->getValidator()) {
+            $validatorClass = $this->route->getValidator();
+
             /** @var BaseValidator $validator */
-            $validator = $this->inject($this->route->getValidator());
+            $validator = new $validatorClass();
             $validator->validateData($data);
         }
 
