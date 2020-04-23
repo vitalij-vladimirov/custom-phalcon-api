@@ -3,31 +3,51 @@ declare(strict_types=1);
 
 namespace Example\Route;
 
+use Common\Exception\LogicException;
 use Common\ApiException\NotFoundApiException;
 use Common\ApiException\UnauthorizedApiException;
-use Common\BaseClasses\BaseRoutes;
+use Common\BaseClass\BaseRoutes;
 use Common\Entity\Route;
 use Documentation\Entity\RouteDoc;
 use Example\Controller\VendorController;
 use Example\Mapper\VendorFilteredRequestMapper;
 use Example\Mapper\VendorMapper;
-use Example\Mapper\VendorPaginatedResponseMapper;
 use Example\Resolver\VendorResolver;
 use Example\Validator\VendorValidator;
 
 class VendorsRoutes extends BaseRoutes
 {
+    /**
+     * @throws LogicException
+     */
     protected function routes(): void
     {
         $this->get['/api/example/vendors'] = (new Route())
+            ->setEndpointType(Route::ENDPOINT_TYPE_LIST)
             ->setController(VendorController::class)
             ->setAction('getVendors')
             ->setPermissions(['example:read'])
             ->setRequestMapper(VendorFilteredRequestMapper::class)
-            ->setResponseMapper(VendorPaginatedResponseMapper::class)
+            ->setResponseMapper(VendorMapper::class)
             ->setDocumentation(
                 (new RouteDoc())
                     ->setSummary('List all vendors')
+                    ->setExceptionsList([
+                        UnauthorizedApiException::class,
+                    ])
+            )
+        ;
+
+        $this->get['/api/example/vendors/paginated'] = (new Route())
+            ->setEndpointType(Route::ENDPOINT_TYPE_PAGINATED)
+            ->setController(VendorController::class)
+            ->setAction('getVendorsPaginated')
+            ->setPermissions(['example:read'])
+            ->setRequestMapper(VendorFilteredRequestMapper::class)
+            ->setResponseMapper(VendorMapper::class)
+            ->setDocumentation(
+                (new RouteDoc())
+                    ->setSummary('List all vendors paginated')
                     ->setExceptionsList([
                         UnauthorizedApiException::class,
                     ])

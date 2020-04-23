@@ -8,7 +8,6 @@ use Common\Interfaces\RoutesInterface;
 use Phalcon\Mvc\Micro;
 use Phalcon\Http\Response;
 use Mvc\RouterInterface;
-use Common\BaseClasses\Injectable;
 use Common\ApiException\ApiException;
 use Common\ApiException\NotFoundApiException;
 use Common\Entity\RequestData;
@@ -19,6 +18,10 @@ use Throwable;
 
 final class CustomRouter extends Injectable implements RouterInterface
 {
+    /**
+     * @param Micro $app
+     * @throws LogicException
+     */
     public function getRoutes(Micro $app): void
     {
         try {

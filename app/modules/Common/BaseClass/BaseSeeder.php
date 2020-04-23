@@ -1,9 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\BaseClasses;
+namespace Common\BaseClass;
 
 use Common\Console;
+use Common\Service\Injectable;
 use Common\Exception\DatabaseException;
 use Common\Exception\LogicException;
 use Illuminate\Database\Capsule\Manager;

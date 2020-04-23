@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\BaseClasses;
+namespace Common\BaseClass;
 
 use ReflectionMethod;
 use Carbon\Carbon;
@@ -72,7 +72,7 @@ abstract class BaseEntity
         return $array;
     }
 
-    public function toEntity($data)
+    public function toEntity($data): BaseEntity
     {
         if (Variable::isObject($data)) {
             try {
@@ -158,7 +158,7 @@ abstract class BaseEntity
         return $this;
     }
 
-    private function getMethodContent($method, $emptyToNull)
+    private function getMethodContent($method, bool $emptyToNull)
     {
         try {
             $content = $this->$method();
@@ -166,7 +166,7 @@ abstract class BaseEntity
             return null;
         }
 
-        if (Variable::isString($content) && empty(trim($content)) && $emptyToNull) {
+        if ($emptyToNull && Variable::isString($content) && empty(trim($content))) {
             $content = null;
         }
 
@@ -178,7 +178,8 @@ abstract class BaseEntity
         try {
             return (new ReflectionMethod($this, $method))
                 ->getReturnType()
-                ->getName();
+                ->getName()
+            ;
         } catch (Throwable $exception) {
             return null;
         }
@@ -187,9 +188,7 @@ abstract class BaseEntity
     private function getMethodParams(string $method): array
     {
         try {
-            return (new ReflectionMethod($this, $method))
-                ->getParameters()
-            ;
+            return (new ReflectionMethod($this, $method))->getParameters();
         } catch (Throwable $exception) {
             return [];
         }
@@ -198,8 +197,7 @@ abstract class BaseEntity
     private function isMethodPublic(string $method): bool
     {
         try {
-            return (new ReflectionMethod($this, $method))
-                ->isPublic();
+            return (new ReflectionMethod($this, $method))->isPublic();
         } catch (Throwable $exception) {
             return false;
         }

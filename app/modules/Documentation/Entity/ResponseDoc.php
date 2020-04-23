@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Documentation\Entity;
 
-use Common\BaseClasses\BaseEntity;
+use Common\BaseClass\BaseEntity;
 
 class ResponseDoc extends BaseEntity
 {

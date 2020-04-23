@@ -1,8 +1,8 @@
 <?php
 declare(strict_types=1);
 
-use Common\BaseClasses\Injectable;
-use Common\BaseClasses\BaseMigration;
+use Common\Service\Injectable;
+use Common\BaseClass\BaseMigration;
 
 $config = (new Injectable())->di->get('config');
 

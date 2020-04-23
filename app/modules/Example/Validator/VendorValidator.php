@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Example\Validator;
 
-use Common\BaseClasses\BaseValidator;
+use Common\BaseClass\BaseValidator;
 use Phalcon\Validation\Validator\InclusionIn;
 use Phalcon\Validation\Validator\PresenceOf;
 use Phalcon\Validation\Validator\StringLength;

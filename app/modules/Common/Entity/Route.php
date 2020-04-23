@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-use Common\BaseClasses\BaseEntity;
+use Common\BaseClass\BaseEntity;
 use Common\Exception\LogicException;
 use Documentation\Entity\RouteDoc;
 
@@ -13,14 +13,25 @@ class Route extends BaseEntity
     public const STATUS_MOVED = 'moved';
     public const STATUS_DEPRECATED = 'deprecated';
 
+    public const ENDPOINT_TYPE_DEFAULT = 'default';
+    public const ENDPOINT_TYPE_LIST = 'list';
+    public const ENDPOINT_TYPE_PAGINATED = 'paginated';
+
     private const ALLOWED_STATUSES = [
         self::STATUS_ACTIVE,
         self::STATUS_MOVED,
         self::STATUS_DEPRECATED,
     ];
 
+    private const ALLOWED_ENDPOINT_TYPES = [
+        self::ENDPOINT_TYPE_DEFAULT,
+        self::ENDPOINT_TYPE_LIST,
+        self::ENDPOINT_TYPE_PAGINATED,
+    ];
+
     private string $status = self::STATUS_ACTIVE;
     private bool $isSecured = true;
+    private string $endpointType = self::ENDPOINT_TYPE_DEFAULT;
     private string $controller;
     private string $action;
     private array $permissions;
@@ -45,7 +56,7 @@ class Route extends BaseEntity
     public function setStatus(string $status): Route
     {
         if (!in_array($status, self::ALLOWED_STATUSES, true)) {
-            throw new LogicException('You are trying to assign route status that is not allowed.');
+            throw new LogicException('Not allowed route status assigned.');
         }
 
         $this->status = $status;
@@ -60,6 +71,21 @@ class Route extends BaseEntity
     public function setIsSecured(bool $isSecured): Route
     {
         $this->isSecured = $isSecured;
+        return $this;
+    }
+
+    public function getEndpointType(): string
+    {
+        return $this->endpointType;
+    }
+
+    public function setEndpointType(string $endpointType): Route
+    {
+        if (!in_array($endpointType, self::ALLOWED_ENDPOINT_TYPES, true)) {
+            throw new LogicException('Not allowed endpoint type assigned.');
+        }
+
+        $this->endpointType = $endpointType;
         return $this;
     }
 

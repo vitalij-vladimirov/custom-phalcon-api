@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\BaseClasses;
+namespace Common\BaseClass;
 
 use Phalcon\Config;
 use Phalcon\Db\Adapter\Pdo\AbstractPdo;
@@ -9,6 +9,7 @@ use Phinx\Migration\AbstractMigration;
 use Illuminate\Database\Capsule\Manager as EloquentDb;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
+use Common\Service\Injectable;
 use Common\Exception\LogicException;
 use Common\Regex;
 use Common\Text;

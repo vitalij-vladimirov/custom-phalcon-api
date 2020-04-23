@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\BaseClasses;
+namespace Common\BaseClass;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;

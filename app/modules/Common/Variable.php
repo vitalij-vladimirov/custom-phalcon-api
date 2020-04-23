@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeImmutable;
 use DateTime;
-use Common\BaseClasses\Injectable;
+use Common\Service\Injectable;
 use Throwable;
 
 class Variable

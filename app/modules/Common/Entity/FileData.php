@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Common\Entity;
 
 use Carbon\Carbon;
-use Common\BaseClasses\BaseEntity;
+use Common\BaseClass\BaseEntity;
 
 class FileData extends BaseEntity
 {

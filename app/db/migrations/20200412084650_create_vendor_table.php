@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Schema\Blueprint;
-use Common\BaseClasses\BaseMigration;
+use Common\BaseClass\BaseMigration;
 use Seeds\VendorSeeder;
 
 /**

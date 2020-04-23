@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-use Common\BaseClasses\BaseEntity;
+use Common\BaseClass\BaseEntity;
 
 class DirectoryData extends BaseEntity
 {

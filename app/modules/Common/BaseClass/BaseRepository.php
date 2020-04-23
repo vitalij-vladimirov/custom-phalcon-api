@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\BaseClasses;
+namespace Common\BaseClass;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -373,7 +373,7 @@ abstract class BaseRepository
     }
 
     /**
-     * @param int $perPage
+     * @param int $limit
      * @param int $page
      * @param string $orderBy
      * @param string $orderDir
@@ -382,7 +382,7 @@ abstract class BaseRepository
      * @return PaginatedResult
      */
     public function paginate(
-        int $perPage = 10,
+        int $limit = 10,
         int $page = 1,
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
@@ -390,13 +390,13 @@ abstract class BaseRepository
     ): PaginatedResult {
         $builder = $this->model::where('id', '>', 0);
 
-        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
+        return $this->getPaginatedData($builder, $limit, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
      * @param string $column
      * @param string|int|float|array $values
-     * @param int $perPage
+     * @param int $limit
      * @param int $page
      * @param string $orderBy
      * @param string $orderDir
@@ -407,7 +407,7 @@ abstract class BaseRepository
     public function paginateBy(
         string $column,
         $values,
-        int $perPage = 10,
+        int $limit = 10,
         int $page = 1,
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
@@ -419,12 +419,12 @@ abstract class BaseRepository
             $builder = $this->model::where($column, '=', $values);
         }
 
-        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
+        return $this->getPaginatedData($builder, $limit, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
      * @param int[] $ids
-     * @param int $perPage
+     * @param int $limit
      * @param int $page
      * @param string $orderBy
      * @param string $orderDir
@@ -434,7 +434,7 @@ abstract class BaseRepository
      */
     public function paginateByIds(
         array $ids,
-        int $perPage = 10,
+        int $limit = 10,
         int $page = 1,
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
@@ -443,13 +443,13 @@ abstract class BaseRepository
         $builder = $this->model::where('id', '>', 0)
             ->whereIn('id', $ids);
 
-        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
+        return $this->getPaginatedData($builder, $limit, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
      * @param int $from
      * @param int|null $to
-     * @param int $perPage
+     * @param int $limit
      * @param int $page
      * @param string $orderBy
      * @param string $orderDir
@@ -460,7 +460,7 @@ abstract class BaseRepository
     public function paginateByIdsRange(
         int $from = 0,
         int $to = null,
-        int $perPage = 10,
+        int $limit = 10,
         int $page = 1,
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
@@ -473,12 +473,12 @@ abstract class BaseRepository
         $builder = $this->model::where('id', '>', 0)
             ->whereBetween('id', [$from, $to]);
 
-        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
+        return $this->getPaginatedData($builder, $limit, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
      * @param array $credentials
-     * @param int $perPage
+     * @param int $limit
      * @param int $page
      * @param string $orderBy
      * @param string $orderDir
@@ -489,7 +489,7 @@ abstract class BaseRepository
      */
     public function paginateByCredentials(
         array $credentials,
-        int $perPage = 10,
+        int $limit = 10,
         int $page = 1,
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
@@ -497,7 +497,7 @@ abstract class BaseRepository
     ): PaginatedResult {
         $builder = $this->queryBuilder($credentials);
 
-        return $this->getPaginatedData($builder, $perPage, $page, $orderBy, $orderDir, $columns);
+        return $this->getPaginatedData($builder, $limit, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
@@ -1065,7 +1065,7 @@ abstract class BaseRepository
 
     /**
      * @param QueryBuilder|EloquentBuilder $builder
-     * @param int $perPage
+     * @param int $limit
      * @param int $page
      * @param string $orderBy
      * @param string $orderDir
@@ -1075,7 +1075,7 @@ abstract class BaseRepository
      */
     protected function getPaginatedData(
         $builder,
-        int $perPage,
+        int $limit,
         int $page,
         string $orderBy = self::DEFAULT_ORDER_BY,
         string $orderDir = self::ORDER_ASC,
@@ -1084,19 +1084,19 @@ abstract class BaseRepository
         $total = $builder->count();
 
         $data = $builder
-            ->offset($perPage * $page - $perPage)
-            ->limit($perPage)
+            ->offset($limit * $page - $limit)
+            ->limit($limit)
             ->orderBy($orderBy, $orderDir)
             ->get($columns)
         ;
 
         return (new PaginatedResult())
             ->setTotalResults($total)
-            ->setTotalPages((int)ceil($total / $perPage))
+            ->setTotalPages((int)ceil($total / $limit))
             ->setCurrentPage($page)
-            ->setResultsPerPage($perPage)
+            ->setLimit($limit)
             ->setData($data)
-            ;
+        ;
     }
 
     /**

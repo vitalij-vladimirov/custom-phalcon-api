@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Common\Integrational\Test;
 
 use Carbon\Carbon;
-use Common\BaseClasses\BaseTestCase;
+use Common\BaseClass\BaseTestCase;
 use Common\Entity\DirectoryData;
 use Common\Entity\FileData;
 use Common\Entity\FileSizeData;

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Example\Model;
 
-use Common\BaseClasses\BaseModel;
+use Common\BaseClass\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 

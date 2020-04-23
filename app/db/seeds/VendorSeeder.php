@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Seeds;
 
-use Common\BaseClasses\BaseSeeder;
+use Common\BaseClass\BaseSeeder;
 
 /**
  * Seeds will be created only if table is empty.

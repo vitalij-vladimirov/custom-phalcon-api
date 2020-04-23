@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace Common\Entity;
 
 use Illuminate\Database\Eloquent\Collection;
-use Common\BaseClasses\BaseEntity;
+use Common\BaseClass\BaseEntity;
 
 class PaginatedResult extends BaseEntity
 {
     private int $totalResults;
     private int $totalPages;
     private int $currentPage;
-    private int $resultsPerPage;
+    private int $limit;
     private Collection $data;
 
     public function getTotalResults(): int
@@ -47,14 +47,14 @@ class PaginatedResult extends BaseEntity
         return $this;
     }
 
-    public function getResultsPerPage(): int
+    public function getLimit(): int
     {
-        return $this->resultsPerPage;
+        return $this->limit;
     }
 
-    public function setResultsPerPage(int $resultsPerPage): PaginatedResult
+    public function setLimit(int $limit): PaginatedResult
     {
-        $this->resultsPerPage = $resultsPerPage;
+        $this->limit = $limit;
         return $this;
     }
 

@@ -1,21 +1,25 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\BaseClasses;
+namespace Common\BaseClass;
 
+use Common\BaseMapper\BasePaginationFilterRequestMapper;
 use Documentation\Entity\ParameterDoc;
 use Authorization\Service\PermissionsManager;
-use Common\Variable;
+use Common\Exception\ForbiddenException;
+use Common\Exception\LogicException;
 use Common\ApiException\BadRequestApiException;
 use Common\ApiException\NotFoundApiException;
 use Common\ApiException\UnauthorizedApiException;
+use Common\BaseMapper\BaseListResponseMapper;
+use Common\BaseMapper\BasePaginatedResponseMapper;
+use Common\Service\Injectable;
 use Common\Entity\Route;
-use Common\Exception\ForbiddenException;
-use Common\Exception\LogicException;
 use Common\Interfaces\RequestMapperInterface;
 use Common\Interfaces\ResponseMapperInterface;
 use Common\Interfaces\RoutesInterface;
 use Common\Entity\RequestData;
+use Common\Variable;
 use Common\Regex;
 
 abstract class BaseRoutes extends Injectable implements RoutesInterface
@@ -248,21 +252,35 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
         }
     }
 
+    /**
+     * @return mixed
+     * @throws LogicException
+     */
     private function runRoute()
     {
         $data = $this->request->getData();
 
-        /*
-         * These are parameters collected from route path {parts}.
-         * They will be sent to controller if $controllerParameters will be empty.
-         */
+        // Validate data provider with request
+        $this->validateData($data);
+
+        // Collect raw path parameters
         $pathParameters = $this->collectPathParameters();
 
-        /*
-         * Parameters collected using RequestMapper and Resolvers.
-         */
-        $controllerParameters = [];
+        // Convert raw path parameters to parameters that will be sent to controller
+        $parameters = $this->resolveParameters($pathParameters);
 
+        // Convert request data to object
+        $requestData = $this->resolveRequest($data);
+
+        // Send collected data and parameters to controller and collect response
+        $response = $this->callController($parameters, $requestData, $pathParameters);
+
+        // Convert response to readable format and return
+        return $this->mapResponse($response);
+    }
+
+    private function validateData(array $data): void
+    {
         if ($this->route->getValidator()) {
             $validatorClass = $this->route->getValidator();
 
@@ -270,6 +288,11 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
             $validator = new $validatorClass();
             $validator->validateData($data);
         }
+    }
+
+    private function resolveParameters(array $pathParameters): array
+    {
+        $resolvers = [];
 
         if (count($this->route->getResolvers())) {
             foreach ($this->route->getResolvers() as $parameterKey => $parameterData) {
@@ -278,34 +301,40 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
                 }
 
                 if (Variable::isObject($parameterData, ParameterDoc::class)) {
-                    $controllerParameters[] = $pathParameters[$parameterKey];
+                    $resolvers[] = $pathParameters[$parameterKey];
                     continue;
                 }
 
                 /** @var BaseResolver $resolver */
                 $resolver = $this->inject($parameterData);
 
-                $controllerParameters[] = $resolver->resolveParameter($pathParameters[$parameterKey]);
+                $resolvers[] = $resolver->resolveParameter($pathParameters[$parameterKey]);
             }
         }
 
+        return $resolvers;
+    }
+
+    /**
+     * @param array $data
+     * @return mixed|null
+     */
+    private function resolveRequest(array $data)
+    {
         if ($this->route->getRequestMapper()) {
             /** @var RequestMapperInterface $requestMapper */
             $requestMapper = $this->inject($this->route->getRequestMapper());
 
-            $controllerParameters[] = $requestMapper->mapRequestToObject($data);
-        }
-        
-        $response = $this->callController($controllerParameters, $pathParameters);
+            if ($this->route->getEndpointType() === Route::ENDPOINT_TYPE_PAGINATED) {
+                return (new BasePaginationFilterRequestMapper($requestMapper))
+                    ->mapRequestToObject($data)
+                ;
+            }
 
-        if ($this->route->getResponseMapper()) {
-            /** @var ResponseMapperInterface $responseMapper */
-            $responseMapper = $this->inject($this->route->getResponseMapper());
-
-            return $responseMapper->mapResponseToArray($response);
+            return $requestMapper->mapRequestToObject($data);
         }
 
-        return $response;
+        return null;
     }
 
     private function collectPathParameters(): array
@@ -330,19 +359,48 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
         return $parameters;
     }
 
-    private function callController(array $controllerParameters, array $pathParameters)
+    private function callController(array $parameters, $requestData, array $pathParameters)
     {
         $controller = $this->inject($this->route->getController());
         $action = $this->route->getAction();
 
-        if (count($controllerParameters) !== 0) {
-            return call_user_func_array([$controller, $action], $controllerParameters);
+        $parameters = $parameters ?? $pathParameters ?? [];
+
+        if (count($parameters) !== 0) {
+            if ($requestData !== null) {
+                $parameters[] = $requestData;
+            }
+
+            return call_user_func_array([$controller, $action], $parameters);
         }
 
-        if (count($pathParameters) !== 0) {
-            return call_user_func_array([$controller, $action], $pathParameters);
+        if ($requestData !== null) {
+            return $controller->$action($requestData);
         }
 
         return $controller->$action();
+    }
+
+    private function mapResponse($response)
+    {
+        if ($this->route->getResponseMapper()) {
+            /** @var ResponseMapperInterface $responseMapper */
+            $responseMapper = $this->inject($this->route->getResponseMapper());
+
+            switch ($this->route->getEndpointType()) {
+                case Route::ENDPOINT_TYPE_PAGINATED:
+                    return (new BasePaginatedResponseMapper($responseMapper))
+                        ->mapResponseToArray($response)
+                    ;
+                case Route::ENDPOINT_TYPE_LIST:
+                    return (new BaseListResponseMapper($responseMapper))
+                        ->mapResponseToArray($response)
+                    ;
+                default:
+                    return $responseMapper->mapResponseToArray($response);
+            }
+        }
+
+        return $response;
     }
 }

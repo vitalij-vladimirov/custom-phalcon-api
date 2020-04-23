@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
-use Common\BaseClasses\Injectable;
 use Phinx\Console\PhinxApplication;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\MigrationCreator;

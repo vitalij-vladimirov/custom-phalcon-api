@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Example\Resolver;
 
 use Common\ApiException\NotFoundApiException;
-use Common\BaseClasses\BaseResolver;
+use Common\BaseClass\BaseResolver;
 use Documentation\Entity\ParameterDoc;
 use Example\Config\ErrorCodes;
 use Example\Model\VendorModel;

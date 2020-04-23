@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Common\Task;
 
-use Common\BaseClasses\BaseTask;
+use Common\BaseClass\BaseTask;
 use Common\File;
 use Throwable;
 

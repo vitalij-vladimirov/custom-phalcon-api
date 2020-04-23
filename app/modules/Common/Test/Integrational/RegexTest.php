@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Common\Integrational\Test;
 
-use Common\BaseClasses\BaseTestCase;
+use Common\BaseClass\BaseTestCase;
 use Common\Regex;
 
 class RegexTest extends BaseTestCase

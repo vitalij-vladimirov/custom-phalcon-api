@@ -5,12 +5,23 @@ namespace Example\Mapper;
 
 use Common\Interfaces\RequestMapperInterface;
 use Documentation\Entity\RequestDoc;
+use Example\Entity\VendorFilter;
 
 class VendorFilteredRequestMapper implements RequestMapperInterface
 {
-    public function mapRequestToObject(array $data) // return filter entity
+    public function mapRequestToObject(array $data): VendorFilter
     {
-        // TODO: write filter entity mapper
+        $vendorFilter = new VendorFilter();
+
+        if (isset($data['environment'])) {
+            $vendorFilter->setEnvironment($data['environment']);
+        }
+
+        if (isset($data['search'])) {
+            $vendorFilter->setSearch($data['search']);
+        }
+
+        return $vendorFilter;
     }
 
     public function requestDocumentation(): ?RequestDoc

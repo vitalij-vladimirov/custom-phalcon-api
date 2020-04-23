@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\BaseClasses;
+namespace Common\Service;
 
 use Phalcon\Di\Injectable as PhalconInjectable;
 use Dice\Dice;
