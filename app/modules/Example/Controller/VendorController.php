@@ -3,11 +3,9 @@ declare(strict_types=1);
 
 namespace Example\Controller;
 
-use Common\ApiException\ForbiddenApiException;
 use Common\ApiException\NotFoundApiException;
 use Common\Entity\PaginatedResult;
 use Common\Entity\PaginationFilter;
-use Common\Exception\DatabaseException;
 use Example\Entity\VendorFilter;
 use Example\Model\VendorModel;
 use Example\Repository\VendorsRepository;

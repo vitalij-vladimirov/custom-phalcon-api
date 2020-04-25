@@ -4,13 +4,13 @@ declare(strict_types=1);
 namespace Common\Service;
 
 use Phinx\Console\PhinxApplication;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\Migrations\MigrationCreator;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\Migrations\MigrationCreator;
 use Common\Exception\LogicException;
-use Common\File;
 use Common\Regex;
+use Common\File;
 
 final class MigrationManager extends Injectable
 {

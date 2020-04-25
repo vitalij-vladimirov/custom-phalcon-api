@@ -9,8 +9,8 @@ use Phinx\Migration\AbstractMigration;
 use Illuminate\Database\Capsule\Manager as EloquentDb;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Database\Schema\Blueprint;
-use Common\Service\Injectable;
 use Common\Exception\LogicException;
+use Common\Service\Injectable;
 use Common\Regex;
 use Common\Text;
 
@@ -20,6 +20,7 @@ abstract class BaseMigration extends AbstractMigration
     private const MIGRATION_UPDATE = 'update';
 
     protected string $table;
+    protected bool $timestamps = true;
 
     protected Injectable $injectable;
     protected EloquentDb $eloquent;
@@ -49,12 +50,14 @@ abstract class BaseMigration extends AbstractMigration
 
                 $this->migrationSchema($table);
 
-                $table->timestamp('created_at')
-                    ->index()
-                    ->useCurrent();
-                $table->timestamp('updated_at')
-                    ->index()
-                    ->useCurrent();
+                if ($this->timestamps) {
+                    $table->timestamp('created_at')
+                        ->index()
+                        ->useCurrent();
+                    $table->timestamp('updated_at')
+                        ->index()
+                        ->useCurrent();
+                }
             });
         } elseif ($this->migrationType === self::MIGRATION_UPDATE) {
             $this->schema->table($this->table, function (Blueprint $table) {
@@ -62,7 +65,9 @@ abstract class BaseMigration extends AbstractMigration
             });
         }
 
-        $this->correctUpdatedAtField();
+        if ($this->timestamps) {
+            $this->correctUpdatedAtField();
+        }
 
         if (method_exists($this, 'afterMigration')) {
             $this->afterMigration();
@@ -77,7 +82,10 @@ abstract class BaseMigration extends AbstractMigration
 
         if ($this->migrationType === self::MIGRATION_CREATE) {
             $this->schema->dropIfExists($this->table);
-        } else {
+            return;
+        }
+
+        if ($this->migrationType === self::MIGRATION_UPDATE) {
             $this->schema->table($this->table, function (Blueprint $table) {
                 $this->rollbackSchema($table);
             });
@@ -92,6 +100,23 @@ abstract class BaseMigration extends AbstractMigration
     protected function inject(string $class): object
     {
         return $this->injectable->inject($class);
+    }
+
+    protected function rollbackSchema(Blueprint $table): void
+    {
+    }
+
+    private function loadGlobalServices(): void
+    {
+        $this->injectable = new Injectable();
+
+        $this->config = $this->injectable->di->get('config');
+        $this->db = $this->injectable->di->get('db');
+        $this->eloquent = $this->injectable->di->get('eloquent');
+
+        $this->schema = $this->eloquent::schema();
+
+        $this->setMigrationType();
     }
 
     private function setMigrationType(): string
@@ -110,19 +135,6 @@ abstract class BaseMigration extends AbstractMigration
         }
 
         throw new LogicException('Couldn\'t resolve migration type.');
-    }
-
-    private function loadGlobalServices(): void
-    {
-        $this->injectable = new Injectable();
-
-        $this->config = $this->injectable->di->get('config');
-        $this->db = $this->injectable->di->get('db');
-        $this->eloquent = $this->injectable->di->get('eloquent');
-
-        $this->schema = $this->eloquent::schema();
-
-        $this->setMigrationType();
     }
 
     /**
@@ -149,10 +161,15 @@ abstract class BaseMigration extends AbstractMigration
             return;
         }
 
-        $this->db->query('
-            ALTER TABLE `' . $this->config->database->dbname . '`.`' . $this->table . '`
+        $alterSql = vsprintf('
+            ALTER TABLE %s.%s
             CHANGE COLUMN `updated_at` `updated_at`
             TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        ')->execute();
+        ', [
+            $this->config->database->dbname,
+            $this->table
+        ]);
+
+        $this->db->query($alterSql)->execute();
     }
 }

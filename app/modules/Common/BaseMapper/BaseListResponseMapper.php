@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Common\BaseMapper;
 
+use Illuminate\Support\Collection;
 use Common\Interfaces\ResponseMapperInterface;
 use Documentation\Entity\ResponseDoc;
-use Illuminate\Support\Collection;
 
 class BaseListResponseMapper implements ResponseMapperInterface
 {

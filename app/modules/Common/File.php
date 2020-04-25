@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Common\Entity\DirectoryData;
 use Common\Entity\FileData;
 use Common\Entity\FileSizeData;
+use Common\Exception\BadRequestException;
 use Common\Exception\LogicException;
 
 class File
@@ -76,10 +77,10 @@ class File
         return file_exists($file);
     }
 
-    public static function getInfo(string $file): ?FileData
+    public static function getInfo(string $file): FileData
     {
         if (!self::exists($file)) {
-            return null;
+            throw new BadRequestException('File not found.');
         }
 
         $fileInfo = (new FileData())
@@ -120,7 +121,7 @@ class File
         ;
     }
 
-    public static function getDirectory(string $file): ?DirectoryData
+    public static function getDirectory(string $file): DirectoryData
     {
         $map = [];
         $pathSplitter = explode('/', $file);
@@ -166,7 +167,7 @@ class File
                     continue;
                 }
 
-                if (!$scanHiddenFiles && substr($file, 0, 1) === '.') {
+                if (!$scanHiddenFiles && strpos($file, '.') === 0) {
                     continue;
                 }
 
@@ -199,14 +200,16 @@ class File
         }
 
         $fullPath = '';
-        for ($i = 0; $i < count($directory->getMap()); ++$i) {
-            $fullPath .= '/' . $directory->getMap()[$i];
+        foreach ($directory->getMap() as $folder) {
+            $fullPath .= '/' . $folder;
 
             if (self::exists($fullPath)) {
                 continue;
             }
 
-            mkdir($fullPath);
+            if (!mkdir($fullPath) && !is_dir($fullPath)) {
+                throw new LogicException('Directory could not be created');
+            }
         }
     }
 }

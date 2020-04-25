@@ -3,25 +3,20 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
+use Phalcon\Http\Response;
+use Phalcon\Mvc\Micro;
+use Mvc\RouterInterface;
 use Common\Exception\LogicException;
 use Common\Interfaces\RoutesInterface;
-use Phalcon\Mvc\Micro;
-use Phalcon\Http\Response;
-use Mvc\RouterInterface;
 use Common\ApiException\ApiException;
 use Common\ApiException\NotFoundApiException;
 use Common\Entity\RequestData;
 use Common\File;
 use Common\Text;
-use Common\Variable;
 use Throwable;
 
 final class CustomRouter extends Injectable implements RouterInterface
 {
-    /**
-     * @param Micro $app
-     * @throws LogicException
-     */
     public function getRoutes(Micro $app): void
     {
         try {
@@ -70,7 +65,7 @@ final class CustomRouter extends Injectable implements RouterInterface
             $request
                 ->setType(RequestData::REQUEST_TYPE_API)
                 ->setModule(Text::toPascalCase($urlSplitter[2]))
-                ->setParams(Variable::restoreArrayTypes(array_slice($urlSplitter, 2)))
+                ->setParams(array_slice($urlSplitter, 2))
             ;
         } else {
             if (empty($urlSplitter[1])) {
@@ -80,7 +75,7 @@ final class CustomRouter extends Injectable implements RouterInterface
             $request
                 ->setType(RequestData::REQUEST_TYPE_VIEW)
                 ->setModule(Text::toPascalCase($urlSplitter[1]))
-                ->setParams(Variable::restoreArrayTypes(array_slice($urlSplitter, 1)))
+                ->setParams(array_slice($urlSplitter, 1))
             ;
         }
 
@@ -95,9 +90,7 @@ final class CustomRouter extends Injectable implements RouterInterface
     {
         if ($this->request->getMethod() === 'GET') {
             try {
-                $queryData = Variable::restoreArrayTypes(
-                    $this->request->getQuery()
-                );
+                $queryData = $this->request->getQuery();
 
                 if (count($queryData) !== 0) {
                     return $queryData;
@@ -113,9 +106,7 @@ final class CustomRouter extends Injectable implements RouterInterface
             true
         )) {
             try {
-                return Variable::restoreArrayTypes(
-                    $this->request->getJsonRawBody(true)
-                );
+                return $this->request->getJsonRawBody(true);
             } catch (Throwable $throwable) {
                 return [];
             }
@@ -123,9 +114,7 @@ final class CustomRouter extends Injectable implements RouterInterface
 
         if ($this->request->getMethod() === 'POST') {
             try {
-                return Variable::restoreArrayTypes(
-                    $this->request->getPost()
-                );
+                return $this->request->getPost();
             } catch (Throwable $throwable) {
                 return [];
             }
@@ -133,9 +122,7 @@ final class CustomRouter extends Injectable implements RouterInterface
 
         if ($this->request->getMethod() === 'PUT') {
             try {
-                return Variable::restoreArrayTypes(
-                    $this->request->getPut()
-                );
+                return $this->request->getPut();
             } catch (Throwable $throwable) {
                 return [];
             }

@@ -645,11 +645,7 @@ abstract class BaseRepository
         $this->validateFieldsCanBeUpdated($data);
 
         try {
-            $model = $this->model::findOrFail($id);
-
-            $model->update($data);
-
-            return $model;
+            return $this->model::findOrFail($id)->update($data);
         } catch (Throwable $throwable) {
             throw new DatabaseException($throwable->getMessage());
         }
@@ -694,11 +690,7 @@ abstract class BaseRepository
         $this->validateFieldsCanBeUpdated($data);
 
         try {
-            $model = $this->findOneByCredentials($credentials);
-
-            $model->update($data);
-
-            return $model;
+            return  ($this->findOneByCredentials($credentials))->update($data);
         } catch (Throwable $throwable) {
             throw new DatabaseException($throwable->getMessage());
         }
@@ -1008,6 +1000,7 @@ abstract class BaseRepository
      *              AND something LIKE '%text'
      *
      * @param array $credentials
+     *
      * @return QueryBuilder|EloquentBuilder|BaseModel
      * @throws LogicException
      */

@@ -4,8 +4,8 @@ declare(strict_types=1);
 namespace Common\Task;
 
 use Common\BaseClass\BaseTask;
-use Common\Console;
 use Common\Service\SeedManager;
+use Common\Console;
 
 class SeedTask extends BaseTask
 {

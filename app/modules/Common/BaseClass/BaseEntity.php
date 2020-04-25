@@ -10,6 +10,7 @@ use Common\Json;
 use Common\Regex;
 use Common\Text;
 use Common\Variable;
+use ReflectionNamedType;
 use Throwable;
 
 abstract class BaseEntity
@@ -22,48 +23,50 @@ abstract class BaseEntity
         $array = [];
 
         foreach (get_class_methods($this) as $method) {
-            if (Regex::isMethodName($method, Regex::METHOD_TYPE_GET) && $this->isMethodPublic($method)) {
-                $content = $this->getMethodContent($method, $emptyToNull);
+            if (!Regex::isMethodName($method, Regex::METHOD_TYPE_GET) || !$this->isMethodPublic($method)) {
+                continue;
+            }
 
-                if ($content === null && $includeNulls === false) {
-                    continue;
-                }
+            $content = $this->getMethodContent($method, $emptyToNull);
 
-                $variable = Text::uncamelizeMethod($method);
-                $returnType = $this->getMethodReturnType($method);
-                $contentType = Variable::getType($content);
+            if ($content === null && $includeNulls === false) {
+                continue;
+            }
 
-                $isJson = Json::isJson($content);
+            $variable = Text::uncamelizeMethod($method);
+            $returnType = $this->getMethodReturnType($method);
+            $contentType = Variable::getType($content);
 
-                $isDefaultType = !$isJson
-                    && Variable::isDefaultType($returnType)
-                    && Variable::isDefaultType($contentType)
-                ;
+            $isJson = Json::isJson($content);
 
-                if ($isDefaultType) {
-                    $array[$variable] = $content;
-                    continue;
-                }
+            $isDefaultType = !$isJson
+                && Variable::isDefaultType($returnType)
+                && Variable::isDefaultType($contentType)
+            ;
 
-                if ($isJson) {
-                    $array[$variable] = Json::decode((string)$content);
-                    continue;
-                }
+            if ($isDefaultType) {
+                $array[$variable] = $content;
+                continue;
+            }
 
-                if (Variable::isDateTimeObject($content)) {
-                    $array[$variable] = Variable::convertTimeObjectToString($content, $timestamps);
-                    continue;
-                }
+            if ($isJson) {
+                $array[$variable] = Json::decode((string)$content);
+                continue;
+            }
 
+            if (Variable::isDateTimeObject($content)) {
+                $array[$variable] = Variable::convertTimeObjectToString($content, $timestamps);
+                continue;
+            }
+
+            try {
+                $array[$variable] = $content->toArray($includeNulls, $emptyToNull, $timestamps);
+            } catch (Throwable $exception) {
                 try {
-                    $array[$variable] = $content->toArray($includeNulls, $emptyToNull, $timestamps);
+                    $array[$variable] = $content->toArray();
                 } catch (Throwable $exception) {
-                    try {
-                        $array[$variable] = $content->toArray();
-                    } catch (Throwable $exception) {
-                        if ($includeNulls) {
-                            $array[$variable] = null;
-                        }
+                    if ($includeNulls) {
+                        $array[$variable] = null;
                     }
                 }
             }
@@ -96,68 +99,74 @@ abstract class BaseEntity
             throw new LogicException('$data type must be array or object.');
         }
 
-        $array = Variable::restoreArrayTypes($data);
-
         foreach (get_class_methods($this) as $method) {
-            if (Regex::isMethodName($method, Regex::METHOD_TYPE_SET) && $this->isMethodPublic($method)) {
-                $variable = Text::uncamelizeMethod($method);
-
-                $content = $array[$variable];
-
-                $parameters = $this->getMethodParams($method);
-
-                if (count($parameters) !== 1) {
-                    continue;
-                }
-
-                $contentType = Variable::getType($content);
-                $parameterType = $parameters[0]->getType()->getName();
-
-                if ($parameterType === Variable::VAR_TYPE_BOOL && empty($content)) {
-                    $this->$method(false);
-                    continue;
-                }
-
-                if ($parameterType === Variable::VAR_TYPE_STRING
-                    && in_array($contentType, [Variable::VAR_TYPE_INT, Variable::VAR_TYPE_FLOAT], true)
-                ) {
-                    $content = (string)$content;
-                    $contentType = Variable::getType($content);
-                }
-
-                if ($contentType === Variable::VAR_TYPE_INT && $parameterType === Carbon::class) {
-                    $this->$method(Carbon::createFromTimestamp($content));
-                    continue;
-                }
-
-                if ($contentType === Variable::VAR_TYPE_STRING && $parameterType === Carbon::class) {
-                    $this->$method(Carbon::createFromTimeString($content));
-                    continue;
-                }
-
-                try {
-                    $class = '\\' . $parameterType;
-
-                    if ($contentType === Variable::VAR_TYPE_OBJECT && class_exists($class)) {
-                        $this->$method($content);
-                        continue;
-                    }
-
-                    if ($contentType === Variable::VAR_TYPE_ARRAY && method_exists($class, 'toEntity')) {
-                        $this->$method((new $class())->toEntity($content));
-                        continue;
-                    }
-                } catch (Throwable $exception) {
-                    continue;
-                }
-
-                $this->$method($content);
+            if (!Regex:: isMethodName($method, Regex::METHOD_TYPE_SET) || !$this->isMethodPublic($method)) {
+                continue;
             }
+
+            $variable = Text::uncamelizeMethod($method);
+
+            $content = $array[$variable];
+
+            $parameters = $this->getMethodParams($method);
+
+            if (count($parameters) !== 1) {
+                continue;
+            }
+
+            $contentType = Variable::getType($content);
+            $parameterType = $parameters[0]->getType()->getName();
+
+            if ($parameterType === Variable::VAR_TYPE_BOOL && empty($content)) {
+                $this->$method(false);
+                continue;
+            }
+
+            if ($parameterType === Variable::VAR_TYPE_STRING
+                && in_array($contentType, [Variable::VAR_TYPE_INT, Variable::VAR_TYPE_FLOAT], true)
+            ) {
+                $content = (string)$content;
+                $contentType = Variable::getType($content);
+            }
+
+            if ($contentType === Variable::VAR_TYPE_INT && $parameterType === Carbon::class) {
+                $this->$method(Carbon::createFromTimestamp($content));
+                continue;
+            }
+
+            if ($contentType === Variable::VAR_TYPE_STRING && $parameterType === Carbon::class) {
+                $this->$method(Carbon::createFromTimeString($content));
+                continue;
+            }
+
+            try {
+                $class = '\\' . $parameterType;
+
+                if ($contentType === Variable::VAR_TYPE_OBJECT && class_exists($class)) {
+                    $this->$method($content);
+                    continue;
+                }
+
+                if ($contentType === Variable::VAR_TYPE_ARRAY && method_exists($class, 'toEntity')) {
+                    $this->$method((new $class())->toEntity($content));
+                    continue;
+                }
+            } catch (Throwable $exception) {
+                continue;
+            }
+
+            $this->$method($content);
         }
 
         return $this;
     }
 
+    /**
+     * @param $method
+     * @param bool $emptyToNull
+     *
+     * @return mixed|null
+     */
     private function getMethodContent($method, bool $emptyToNull)
     {
         try {
@@ -176,10 +185,10 @@ abstract class BaseEntity
     private function getMethodReturnType(string $method): ?string
     {
         try {
-            return (new ReflectionMethod($this, $method))
-                ->getReturnType()
-                ->getName()
-            ;
+            /** @var ReflectionNamedType $methodReturnType */
+            $methodReturnType = (new ReflectionMethod($this, $method))->getReturnType();
+
+            return $methodReturnType->getName();
         } catch (Throwable $exception) {
             return null;
         }

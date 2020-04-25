@@ -24,6 +24,17 @@ use Common\Regex;
 
 abstract class BaseRoutes extends Injectable implements RoutesInterface
 {
+    protected array $get = [];
+    protected array $post = [];
+    protected array $put = [];
+    protected array $delete = [];
+
+    protected RequestData $request;
+    protected string $routePath;
+    protected Route $route;
+
+    protected PermissionsManager $permissionsManager;
+
     private const DEFAULT_ACTIONS = [
         'request_mapper_action' => 'mapRequestToObject',
         'request_mapper_docs' => 'requestDocumentation',
@@ -34,21 +45,11 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
         'validator_action' => 'validateData',
     ];
 
-    protected array $get = [];
-    protected array $post = [];
-    protected array $put = [];
-    protected array $delete = [];
-
-    protected RequestData $request;
-    protected PermissionsManager $permissionsManager;
-    protected string $routePath;
-    protected Route $route;
-
     public function __construct(PermissionsManager $permissionsManager)
     {
         $this->permissionsManager = $permissionsManager;
 
-        $this->routes(); // Load routes from extendable Routes class
+        $this->routes(); // Loading routes from extendable Routes class
     }
 
     abstract protected function routes(): void;
@@ -82,15 +83,15 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
         $method = $this->request->getMethod();
         $path = $this->request->getPath();
 
+        if (count($this->{$method}) === 0) {
+            throw new NotFoundApiException();
+        }
+
         if (isset($this->{$method}[$path])) {
             $this->routePath = $path;
             $this->route = $this->{$method}[$path];
 
             return;
-        }
-
-        if (count($this->{$method}) === 0) {
-            throw new NotFoundApiException();
         }
 
         $pattern = ($this->request->getType() === RequestData::REQUEST_TYPE_API) ? '/^\/api' : '/^';
