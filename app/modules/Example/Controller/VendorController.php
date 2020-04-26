@@ -3,14 +3,17 @@ declare(strict_types=1);
 
 namespace Example\Controller;
 
+use Illuminate\Support\Collection;
+use Common\ApiException\BadRequestApiException;
 use Common\ApiException\NotFoundApiException;
 use Common\Entity\PaginatedResult;
 use Common\Entity\PaginationFilter;
+use Example\Config\ErrorCodes;
 use Example\Entity\VendorFilter;
+use Example\Exception\VendorAlreadyExistsException;
 use Example\Model\VendorModel;
 use Example\Repository\VendorsRepository;
 use Example\Service\VendorManager;
-use Illuminate\Support\Collection;
 
 class VendorController
 {
@@ -48,12 +51,28 @@ class VendorController
         return $vendorModel;
     }
 
-    public function createVendor(): void
+    public function createVendor(VendorModel $vendorModel): VendorModel
     {
+        try {
+            return $this->vendorManager->createVendor($vendorModel);
+        } catch (VendorAlreadyExistsException $exception) {
+            throw new BadRequestApiException(
+                'Vendor already exists.',
+                ErrorCodes::VENDOR_ALREADY_EXISTS
+            );
+        }
     }
 
-    public function updateVendor(): void
+    public function updateVendor(VendorModel $vendorModel, VendorModel $updateData): VendorModel
     {
+        try {
+            return $this->vendorManager->updateVendor($vendorModel, $updateData);
+        } catch (VendorAlreadyExistsException $exception) {
+            throw new BadRequestApiException(
+                'Vendor with the same name or url already exists.',
+                ErrorCodes::VENDOR_ALREADY_EXISTS
+            );
+        }
     }
 
     public function deleteVendor(VendorModel $vendorModel): void

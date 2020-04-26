@@ -42,7 +42,7 @@ class {{ class }} extends BaseMigration
 
     protected function afterMigration(): void
     {
-        //(new TableSeeder())->run();
+        //
     }
 
     protected function rollbackSchema(Blueprint $table): void

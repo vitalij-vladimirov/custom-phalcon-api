@@ -5,6 +5,7 @@ namespace Example\Repository;
 
 use Common\BaseClass\BaseRepository;
 use Common\Entity\PaginatedResult;
+use Common\Exception\LogicException;
 use Example\Entity\VendorFilter;
 use Example\Model\VendorModel;
 
@@ -24,6 +25,7 @@ class VendorsRepository extends BaseRepository
      * @param string[] $columns
      *
      * @return PaginatedResult
+     * @throws LogicException
      */
     public function paginateByFilter(
         VendorFilter $filter,
@@ -33,7 +35,7 @@ class VendorsRepository extends BaseRepository
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
     ): PaginatedResult {
-        $builder = $this->model::where('id', '>', 0);
+        $builder = $this->queryBuilder();
 
         if ($filter->getEnvironment() !== null) {
             $builder->where('environment', $filter->getEnvironment());
@@ -52,5 +54,28 @@ class VendorsRepository extends BaseRepository
         }
 
         return $this->getPaginatedData($builder, $limit, $page, $orderBy, $orderDir, $columns);
+    }
+
+    public function oneWithLibNameOrLibUrlExists(VendorModel $vendorModel): bool
+    {
+        return $this->queryBuilder()->where('lib_name', '=', $vendorModel->lib_name)
+            ->orWhere('lib_url', '=', $vendorModel->lib_url)
+            ->exists()
+        ;
+    }
+
+    public function oneWithLibNameOrLibUrlAndDifferentIdExists(VendorModel $vendorModel, int $id): bool
+    {
+        return $this->queryBuilder()->where('id', '<>', $id)
+            ->where(
+                function ($query) use ($vendorModel) {
+                    $query
+                        ->where('lib_name', '=', $vendorModel->lib_name)
+                        ->orWhere('lib_url', '=', $vendorModel->lib_url)
+                    ;
+                }
+            )
+            ->exists()
+        ;
     }
 }

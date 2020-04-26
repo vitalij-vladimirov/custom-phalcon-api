@@ -6,4 +6,5 @@ namespace Example\Config;
 class ErrorCodes
 {
     public const VENDOR_NOT_FOUND = 'vendor_not_found';
+    public const VENDOR_ALREADY_EXISTS = 'vendor_already_exists';
 }

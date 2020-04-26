@@ -5,8 +5,7 @@ namespace Common\BaseClass;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Common\Regex;
 use Common\Variable;
@@ -31,6 +30,8 @@ abstract class BaseRepository
 
     protected BaseModel $model;
 
+    private const FORBIDDEN_TO_UPDATE_FIELDS = ['id', 'created_at', 'updated_at'];
+
     public function __construct()
     {
         $this->setModel();
@@ -42,17 +43,18 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return Collection|BaseModel[]
+     * @throws LogicException
      */
     public function all(array $columns = ['*']): Collection
     {
-        return $this->model::get($columns);
+        return $this->queryBuilder()->get($columns);
     }
 
     /**
      * @param array $credentials
      * @param string[] $columns
      *
-     * @return EloquentBuilder|BaseModel|null
+     * @return Builder|BaseModel|null
      * @throws LogicException
      */
     public function first(array $credentials = [], array $columns = ['*']): ?BaseModel
@@ -68,7 +70,7 @@ abstract class BaseRepository
      * @param array $credentials
      * @param string[] $columns
      *
-     * @return EloquentBuilder|BaseModel|null
+     * @return Builder|BaseModel|null
      * @throws LogicException
      */
     public function firstUpdated(array $credentials = [], array $columns = ['*']): ?BaseModel
@@ -84,7 +86,7 @@ abstract class BaseRepository
      * @param array $credentials
      * @param string[] $columns
      *
-     * @return EloquentBuilder|BaseModel|null
+     * @return Builder|BaseModel|null
      * @throws LogicException
      */
     public function last(array $credentials = [], array $columns = ['*']): ?BaseModel
@@ -100,7 +102,7 @@ abstract class BaseRepository
      * @param array $credentials
      * @param array $columns
      *
-     * @return QueryBuilder|BaseModel|null
+     * @return Builder|BaseModel|null
      * @throws LogicException
      */
     public function lastUpdated(array $credentials = [], array $columns = ['*']): ?BaseModel
@@ -116,18 +118,19 @@ abstract class BaseRepository
      * @param int $id
      * @param string[] $columns
      *
-     * @return QueryBuilder|BaseModel|null
+     * @return Builder|BaseModel|null
+     * @throws LogicException
      */
     public function findOneById(int $id, array $columns = ['*']): ?BaseModel
     {
-        return $this->model::whereId($id)->first($columns);
+        return $this->queryBuilder()->where('id', '=', $id)->first($columns);
     }
 
     /**
      * @param array $credentials
      * @param array $columns
      *
-     * @return QueryBuilder|BaseModel|null
+     * @return Builder|BaseModel|null
      * @throws LogicException
      */
     public function findOneByCredentials(array $credentials, array $columns = ['*']): ?BaseModel
@@ -140,15 +143,16 @@ abstract class BaseRepository
      * @param string|int|float|array $values
      * @param string[] $columns
      *
-     * @return QueryBuilder|EloquentBuilder|BaseModel|null
+     * @return Builder|BaseModel|null
+     * @throws LogicException
      */
     public function findOneBy(string $column, $values, array $columns = ['*']): ?BaseModel
     {
         if (Variable::isArray($values)) {
-            return $this->model::whereIn($column, $values)->first($columns);
+            return $this->queryBuilder()->whereIn($column, $values)->first($columns);
         }
 
-        return $this->model::where($column, '=', $values)->first($columns);
+        return $this->queryBuilder()->where($column, '=', $values)->first($columns);
     }
 
     /**
@@ -160,6 +164,7 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return Collection|BaseModel[]
+     * @throws LogicException
      */
     public function findManyByIds(
         array $ids,
@@ -169,7 +174,7 @@ abstract class BaseRepository
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
     ): Collection {
-        $query = $this->model::whereIn('id', $ids)
+        $query = $this->queryBuilder()->whereIn('id', $ids)
             ->orderBy($orderBy, strtoupper($orderDir))
         ;
 
@@ -193,6 +198,7 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return Collection|BaseModel[]
+     * @throws LogicException
      */
     public function findManyByIdsRange(
         int $from = 0,
@@ -204,7 +210,7 @@ abstract class BaseRepository
         array $columns = ['*']
     ): Collection {
         if ($to === null) {
-            $to = $this->model::max('id');
+            $to = $this->queryBuilder()->max('id');
         }
 
         return $this->findManyBetween('id', $from, $to, $offset, $limit, $orderBy, $orderDir, $columns);
@@ -220,6 +226,7 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return Collection|BaseModel[]
+     * @throws LogicException
      */
     public function findManyBy(
         string $column,
@@ -231,9 +238,9 @@ abstract class BaseRepository
         array $columns = ['*']
     ): Collection {
         if (Variable::isArray($values)) {
-            $query = $this->model::whereIn($column, $values);
+            $query = $this->queryBuilder()->whereIn($column, $values);
         } else {
-            $query = $this->model::where($column, $values);
+            $query = $this->queryBuilder()->where($column, '=', $values);
         }
 
         $query->orderBy($orderBy, strtoupper($orderDir));
@@ -258,6 +265,7 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return Collection|BaseModel[]
+     * @throws LogicException
      */
     public function findManyCreatedBetween(
         Carbon $from,
@@ -285,6 +293,7 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return Collection|BaseModel[]
+     * @throws LogicException
      */
     public function findManyUpdatedBetween(
         Carbon $from,
@@ -313,6 +322,7 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return Collection|BaseModel[]
+     * @throws LogicException
      */
     public function findManyBetween(
         string $column,
@@ -324,7 +334,7 @@ abstract class BaseRepository
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
     ): Collection {
-        $query = $this->model::whereBetween($column, [$from, $to])
+        $query = $this->queryBuilder()->whereBetween($column, [$from, $to])
             ->orderBy($orderBy, strtoupper($orderDir))
         ;
 
@@ -380,6 +390,7 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return PaginatedResult
+     * @throws LogicException
      */
     public function paginate(
         int $limit = 10,
@@ -388,9 +399,7 @@ abstract class BaseRepository
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
     ): PaginatedResult {
-        $builder = $this->model::where('id', '>', 0);
-
-        return $this->getPaginatedData($builder, $limit, $page, $orderBy, $orderDir, $columns);
+        return $this->getPaginatedData($this->queryBuilder(), $limit, $page, $orderBy, $orderDir, $columns);
     }
 
     /**
@@ -403,6 +412,7 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return PaginatedResult
+     * @throws LogicException
      */
     public function paginateBy(
         string $column,
@@ -414,9 +424,9 @@ abstract class BaseRepository
         array $columns = ['*']
     ): PaginatedResult {
         if (Variable::isArray($values)) {
-            $builder = $this->model::whereIn($column, $values);
+            $builder = $this->queryBuilder()->whereIn($column, $values);
         } else {
-            $builder = $this->model::where($column, '=', $values);
+            $builder = $this->queryBuilder()->where($column, '=', $values);
         }
 
         return $this->getPaginatedData($builder, $limit, $page, $orderBy, $orderDir, $columns);
@@ -431,6 +441,7 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return PaginatedResult
+     * @throws LogicException
      */
     public function paginateByIds(
         array $ids,
@@ -440,8 +451,7 @@ abstract class BaseRepository
         string $orderDir = self::ORDER_ASC,
         array $columns = ['*']
     ): PaginatedResult {
-        $builder = $this->model::where('id', '>', 0)
-            ->whereIn('id', $ids);
+        $builder = $this->queryBuilder()->whereIn('id', $ids);
 
         return $this->getPaginatedData($builder, $limit, $page, $orderBy, $orderDir, $columns);
     }
@@ -456,6 +466,7 @@ abstract class BaseRepository
      * @param string[] $columns
      *
      * @return PaginatedResult
+     * @throws LogicException
      */
     public function paginateByIdsRange(
         int $from = 0,
@@ -467,11 +478,10 @@ abstract class BaseRepository
         array $columns = ['*']
     ): PaginatedResult {
         if ($to === null) {
-            $to = $this->model::max('id');
+            $to = $this->queryBuilder()->max('id');
         }
 
-        $builder = $this->model::where('id', '>', 0)
-            ->whereBetween('id', [$from, $to]);
+        $builder = $this->queryBuilder()->whereBetween('id', [$from, $to]);
 
         return $this->getPaginatedData($builder, $limit, $page, $orderBy, $orderDir, $columns);
     }
@@ -588,6 +598,7 @@ abstract class BaseRepository
      *
      * @return Collection|BaseModel[]
      * @throws ForbiddenException
+     * @throws LogicException
      */
     public function createMany(array $data): Collection
     {
@@ -619,7 +630,7 @@ abstract class BaseRepository
      * @throws DatabaseException
      * @throws ForbiddenException
      */
-    public function saveModel(BaseModel $model): BaseModel
+    public function createModel(BaseModel $model): BaseModel
     {
         $this->validateFieldsCanBeUpdated($model->toArray());
 
@@ -645,7 +656,7 @@ abstract class BaseRepository
         $this->validateFieldsCanBeUpdated($data);
 
         try {
-            return $this->model::findOrFail($id)->update($data);
+            return $this->queryBuilder()->findOrFail($id)->update($data);
         } catch (Throwable $throwable) {
             throw new DatabaseException($throwable->getMessage());
         }
@@ -656,7 +667,7 @@ abstract class BaseRepository
      * @param string|int|float $value
      * @param array $data
      *
-     * @return EloquentBuilder|BaseModel
+     * @return Builder|BaseModel
      * @throws DatabaseException
      * @throws ForbiddenException
      */
@@ -665,7 +676,8 @@ abstract class BaseRepository
         $this->validateFieldsCanBeUpdated($data);
 
         try {
-            $model = $this->model::where($column, '=', $value)
+            $model = $this->queryBuilder()
+                ->where($column, '=', $value)
                 ->firstOrFail()
             ;
 
@@ -707,11 +719,14 @@ abstract class BaseRepository
      */
     public function updateManyByIds(array $ids, array $data, int $limit = 1000): Collection
     {
-        $this->validateFieldsCanBeUpdated($data);
         $this->validateUpdateMany();
+        $this->validateFieldsCanBeUpdated($data);
 
         try {
-            $models = $this->model::whereIn('id', $ids)->limit($limit);
+            $models = $this->queryBuilder()
+                ->whereIn('id', $ids)
+                ->limit($limit)
+            ;
 
             $models->update($data);
 
@@ -733,11 +748,15 @@ abstract class BaseRepository
      */
     public function updateManyByIdsRange(int $from, int $to, array $data, int $limit = 1000): Collection
     {
-        $this->validateFieldsCanBeUpdated($data);
         $this->validateUpdateMany();
+        $this->validateFieldsCanBeUpdated($data);
 
         try {
-            $models = $this->model::whereBetween('id', [$from, $to])->limit($limit);
+            $models = $this->queryBuilder()
+                ->whereBetween('id', [$from, $to])
+                ->limit($limit)
+            ;
+
             $models->update($data);
 
             return $models->get();
@@ -758,14 +777,20 @@ abstract class BaseRepository
      */
     public function updateManyBy(string $column, $values, array $data, int $limit = 1000): Collection
     {
-        $this->validateFieldsCanBeUpdated($data);
         $this->validateUpdateMany();
+        $this->validateFieldsCanBeUpdated($data);
 
         try {
             if (Variable::isArray($values)) {
-                $models = $this->model::whereIn($column, $values)->limit($limit);
+                $models = $this->queryBuilder()
+                    ->whereIn($column, $values)
+                    ->limit($limit)
+                ;
             } else {
-                $models = $this->model::where($column, '=', $values)->limit($limit);
+                $models = $this->queryBuilder()
+                    ->where($column, '=', $values)
+                    ->limit($limit)
+                ;
             }
 
             $ids = $this->getIds($models->get(['id']));
@@ -789,8 +814,8 @@ abstract class BaseRepository
      */
     public function updateManyByCredentials(array $credentials, array $data = [], int $limit = 1000): Collection
     {
-        $this->validateFieldsCanBeUpdated($data);
         $this->validateUpdateMany();
+        $this->validateFieldsCanBeUpdated($data);
 
         try {
             $models = $this->queryBuilder($credentials)->limit($limit);
@@ -803,6 +828,24 @@ abstract class BaseRepository
         } catch (Throwable $throwable) {
             throw new DatabaseException($throwable->getMessage());
         }
+    }
+
+    /**
+     * @param BaseModel $model
+     *
+     * @return BaseModel
+     * @throws DatabaseException
+     */
+    public function updateModel(BaseModel $model): BaseModel
+    {
+        try {
+            $model->setHidden(self::FORBIDDEN_TO_UPDATE_FIELDS);
+            $model->update($model->toArray());
+        } catch (Throwable $throwable) {
+            throw new DatabaseException($throwable->getMessage());
+        }
+
+        return $model;
     }
 
     /**
@@ -829,7 +872,7 @@ abstract class BaseRepository
     public function deleteOneById(int $id): bool
     {
         try {
-            return $this->model::findOrFail($id)->delete();
+            return $this->queryBuilder()->findOrFail($id)->delete();
         } catch (Throwable $throwable) {
             throw new DatabaseException($throwable->getMessage());
         }
@@ -845,7 +888,8 @@ abstract class BaseRepository
     public function deleteOneBy(string $column, $value): bool
     {
         try {
-            return $this->model::where($column, '=', $value)
+            return $this->queryBuilder()
+                ->where($column, '=', $value)
                 ->firstOrFail()
                 ->delete()
             ;
@@ -885,7 +929,10 @@ abstract class BaseRepository
         $this->validateDeleteMany();
 
         try {
-            $models = $this->model::whereIn('id', $ids)->limit($limit);
+            $models = $this->queryBuilder()
+                ->whereIn('id', $ids)
+                ->limit($limit)
+            ;
 
             $total = $models->count();
 
@@ -912,9 +959,15 @@ abstract class BaseRepository
 
         try {
             if (Variable::isArray($values)) {
-                $models = $this->model::whereIn($column, $values)->limit($limit);
+                $models = $this->queryBuilder()
+                    ->whereIn($column, $values)
+                    ->limit($limit)
+                ;
             } else {
-                $models = $this->model::where($column, '=', $values)->limit($limit);
+                $models = $this->queryBuilder()
+                    ->where($column, '=', $values)
+                    ->limit($limit)
+                ;
             }
 
             $total = $models->count();
@@ -941,7 +994,10 @@ abstract class BaseRepository
         $this->validateDeleteMany();
 
         try {
-            $models = $this->model::whereBetween('id', [$from, $to])->limit($limit);
+            $models = $this->queryBuilder()
+                ->whereBetween('id', [$from, $to])
+                ->limit($limit)
+            ;
 
             $total = $models->count();
 
@@ -1001,10 +1057,10 @@ abstract class BaseRepository
      *
      * @param array $credentials
      *
-     * @return QueryBuilder|EloquentBuilder|BaseModel
+     * @return Builder
      * @throws LogicException
      */
-    protected function queryBuilder(array $credentials)
+    protected function queryBuilder(array $credentials = []): Builder
     {
         $builder = $this->model::where('id', '>', 0);
         if (count($credentials) === 0) {
@@ -1057,7 +1113,7 @@ abstract class BaseRepository
     }
 
     /**
-     * @param QueryBuilder|EloquentBuilder $builder
+     * @param Builder $builder
      * @param int $limit
      * @param int $page
      * @param string $orderBy
@@ -1115,20 +1171,24 @@ abstract class BaseRepository
      */
     private function validateFieldsCanBeUpdated(array $data): void
     {
-        if (count($data) >= 1 && Variable::isArray($data[0])) {
+        if (count($data) >= 1 && isset($data[0]) && Variable::isArray($data[0])) {
             foreach ($data as $row) {
-                if (isset($row['id']) || isset($row['created_at']) || isset($row['updated_at'])) {
-                    throw new ForbiddenException(
-                        'Fields `id`, `created_at` and `updated_at` can not be updated manually.'
-                    );
+                foreach (self::FORBIDDEN_TO_UPDATE_FIELDS as $forbiddenToUpdateField) {
+                    if (isset($row[$forbiddenToUpdateField])) {
+                        throw new ForbiddenException(
+                            'Field `' . $forbiddenToUpdateField . '` can not be updated manually.'
+                        );
+                    }
                 }
             }
         }
 
-        if (isset($data['id']) || isset($data['created_at']) || isset($data['updated_at'])) {
-            throw new ForbiddenException(
-                'Fields `id`, `created_at` and `updated_at` can not be updated manually.'
-            );
+        foreach (self::FORBIDDEN_TO_UPDATE_FIELDS as $forbiddenToUpdateField) {
+            if (isset($data[$forbiddenToUpdateField])) {
+                throw new ForbiddenException(
+                    'Field `' . $forbiddenToUpdateField . '` can not be updated manually.'
+                );
+            }
         }
     }
 

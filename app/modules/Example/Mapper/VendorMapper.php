@@ -35,7 +35,7 @@ class VendorMapper implements RequestMapperInterface, ResponseMapperInterface
      */
     public function mapResponseToArray($object): array
     {
-        $object->setHidden(['id', 'created_at', 'updated_at']);
+        $object->setHidden(['created_at', 'updated_at']);
 
         return $object->toArray();
     }
