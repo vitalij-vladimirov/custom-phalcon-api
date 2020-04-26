@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Common\BaseClass;
 
-use Common\BaseMapper\BasePaginationFilterRequestMapper;
 use Documentation\Entity\ParameterDoc;
 use Authorization\Service\PermissionsManager;
+use Common\BaseMapper\BasePaginationFilterRequestMapper;
 use Common\Exception\ForbiddenException;
 use Common\Exception\LogicException;
 use Common\ApiException\BadRequestApiException;
@@ -42,7 +42,7 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
         'response_mapper_docs' => 'responseDocumentation',
         'resolver_action' => 'resolveParameter',
         'resolver_docs' => 'parameterDocumentation',
-        'validator_action' => 'validateData',
+        'validator_action' => 'validationSchema',
     ];
 
     public function __construct(PermissionsManager $permissionsManager)
@@ -255,10 +255,12 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
 
     /**
      * @return mixed
+     * @throws BadRequestApiException
      * @throws LogicException
      */
     private function runRoute()
     {
+        // Get collected request data
         $data = $this->request->getData();
 
         // Validate data provider with request
@@ -270,24 +272,26 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
         // Convert raw path parameters to parameters that will be sent to controller
         $parameters = $this->resolveParameters($pathParameters);
 
-        // Convert request data to object
+        // Map request data to object
         $requestData = $this->resolveRequest($data);
 
         // Send collected data and parameters to controller and collect response
         $response = $this->callController($parameters, $requestData, $pathParameters);
 
-        // Convert response to readable format and return
-        return $this->mapResponse($response);
+        // Map response object to array
+        return $this->resolveResponse($response);
     }
 
+    /**
+     * @param array $data
+     * @throws BadRequestApiException
+     */
     private function validateData(array $data): void
     {
         if ($this->route->getValidator()) {
-            $validatorClass = $this->route->getValidator();
-
             /** @var BaseValidator $validator */
-            $validator = new $validatorClass();
-            $validator->validateData($data);
+            $validator = $this->inject($this->route->getValidator());
+            $validator->runValidationAndThrowException($data);
         }
     }
 
@@ -382,7 +386,7 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
         return $controller->$action();
     }
 
-    private function mapResponse($response)
+    private function resolveResponse($response)
     {
         if ($this->route->getResponseMapper()) {
             /** @var ResponseMapperInterface $responseMapper */

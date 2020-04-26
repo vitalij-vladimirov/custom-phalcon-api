@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Example\Resolver;
 
+use Common\Exception\LogicException;
 use Common\ApiException\NotFoundApiException;
 use Common\BaseClass\BaseResolver;
 use Documentation\Entity\ParameterDoc;
@@ -24,6 +25,7 @@ class VendorResolver extends BaseResolver
      *
      * @return VendorModel
      * @throws NotFoundApiException
+     * @throws LogicException
      */
     public function resolveParameter($parameter): VendorModel
     {

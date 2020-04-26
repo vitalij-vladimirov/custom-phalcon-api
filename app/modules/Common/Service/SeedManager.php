@@ -74,7 +74,7 @@ final class SeedManager extends Injectable
 
     public function runSeeds(string $table = null): void
     {
-        if ($this->di->get('config')->environment === 'production') {
+        if (APP_ENV === 'production') {
             throw new LogicException('Seeds can\'t be used in production environment.');
         }
 
