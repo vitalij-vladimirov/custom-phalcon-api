@@ -208,7 +208,7 @@ class File
             }
 
             if (!mkdir($fullPath) && !is_dir($fullPath)) {
-                throw new LogicException('Directory could not be created');
+                throw new LogicException('Directory could not be created.');
             }
         }
     }

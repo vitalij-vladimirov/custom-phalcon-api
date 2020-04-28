@@ -86,7 +86,7 @@ abstract class BaseEntity
                         $array[Text::uncamelizeMethod($key)] = $value;
                     }
                 } catch (Throwable $exception) {
-                    throw new LogicException('Can\'t convert $data object.');
+                    throw new LogicException('Can\'t convert \'data\' object.');
                 }
             }
         }

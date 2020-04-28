@@ -35,7 +35,7 @@ abstract class BaseMigration extends AbstractMigration
     public function up(): void
     {
         if (empty($this->table)) {
-            throw new LogicException('Parameter $table empty.');
+            throw new LogicException('Parameter \'table\' empty.');
         }
 
         $this->loadGlobalServices();
@@ -77,7 +77,7 @@ abstract class BaseMigration extends AbstractMigration
     public function down(): void
     {
         if (empty($this->table)) {
-            throw new LogicException('Parameter $table empty.');
+            throw new LogicException('Parameter \'table\' empty.');
         }
 
         if ($this->migrationType === self::MIGRATION_CREATE) {

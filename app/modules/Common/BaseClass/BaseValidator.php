@@ -5,7 +5,7 @@ namespace Common\BaseClass;
 
 use Phalcon\Messages\MessageInterface;
 use Phalcon\Messages\Messages;
-use Phalcon\Messages\Message;
+use Phalcon\Messages\Message as PhalconMessage;
 use Phalcon\Validation;
 use Phalcon\Validation\Validator\Alnum;
 use Phalcon\Validation\Validator\Alpha;
@@ -39,21 +39,21 @@ use Phalcon\Validation\Validator\Url;
 use Common\Config\DefaultErrorCodes;
 use Common\Service\Injectable;
 use Common\ApiException\BadRequestApiException;
+use Common\BaseValidator\Message as ValidationMessage;
+use Common\Text;
 
 abstract class BaseValidator extends Injectable
 {
-
-
     public const STRING_MAX_LENGTH = 255;
 
-    abstract public function validationSchema(Validation $validation): void;
+    abstract public function validationSchema(Validation $validation, array $data = []): void;
 
     public function runValidationAndGetMessages(array $data = []): Messages
     {
         $validation = new Validation();
 
         // Get validation schema
-        $this->validationSchema($validation);
+        $this->validationSchema($validation, $data);
 
         // Run validation and collect messages
         return $validation->validate($data, null);
@@ -70,12 +70,16 @@ abstract class BaseValidator extends Injectable
                 $messageData[] = [
                     'field' => $message->getField(),
                     'code' => $this->getCode($message),
-                    'message' => $message->getMessage(),
+                    'message' => str_replace(
+                        [$message->getField(), '\'\'', '...', '..'],
+                        ['\'' . Text::toSnakeCase($message->getField()) . '\'', '\'', '.', '.'],
+                        $message->getMessage() . '.'
+                    ),
                 ];
             }
 
             throw new BadRequestApiException(
-                'Invalid parameters',
+                'Invalid parameters.',
                 DefaultErrorCodes::INVALID_PARAMETERS,
                 $messageData
             );
@@ -83,11 +87,15 @@ abstract class BaseValidator extends Injectable
     }
 
     /**
-     * @param MessageInterface|Message $message
+     * @param MessageInterface|PhalconMessage|ValidationMessage $message
      * @return string
      */
-    private function getCode(Message $message): string
+    private function getCode(MessageInterface $message): string
     {
+        if ($message instanceof ValidationMessage && $message->getErrorCode() !== null) {
+            return $message->getErrorCode();
+        }
+
         switch ($message->getType()) {
             case PresenceOf::class:
                 return DefaultErrorCodes::IS_REQUIRED;
@@ -122,7 +130,6 @@ abstract class BaseValidator extends Injectable
             case Alnum::class:
                 return DefaultErrorCodes::INVALID_TYPE;
 
-            // Database validation
             case Uniqueness::class:
                 return DefaultErrorCodes::DUPLICATE;
 

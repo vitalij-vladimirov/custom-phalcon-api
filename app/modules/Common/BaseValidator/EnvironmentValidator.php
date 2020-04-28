@@ -9,7 +9,7 @@ use Common\BaseClass\BaseValidator;
 
 class EnvironmentValidator extends BaseValidator
 {
-    public function validationSchema(Validation $validation): void
+    public function validationSchema(Validation $validation, array $data = []): void
     {
         $validation
             ->add('environment', new InclusionIn([

@@ -43,7 +43,7 @@ final class MigrationManager extends Injectable
     public function createMigration(string $table = null): string
     {
         if ($table === null) {
-            throw new LogicException('Argument $table must be specified.');
+            throw new LogicException('Argument \'table\' must be specified.');
         }
 
         if (in_array($table, self::FORBIDDEN_TABLE_NAMES, true)) {
@@ -63,11 +63,11 @@ final class MigrationManager extends Injectable
     public function updateMigration(string $table = null, string $action = null): string
     {
         if ($table === null) {
-            throw new LogicException('Argument $table must be string, null given.');
+            throw new LogicException('Argument \'table\' must be string, null given.');
         }
 
         if ($action === null) {
-            throw new LogicException('Argument $action must be string, null given.');
+            throw new LogicException('Argument \'action\' must be string, null given.');
         }
 
         if (!$this->ensurePrimaryMigrationExist($table)) {
@@ -88,7 +88,7 @@ final class MigrationManager extends Injectable
                 break;
             default:
                 throw new LogicException(
-                    '$action must start with one of these prefixes: \'add_\', \'update_\', \'remove_\''
+                    '\'action\' must start with one of these prefixes: \'add_\', \'update_\', \'remove_\'.'
                 );
         }
 

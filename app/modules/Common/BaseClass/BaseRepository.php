@@ -647,7 +647,7 @@ abstract class BaseRepository
      * @param int $id
      * @param array $data
      *
-     * @return BaseModel
+     * @return BaseModel|Builder
      * @throws DatabaseException
      * @throws ForbiddenException
      */
@@ -656,7 +656,10 @@ abstract class BaseRepository
         $this->validateFieldsCanBeUpdated($data);
 
         try {
-            return $this->queryBuilder()->findOrFail($id)->update($data);
+            $model = $this->queryBuilder()->findOrFail($id);
+            $model->update($data);
+
+            return $model;
         } catch (Throwable $throwable) {
             throw new DatabaseException($throwable->getMessage());
         }
@@ -872,7 +875,9 @@ abstract class BaseRepository
     public function deleteOneById(int $id): bool
     {
         try {
-            return $this->queryBuilder()->findOrFail($id)->delete();
+            $model = $this->queryBuilder()->findOrFail($id);
+
+            return $model->delete();
         } catch (Throwable $throwable) {
             throw new DatabaseException($throwable->getMessage());
         }
@@ -1079,7 +1084,7 @@ abstract class BaseRepository
             }
 
             if (!Regex::isValidPattern($key, '/[a-zA-Z0-9_]/')) {
-                throw new LogicException('Bad key `' . $key . '`.');
+                throw new LogicException('Bad key \'' . $key . '\'.');
             }
 
             if ($operator === 'NOT') {
@@ -1093,7 +1098,7 @@ abstract class BaseRepository
                     continue;
                 }
 
-                throw new LogicException('Wrong condition NOT with key `' . $key . '`.');
+                throw new LogicException('Wrong condition NOT with key \'' . $key . '\'.');
             }
 
             if (empty($value)) {
