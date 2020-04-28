@@ -22,8 +22,8 @@ class VendorValidator extends BaseValidator
     {
         $validation
             ->add(['lib_name', 'lib_url', 'version', 'environment', 'description'], new PresenceOf())
-            ->add('lib_name', new StringLength(['max' => self::STRING_LENGTH]))
-            ->add('lib_url', new StringLength(['max' => self::STRING_LENGTH]))
+            ->add('lib_name', new StringLength(['max' => self::STRING_MAX_LENGTH]))
+            ->add('lib_url', new StringLength(['max' => self::STRING_MAX_LENGTH]))
             ->add('version', new StringLength(['max' => 10]))
         ;
 
