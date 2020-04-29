@@ -15,12 +15,32 @@ use Throwable;
 class Bootstrap
 {
     private FactoryDefault $di;
+    private array $customConfig;
 
-    public function runApp(): Micro
+    public function runApp(array $customConfig = []): Micro
     {
+        $this->customConfig = $customConfig;
+
         $this->setupDi();
         $this->setupLoader();
         $this->defineGlobals();
+
+        return new Micro($this->di);
+    }
+
+    public function setupTestDb(array $customConfig = []): Micro
+    {
+        if (count($customConfig) === 0) {
+            return new Micro($this->di);
+        }
+
+        $this->customConfig = $customConfig;
+
+        $config = $this->di->get('config')->merge($customConfig);
+
+        $this->di->set('config', $config);
+
+        $this->setupDatabase();
 
         return new Micro($this->di);
     }
@@ -40,6 +60,10 @@ class Bootstrap
         });
 
         $config = $this->di->get('config');
+        if (count($this->customConfig) !== 0) {
+            $config->merge($this->customConfig);
+            $this->di->set('config', $config);
+        }
 
         $this->di->set('view', function () use ($config) {
             $view = new View();
@@ -52,6 +76,15 @@ class Bootstrap
             $url->setBaseUri($config->application->baseUri);
             return $url;
         });
+
+        $this->setupDatabase();
+
+        return $this->di;
+    }
+
+    private function setupDatabase(): void
+    {
+        $config = $this->di->get('config');
 
         $this->di->set('db', function () use ($config) {
             $class = 'Phalcon\Db\Adapter\Pdo\\' . $config->database->adapter;
@@ -87,8 +120,6 @@ class Bootstrap
 
             return $eloquent;
         });
-
-        return $this->di;
     }
 
     private function setupLoader(): Loader

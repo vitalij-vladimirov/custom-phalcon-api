@@ -1,7 +1,11 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then
-  /app/vendor/bin/paratest
+  if [ $(nproc) -lt 4 ] ; then
+    /app/vendor/bin/paratest --processes 4
+  else
+    /app/vendor/bin/paratest --processes $(nproc)
+  fi;
 else
   ARG=$(echo "$1" | cut -c1-1);
 

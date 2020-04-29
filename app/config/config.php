@@ -11,6 +11,7 @@ return new Config([
     'environments' => [
         'production',
         'development',
+        'testing',
     ],
 
     /*
