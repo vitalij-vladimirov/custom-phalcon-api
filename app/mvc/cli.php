@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mvc;
 
-use Common\BaseClasses\Injectable;
+use Common\Service\Injectable;
 use Phalcon\Config;
 use Common\Console;
 use Throwable;

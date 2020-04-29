@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
-use Common\BaseClasses\Injectable;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Filesystem\Filesystem;
 use Common\Exception\LogicException;
 use Common\Text;
 use Common\File;
@@ -75,7 +74,7 @@ final class SeedManager extends Injectable
 
     public function runSeeds(string $table = null): void
     {
-        if ($this->di->get('config')->environment === 'production') {
+        if (APP_ENV === 'production') {
             throw new LogicException('Seeds can\'t be used in production environment.');
         }
 

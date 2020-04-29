@@ -1,12 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\BaseClasses;
+namespace Common\BaseClass;
 
 use Phalcon\Config;
 use Phalcon\Db\Adapter\Pdo\AbstractPdo as PhalconDb;
 use Illuminate\Database\Capsule\Manager as EloquentDb;
 use PHPUnit\Framework\TestCase;
+use Common\Service\Injectable;
 
 abstract class BaseTestCase extends TestCase
 {

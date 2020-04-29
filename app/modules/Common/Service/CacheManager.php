@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
-use Common\BaseClasses\Injectable;
+use Phalcon\Config;
 use Common\File;
 use Common\Json;
-use Phalcon\Config;
 
 final class CacheManager extends Injectable
 {
@@ -37,13 +36,15 @@ final class CacheManager extends Injectable
             $modulesDirs = $this->generateDirectoriesList($modulesDir);
 
             if (!empty($namespaceBegin)) {
-                $namespaces = array_merge($namespaces, [$namespaceBegin => $modulesDir]);
+                $namespaces[$namespaceBegin] = $modulesDir;
             }
 
             if (count($modulesDirs)) {
-                $namespaces = array_merge(
+                $namespaces = $this->generateNamespaceForDirectories(
                     $namespaces,
-                    $this->generateNamespaceForDirectories($modulesDir, $namespaceBegin, $modulesDirs)
+                    $modulesDir,
+                    $namespaceBegin,
+                    $modulesDirs
                 );
             }
         }
@@ -59,9 +60,8 @@ final class CacheManager extends Injectable
         File::write($this->config->application->namespacesCache, $namespacesJson);
     }
 
-    private function generateDirectoriesList(string $directory): array
+    private function generateDirectoriesList(string $directory, array $directories = []): array
     {
-        $directories = [];
         $handle = opendir($directory);
 
         if ($handle) {
@@ -71,10 +71,7 @@ final class CacheManager extends Injectable
                 if (!in_array($file, self::IGNORE_FILES, true) && filetype($path) === 'dir') {
                     $directories[] = $path;
 
-                    $subDirectories = $this->generateDirectoriesList($path);
-                    if (count($subDirectories)) {
-                        $directories = array_merge($directories, $subDirectories);
-                    }
+                    $directories = $this->generateDirectoriesList($path, $directories);
                 }
             }
             closedir($handle);
@@ -84,12 +81,11 @@ final class CacheManager extends Injectable
     }
 
     private function generateNamespaceForDirectories(
+        array $namespaces,
         string $modulesDir,
         string $namespaceBegin,
         array $directories
     ): array {
-        $namespaces = [];
-
         foreach ($directories as $directory) {
             $namespace = substr($directory, strlen($modulesDir) + 1);
             $namespace = str_replace('/', '\\', $namespace);

@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-use Common\BaseClasses\BaseEntity;
+use Common\BaseClass\BaseEntity;
 
-class FileSizeEntity extends BaseEntity
+class FileSizeData extends BaseEntity
 {
     private int $bytes;
     private string $kilobytes;
@@ -17,7 +17,7 @@ class FileSizeEntity extends BaseEntity
         return $this->bytes;
     }
 
-    public function setBytes(int $bytes): FileSizeEntity
+    public function setBytes(int $bytes): FileSizeData
     {
         $this->bytes = $bytes;
 
@@ -29,7 +29,7 @@ class FileSizeEntity extends BaseEntity
         return $this->kilobytes;
     }
 
-    public function setKilobytes(string $kilobytes): FileSizeEntity
+    public function setKilobytes(string $kilobytes): FileSizeData
     {
         $this->kilobytes = $kilobytes;
 
@@ -41,7 +41,7 @@ class FileSizeEntity extends BaseEntity
         return $this->megabytes;
     }
 
-    public function setMegabytes(string $megabytes): FileSizeEntity
+    public function setMegabytes(string $megabytes): FileSizeData
     {
         $this->megabytes = $megabytes;
 
@@ -53,7 +53,7 @@ class FileSizeEntity extends BaseEntity
         return $this->gigabytes;
     }
 
-    public function setGigabytes(string $gigabytes): FileSizeEntity
+    public function setGigabytes(string $gigabytes): FileSizeData
     {
         $this->gigabytes = $gigabytes;
 

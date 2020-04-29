@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace Common\Entity;
 
 use Illuminate\Database\Eloquent\Collection;
-use Common\BaseClasses\BaseEntity;
+use Common\BaseClass\BaseEntity;
 
-class PaginationEntity extends BaseEntity
+class PaginatedResult extends BaseEntity
 {
     private int $totalResults;
     private int $totalPages;
     private int $currentPage;
-    private int $resultsPerPage;
+    private int $limit;
     private Collection $data;
 
     public function getTotalResults(): int
@@ -19,7 +19,7 @@ class PaginationEntity extends BaseEntity
         return $this->totalResults;
     }
 
-    public function setTotalResults(int $totalResults): PaginationEntity
+    public function setTotalResults(int $totalResults): PaginatedResult
     {
         $this->totalResults = $totalResults;
         return $this;
@@ -30,7 +30,7 @@ class PaginationEntity extends BaseEntity
         return $this->totalPages;
     }
 
-    public function setTotalPages(int $totalPages): PaginationEntity
+    public function setTotalPages(int $totalPages): PaginatedResult
     {
         $this->totalPages = $totalPages;
         return $this;
@@ -41,20 +41,20 @@ class PaginationEntity extends BaseEntity
         return $this->currentPage;
     }
 
-    public function setCurrentPage(int $currentPage): PaginationEntity
+    public function setCurrentPage(int $currentPage): PaginatedResult
     {
         $this->currentPage = $currentPage;
         return $this;
     }
 
-    public function getResultsPerPage(): int
+    public function getLimit(): int
     {
-        return $this->resultsPerPage;
+        return $this->limit;
     }
 
-    public function setResultsPerPage(int $resultsPerPage): PaginationEntity
+    public function setLimit(int $limit): PaginatedResult
     {
-        $this->resultsPerPage = $resultsPerPage;
+        $this->limit = $limit;
         return $this;
     }
 
@@ -63,7 +63,7 @@ class PaginationEntity extends BaseEntity
         return $this->data;
     }
 
-    public function setData(Collection $data): PaginationEntity
+    public function setData(Collection $data): PaginatedResult
     {
         $this->data = $data;
         return $this;

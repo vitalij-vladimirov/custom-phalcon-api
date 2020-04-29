@@ -8,6 +8,11 @@ return new Config([
 
     'environment' => getenv('APP_ENV') ?? 'production',
 
+    'environments' => [
+        'production',
+        'development',
+    ],
+
     /*
      * Specify cli commands shortcuts he to avoid Writing long command paths
      * Shortcut must specify full command path: Module:Task:command

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Example\Model;
 
-use Common\BaseClasses\BaseModel;
+use Common\BaseClass\BaseModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -39,6 +39,7 @@ class VendorModel extends BaseModel
     public function setLibName(string $lib_name): VendorModel
     {
         $this->lib_name = $lib_name;
+
         return $this;
     }
 
@@ -50,6 +51,7 @@ class VendorModel extends BaseModel
     public function setLibUrl(string $lib_url): VendorModel
     {
         $this->lib_url = $lib_url;
+
         return $this;
     }
 
@@ -61,6 +63,7 @@ class VendorModel extends BaseModel
     public function setVersion(string $version): VendorModel
     {
         $this->version = $version;
+
         return $this;
     }
 
@@ -72,6 +75,7 @@ class VendorModel extends BaseModel
     public function setEnvironment(string $environment): VendorModel
     {
         $this->environment = $environment;
+
         return $this;
     }
 
@@ -83,6 +87,7 @@ class VendorModel extends BaseModel
     public function setDescription(string $description): VendorModel
     {
         $this->description = $description;
+
         return $this;
     }
 }

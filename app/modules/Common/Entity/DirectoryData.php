@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-use Common\BaseClasses\BaseEntity;
+use Common\BaseClass\BaseEntity;
 
-class DirectoryEntity extends BaseEntity
+class DirectoryData extends BaseEntity
 {
     private string $name;
     private string $path;
@@ -16,7 +16,7 @@ class DirectoryEntity extends BaseEntity
         return $this->name;
     }
 
-    public function setName(string $name): DirectoryEntity
+    public function setName(string $name): DirectoryData
     {
         $this->name = $name;
 
@@ -28,7 +28,7 @@ class DirectoryEntity extends BaseEntity
         return $this->path;
     }
 
-    public function setPath(string $path): DirectoryEntity
+    public function setPath(string $path): DirectoryData
     {
         $this->path = $path;
 
@@ -40,7 +40,7 @@ class DirectoryEntity extends BaseEntity
         return $this->map;
     }
 
-    public function setMap(array $map): DirectoryEntity
+    public function setMap(array $map): DirectoryData
     {
         $this->map = $map;
 

@@ -16,7 +16,7 @@ try {
     $router = $app->di->get('config')->customRouter ?? Routes::class;
 
     if (!isset(class_implements($router)[RouterInterface::class])) {
-        throw new Exception('Router must implement \Mvc\RouterInterface');
+        throw new Exception('Router must implement RouterInterface.');
     }
 
     (new $router())->getRoutes($app);

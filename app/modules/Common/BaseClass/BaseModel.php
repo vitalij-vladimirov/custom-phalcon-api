@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Common\BaseClasses;
+namespace Common\BaseClass;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -11,7 +11,6 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Support\Collection;
 use Closure;
-use Common\Variable;
 use Common\Regex;
 use Common\Text;
 
@@ -147,8 +146,10 @@ abstract class BaseModel extends Model
             $this->setTableName();
         }
 
-        $this->casts['created_at'] = 'datetime:' . self::TIMESTAMP_FORMAT;
-        $this->casts['updated_at'] = 'datetime:' . self::TIMESTAMP_FORMAT;
+        if ($this->timestamps) {
+            $this->casts['created_at'] = 'datetime:' . self::TIMESTAMP_FORMAT;
+            $this->casts['updated_at'] = 'datetime:' . self::TIMESTAMP_FORMAT;
+        }
     }
 
     public function getId(): ?int
@@ -164,17 +165,6 @@ abstract class BaseModel extends Model
     public function getUpdatedAt(): ?Carbon
     {
         return $this->updated_at ?? null;
-    }
-
-    public function toArray(): array
-    {
-        return Variable::restoreArrayTypes(
-            parent::toArray(),
-            true,
-            true,
-            false,
-            ['created_at', 'updated_at']
-        );
     }
 
     private function setTableName(): void

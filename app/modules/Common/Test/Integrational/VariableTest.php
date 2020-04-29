@@ -7,7 +7,7 @@ use Phalcon\Text as PhalconText;
 use DateTimeImmutable;
 use DateTime;
 use Carbon\Carbon;
-use Common\BaseClasses\BaseTestCase;
+use Common\BaseClass\BaseTestCase;
 use Common\Variable;
 
 class VariableTest extends BaseTestCase

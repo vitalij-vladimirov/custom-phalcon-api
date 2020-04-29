@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Common\Task;
 
-use Common\Exception\LogicException;
 use Phalcon\Cli\Task;
+use Common\Exception\LogicException;
 use Common\Service\CacheManager;
 
 class CacheNamespacesTask extends Task

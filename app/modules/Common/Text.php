@@ -141,7 +141,7 @@ class Text extends PhalconText
             || $stringType === self::STRING_TYPE_PASCAL_ONE_WORD
             || $stringType === self::STRING_TYPE_CAMEL_CASE
         ) {
-            $value = preg_replace('/(?<!\ )[A-Z]/', ' $0', $value);
+            $value = preg_replace('/(?<! )[A-Z]/', ' $0', $value);
             $value = trim(self::lower($value));
 
             return str_replace(['  ', ' ', ''], '-', $value);
@@ -186,7 +186,7 @@ class Text extends PhalconText
             $value = preg_replace('/^(get|is|set)/', '', $value);
         }
 
-        return self::uncamelize($value);
+        return self::toSnakeCase($value);
     }
 
     public static function methodToVariable(string $value): string
@@ -204,7 +204,7 @@ class Text extends PhalconText
             return '';
         }
 
-        return self::lower(substr($value, 0, 1)) . substr($value, 1);
+        return self::lower($value[0]) . substr($value, 1);
     }
 
     public static function upperFirst(string $value): string
@@ -213,7 +213,7 @@ class Text extends PhalconText
             return '';
         }
 
-        return self::upper(substr($value, 0, 1)) . substr($value, 1);
+        return self::upper($value[0]) . substr($value, 1);
     }
 
     /**
@@ -270,7 +270,7 @@ class Text extends PhalconText
             $value = preg_replace('/[^a-zA-Z0-9 _\\-]/', '', $value);
         }
 
-        $value = preg_replace('/(?<!\ )[A-Z]/', ' $0', $value);
+        $value = preg_replace('/(?<! )[A-Z]/', ' $0', $value);
         $value = trim(self::lower($value));
         $value = preg_replace('/[_ \\-]/', '-', $value);
         $value = str_replace(['---', '--'], '-', $value);

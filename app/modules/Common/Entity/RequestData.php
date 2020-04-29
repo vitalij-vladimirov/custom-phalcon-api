@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Common\Entity;
 
-use Common\BaseClasses\BaseEntity;
+use Common\BaseClass\BaseEntity;
 
-class RequestEntity extends BaseEntity
+class RequestData extends BaseEntity
 {
     public const REQUEST_TYPE_API = 'api';
     public const REQUEST_TYPE_VIEW = 'view';
@@ -15,14 +15,14 @@ class RequestEntity extends BaseEntity
     private string $path;
     private string $module;
     private array $params;
-    private array $query;
+    private array $data;
 
     public function getMethod(): string
     {
         return $this->method;
     }
 
-    public function setMethod(string $method): RequestEntity
+    public function setMethod(string $method): RequestData
     {
         $this->method = $method;
         return $this;
@@ -33,7 +33,7 @@ class RequestEntity extends BaseEntity
         return $this->type;
     }
 
-    public function setType(string $type): RequestEntity
+    public function setType(string $type): RequestData
     {
         $this->type = $type;
         return $this;
@@ -44,7 +44,7 @@ class RequestEntity extends BaseEntity
         return $this->path;
     }
 
-    public function setPath(string $path): RequestEntity
+    public function setPath(string $path): RequestData
     {
         $this->path = $path;
         return $this;
@@ -55,7 +55,7 @@ class RequestEntity extends BaseEntity
         return $this->module;
     }
 
-    public function setModule(string $module): RequestEntity
+    public function setModule(string $module): RequestData
     {
         $this->module = $module;
         return $this;
@@ -66,20 +66,29 @@ class RequestEntity extends BaseEntity
         return $this->params;
     }
 
-    public function setParams(array $params): RequestEntity
+    /**
+     * @param int $key
+     * @return string|int|float|null
+     */
+    public function getParam(int $key)
+    {
+        return $this->params[$key] ?? null;
+    }
+
+    public function setParams(array $params): RequestData
     {
         $this->params = $params;
         return $this;
     }
 
-    public function getQuery(): array
+    public function getData(): array
     {
-        return $this->query;
+        return $this->data;
     }
 
-    public function setQuery(array $query): RequestEntity
+    public function setData(array $data): RequestData
     {
-        $this->query = $query;
+        $this->data = $data;
         return $this;
     }
 }
