@@ -37,19 +37,19 @@ class VendorControllerTest extends BaseTestCase
         ]
     ];
 
-    /** @var VendorsRepository $vendorRepository */
-    private $vendorRepository;
+    /** @var VendorsRepository $vendorsRepository */
+    private $vendorsRepository;
 
     protected function setUp(): void
     {
         $this->truncate(new VendorModel());
 
-        $this->vendorRepository = $this->inject(VendorsRepository::class);
+        $this->vendorsRepository = $this->inject(VendorsRepository::class);
     }
 
     public function testWillGetFullListOfVendors(): void
     {
-        $vendors = $this->vendorRepository->createMany(self::EXAMPLE_VENDORS);
+        $vendors = $this->vendorsRepository->createMany(self::EXAMPLE_VENDORS);
 
         $request = $this->getRequest('/api/example/vendors');
 
@@ -67,7 +67,7 @@ class VendorControllerTest extends BaseTestCase
 
     public function testWillGetFilteredListOfVendors(): void
     {
-        $vendors = $this->vendorRepository->createMany(self::EXAMPLE_VENDORS);
+        $vendors = $this->vendorsRepository->createMany(self::EXAMPLE_VENDORS);
 
         $request = $this->getRequest('/api/example/vendors', [
             'environment' => 'development'
@@ -96,7 +96,7 @@ class VendorControllerTest extends BaseTestCase
 
     public function testWillGetPaginatedListOfVendors(): void
     {
-        $vendors = $this->vendorRepository->createMany(self::EXAMPLE_VENDORS);
+        $vendors = $this->vendorsRepository->createMany(self::EXAMPLE_VENDORS);
 
         $request = $this->getRequest(
             '/api/example/vendors/paginated',
@@ -126,7 +126,7 @@ class VendorControllerTest extends BaseTestCase
 
     public function testWillGetVendorById(): void
     {
-        $vendors = $this->vendorRepository->createMany(self::EXAMPLE_VENDORS);
+        $vendors = $this->vendorsRepository->createMany(self::EXAMPLE_VENDORS);
 
         $request = $this->getRequest('/api/example/vendors/' . $vendors[0]->getId());
 
@@ -151,7 +151,7 @@ class VendorControllerTest extends BaseTestCase
 
         self::assertEquals(200, $request->getStatusCode());
 
-        $vendors = $this->vendorRepository->all();
+        $vendors = $this->vendorsRepository->all();
 
         self::assertEquals(1, $vendors->count());
 
@@ -173,7 +173,7 @@ class VendorControllerTest extends BaseTestCase
 
     public function testWillUpdateVendor(): void
     {
-        $vendor = $this->vendorRepository->create(self::EXAMPLE_VENDORS[0]);
+        $vendor = $this->vendorsRepository->create(self::EXAMPLE_VENDORS[0]);
 
         self::assertEquals(
             array_merge(['id' => $vendor->getId()], self::EXAMPLE_VENDORS[0]),
@@ -202,7 +202,7 @@ class VendorControllerTest extends BaseTestCase
 
     public function testWillDeleteVendor(): void
     {
-        $vendor = $this->vendorRepository->create(self::EXAMPLE_VENDORS[0]);
+        $vendor = $this->vendorsRepository->create(self::EXAMPLE_VENDORS[0]);
 
         $request = $this->deleteRequest('/api/example/vendors/' . $vendor->getId());
 

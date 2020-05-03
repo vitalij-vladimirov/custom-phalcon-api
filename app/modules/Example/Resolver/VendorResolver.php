@@ -12,17 +12,17 @@ use Example\Repository\VendorsRepository;
 
 class VendorResolver extends BaseResolver
 {
-    private VendorsRepository $vendorRepository;
+    private VendorsRepository $vendorsRepository;
 
-    public function __construct(VendorsRepository $vendorRepository)
+    public function __construct(VendorsRepository $vendorsRepository)
     {
-        $this->vendorRepository = $vendorRepository;
+        $this->vendorsRepository = $vendorsRepository;
     }
 
     public function resolveParameter($parameter): VendorModel
     {
         /** @var VendorModel $vendor */
-        $vendor = $this->vendorRepository->findOneById((int)$parameter);
+        $vendor = $this->vendorsRepository->findOneById((int)$parameter);
 
         if ($vendor === null) {
             throw new NotFoundApiException('Vendor not found.', ErrorCodes::VENDOR_NOT_FOUND);

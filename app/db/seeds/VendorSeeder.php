@@ -70,6 +70,12 @@ class VendorSeeder extends BaseSeeder
                 'environment' => 'production',
                 'description' => 'Migrations manager required to run Eloquent migrations',
             ], [
+                'lib_name' => 'Non existing vendor',
+                'lib_url' => 'test/vendor',
+                'version' => '7.77',
+                'environment' => 'development',
+                'description' => 'Test description',
+            ], [
                 'lib_name' => 'Phalcon IDE stubs',
                 'lib_url' => 'phalcon/ide-stubs',
                 'version' => '4.0',

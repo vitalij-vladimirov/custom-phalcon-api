@@ -13,7 +13,6 @@ class VendorMapper implements RequestMapperInterface, ResponseMapperInterface
 {
     public function mapRequestToObject(array $data): VendorModel
     {
-        // TODO: how about create "BaseModel()->toModel($data);" ?
         return (new VendorModel())
             ->setLibName($data['lib_name'])
             ->setLibUrl($data['lib_url'])
