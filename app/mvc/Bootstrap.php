@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mvc;
 
+use Common\BaseClass\BaseTestCase;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Loader;
 use Phalcon\Mvc\Micro;
@@ -25,7 +26,7 @@ class Bootstrap
         $this->setupLoader();
         $this->defineGlobals();
 
-        return new Micro($this->di);
+        return $this->createApp();
     }
 
     public function setupTestDb(array $customConfig = []): Micro
@@ -42,7 +43,11 @@ class Bootstrap
 
         $this->setupDatabase();
 
-        return new Micro($this->di);
+        $app = new Micro($this->di);
+
+        $app->di->get('eloquent')->setAsGlobal();
+
+        return $app;
     }
 
     private function setupDi(): FactoryDefault
@@ -159,5 +164,46 @@ class Bootstrap
 
         // Load Eloquent DB
         $this->di->get('eloquent');
+    }
+
+    private function createApp(): Micro
+    {
+        $app = new Micro($this->di);
+
+        if (APP_ENV === 'production') {
+            return $app;
+        }
+
+        /**
+         * If this is http request, run additional check and change database
+         * to testdb_x if this is phpunit test request
+         */
+        try {
+            $testToken = $app->request->getHeader(BaseTestCase::HEADER_TEST_KEY);
+
+            if (empty($testToken)) {
+                return $app;
+            }
+
+            $dbName = 'testdb_' . $testToken;
+
+            $testDb = $app->di->get('db')->query('
+                SELECT SCHEMA_NAME
+                FROM INFORMATION_SCHEMA.SCHEMATA
+                WHERE SCHEMA_NAME = \'' . $dbName . '\'
+            ')->fetch();
+
+            if (!isset($testDb['SCHEMA_NAME']) || $testDb['SCHEMA_NAME'] !== $dbName) {
+                return $app;
+            }
+
+            return $this->setupTestDb([
+                'database' => [
+                    'dbname' => $dbName
+                ],
+            ]);
+        } catch (Throwable $throwable) {
+            return $app;
+        }
     }
 }

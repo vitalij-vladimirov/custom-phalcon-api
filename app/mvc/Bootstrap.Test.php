@@ -14,9 +14,6 @@ include '/app/mvc/Bootstrap.php';
 
 $customConfig = [
     'environment' => 'testing',
-    'database' => [
-        'username' => 'root'
-    ],
 ];
 
 $bootstrap = new Bootstrap();

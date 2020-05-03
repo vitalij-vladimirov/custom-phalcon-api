@@ -41,8 +41,6 @@ class CreateVendorTable extends BaseMigration
 
     protected function afterMigration(): void
     {
-        if (APP_ENV === 'development') {
-            (new VendorSeeder())->run();
-        }
+        (new VendorSeeder())->run();
     }
 }

@@ -6,6 +6,8 @@ namespace Common\Service;
 use Phalcon\Http\Response;
 use Phalcon\Mvc\Micro;
 use Mvc\RouterInterface;
+use Common\Config\DefaultErrorCodes;
+use Common\BaseClass\BaseModel;
 use Common\Exception\LogicException;
 use Common\Interfaces\RoutesInterface;
 use Common\ApiException\ApiException;
@@ -13,6 +15,7 @@ use Common\ApiException\NotFoundApiException;
 use Common\Entity\RequestData;
 use Common\File;
 use Common\Text;
+use Common\Variable;
 use Throwable;
 
 final class CustomRouter extends Injectable implements RouterInterface
@@ -155,17 +158,56 @@ final class CustomRouter extends Injectable implements RouterInterface
 
         $response = $routes->get($request);
 
+        $this->resolveResponse($app, $request, $response);
+
+        return $app;
+    }
+
+    /**
+     * @param Micro $app
+     * @param RequestData $request
+     * @param mixed $response
+     */
+    private function resolveResponse(Micro $app, RequestData $request, $response): void
+    {
         $app->{$request->getMethod()}(
             $request->getPath(),
             function () use ($app, $response) {
-                // TODO: describe different data types
-                $app->response
-                    ->setJsonContent($response)
-                    ->send()
-                ;
+                $appResponse = $app->response;
+
+                if (Variable::isArray($response)) {
+                    $appResponse
+                        ->setStatusCode(200)
+                        ->setJsonContent($response)
+                    ;
+                } elseif (Variable::isObject(BaseModel::class)) {
+                    $appResponse
+                        ->setStatusCode(200)
+                        ->setJsonContent($response->toArray())
+                    ;
+                } elseif (Variable::isBool($response)) {
+                    if ($response) {
+                        $appResponse
+                            ->setStatusCode(204)
+                        ;
+                    } else {
+                        $appResponse
+                            ->setStatusCode(400)
+                            ->setJsonContent([
+                                'code' => DefaultErrorCodes::BAD_REQUEST,
+                                'message' => 'Something went wrong. Please contact admin for more information.',
+                            ])
+                        ;
+                    }
+                } else {
+                    $appResponse
+                        ->setStatusCode(200)
+                        ->setContent($response)
+                    ;
+                }
+
+                $appResponse->send();
             }
         );
-
-        return $app;
     }
 }

@@ -30,6 +30,10 @@ class VendorValidator extends BaseValidator
             ->add('version', new StringLength(['max' => 10]))
             ->add('lib_name', new Callback([
                 'callback' => static function ($data) use ($validation) {
+                    if (!isset($data['lib_name'], $data['lib_url'])) {
+                        return true;
+                    }
+
                     if ($data['lib_name'] === $data['lib_url']) {
                         $validation->appendMessage(
                             new Message(
@@ -43,7 +47,8 @@ class VendorValidator extends BaseValidator
                     }
 
                     return true;
-                }
+                },
+                'allowEmpty' => true,
             ]))
         ;
 

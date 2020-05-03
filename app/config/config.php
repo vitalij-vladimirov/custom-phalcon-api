@@ -14,6 +14,9 @@ return new Config([
         'testing',
     ],
 
+    'localhostUrl' => getenv('APP_URL'),
+    'containerUrl' => getenv('CONTAINER_URL'),
+
     /*
      * Specify cli commands shortcuts he to avoid Writing long command paths
      * Shortcut must specify full command path: Module:Task:command
