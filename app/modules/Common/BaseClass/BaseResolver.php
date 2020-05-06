@@ -7,6 +7,6 @@ use Documentation\Entity\ParameterDoc;
 
 abstract class BaseResolver
 {
-    abstract public function resolveParameter($parameter);
+    abstract public function resolveParameter(string $parameter);
     abstract public function parameterDocumentation(): ?ParameterDoc;
 }

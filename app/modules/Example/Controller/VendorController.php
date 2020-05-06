@@ -75,8 +75,8 @@ class VendorController
         }
     }
 
-    public function deleteVendor(VendorModel $vendorModel): void
+    public function deleteVendor(VendorModel $vendorModel): bool
     {
-        $this->vendorsRepository->deleteModel($vendorModel);
+        return $this->vendorsRepository->deleteModel($vendorModel);
     }
 }

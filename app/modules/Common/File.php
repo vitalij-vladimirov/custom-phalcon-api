@@ -21,7 +21,6 @@ class File
         return ($fileWrite || $text === '') ?? false;
     }
 
-    // TODO: write test
     public static function copy(string $from, string $to): bool
     {
         if (!self::exists($from)) {
@@ -32,10 +31,26 @@ class File
             throw new LogicException('Destination file already exists.');
         }
 
+        self::validateFileDirectoryEntityAndCreateIfNotFound($to);
+
         return copy($from, $to);
     }
 
-    // TODO: write test
+    public static function move(string $from, string $to): bool
+    {
+        if (!self::exists($from)) {
+            throw new LogicException('Source file not found.');
+        }
+
+        if (self::exists($to)) {
+            throw new LogicException('Destination file already exists.');
+        }
+
+        self::validateFileDirectoryEntityAndCreateIfNotFound($to);
+
+        return rename($from, $to);
+    }
+
     public static function delete(string $file): bool
     {
         if (!self::exists($file)) {
@@ -47,20 +62,6 @@ class File
         }
 
         return unlink($file);
-    }
-
-    // TODO: write test
-    public static function move(string $from, string $to): bool
-    {
-        if (!self::exists($from)) {
-            throw new LogicException('Source file not found.');
-        }
-
-        if (self::exists($to)) {
-            throw new LogicException('Destination file already exists.');
-        }
-
-        return rename($from, $to);
     }
 
     public static function read(string $file): ?string
@@ -146,7 +147,6 @@ class File
         ;
     }
 
-    // TODO: create test
     public static function readDirectory(
         string $directory,
         bool $scanHiddenFiles = true,
@@ -174,7 +174,7 @@ class File
                 $path = $directory . '/' . $file;
 
                 if (filetype($path) === 'dir') {
-                    if ($readSubDirs) {
+                    if ($readSubDirs === true) {
                         $directories[$file] = self::readDirectory($path, $scanHiddenFiles, true);
                         continue;
                     }

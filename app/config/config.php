@@ -11,7 +11,11 @@ return new Config([
     'environments' => [
         'production',
         'development',
+        'testing',
     ],
+
+    'localhostUrl' => getenv('APP_URL'),
+    'containerUrl' => getenv('CONTAINER_URL'),
 
     /*
      * Specify cli commands shortcuts he to avoid Writing long command paths
