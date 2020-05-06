@@ -3,17 +3,11 @@
 if [ -z "$1" ]; then
   /app/vendor/bin/paratest
 else
-  ARG=$(echo "$1" | cut -c1-1);
+  FIRST_SYMBOL=$(echo "$1" | cut -c1-1);
 
-  if [ "$ARG" != "-" ]; then
+  if [ "$FIRST_SYMBOL" != "-" ]; then
     /app/vendor/bin/phpunit --filter "$1"
-  elif [ -z "$2" ]; then
-    /app/vendor/bin/phpunit "$1";
-  elif [ -z "$3" ]; then
-    /app/vendor/bin/phpunit "$1" "$2";
-  elif [ -z "$4" ]; then
-    /app/vendor/bin/phpunit "$1" "$2" "$3";
   else
-    /app/vendor/bin/phpunit "$1" "$2" "$3" "$4";
+    /app/vendor/bin/phpunit "$@";
   fi;
 fi;
