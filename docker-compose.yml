@@ -22,12 +22,8 @@ services:
       - 3380:3306
     environment:
       - MYSQL_DATABASE=phalcon_api
-      - MYSQL_USER=api
-      - MYSQL_PASSWORD=api
       - MYSQL_ROOT_PASSWORD=api
-      - TZ=UTC
     volumes:
-      - ./.config/mysql/my.cnf:/root/.my.cnf:ro
-      - ./.config/mysql/conf.d:/etc/mysql/conf.d:ro
-      - ./data/log:/var/log/mysql:rw
       - ./data/mysql:/var/lib/mysql:rw
+      - ./data/log:/var/log/mysql:rw
+    command: "--innodb_use_native_aio=0"

@@ -1,6 +1,16 @@
 #!/bin/bash -e
 
+# TODO: review and refactoring needed
+
 APP_NAME='phalcon-api'
+
+LIST_OF_UNIX_FILES=(
+  "/usr/bin/cs"
+  "/usr/bin/edit"
+  "/usr/bin/cli"
+  "/usr/bin/unit"
+  "/etc/mc/mc.keymap"
+)
 
 check_db() {
   if [ "$(docker exec -ti "$APP_NAME" bash -c "cli Common:CheckDbState" 2>&1)" == 1 ]; then
@@ -15,6 +25,15 @@ check_db() {
       fi
     done
     echo "Couldn't connect to DB."
+  fi
+}
+
+run_unix_files_formatter() {
+  if [ "$OSTYPE" == "msys" ]; then
+    for FILE in "${LIST_OF_UNIX_FILES[@]}"
+    do
+       docker exec -ti "$APP_NAME" bash -c "sed -i -e 's/\r$//' $FILE"
+    done
   fi
 }
 
@@ -39,6 +58,8 @@ Testing arguments:
   ${0} cs {dir}         - run Code Sniffers in exact directory
   ${0} unit             - run paratest
   ${0} unit {test_name} - run exact test class or test method
+  ${0} db               - check if DB is online
+  ${0} fix              - fix unix files when running docker from windows
 "
   exit
 
@@ -47,6 +68,8 @@ elif [ "$1" == "up" ]; then
   docker-compose down
   docker-compose up -d
   docker exec -ti "$APP_NAME" bash -c "composer install"
+
+  run_unix_files_formatter
 
   check_db
   if [ "$DB_STATUS" == "1" ]; then
@@ -64,6 +87,8 @@ elif [ "$1" == "build" ]; then
   docker-compose down
   docker-compose up --build -d
   docker exec -ti "$APP_NAME" bash -c "composer install"
+
+  run_unix_files_formatter
 
   check_db
   if [ "$DB_STATUS" == "1" ]; then
@@ -106,22 +131,15 @@ elif [ "$1" == "unit" ]; then
 elif [ "$1" == "test" ]; then
   docker exec -ti "$APP_NAME" bash -c "cs && unit"
 elif [ "$1" == "cli" ]; then
-  if [ -z "$2" ]; then
-    docker exec -ti "$APP_NAME" bash -c "$1"
-  elif [ -z "$3" ]; then
-    docker exec -ti "$APP_NAME" bash -c "$1 $2"
-  elif [ -z "$4" ]; then
-    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3"
-  elif [ -z "$5" ]; then
-    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3 $4"
-  elif [ -z "$6" ]; then
-    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3 $4 $5"
-  elif [ -z "$7" ]; then
-    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3 $4 $5 $6"
-  elif [ -z "$8" ]; then
-    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3 $4 $5 $6 $7"
-  elif [ -z "$9" ]; then
-    docker exec -ti "$APP_NAME" bash -c "$1 $2 $3 $4 $5 $6 $7 $8"
+  docker exec -ti "$APP_NAME" bash -c "cli $2 $3 $4 $5 $6 $7 $8 $9"
+elif [ "$1" == "fix" ]; then
+  run_unix_files_formatter
+elif [ "$1" == "db" ]; then
+  check_db
+  if [ "$DB_STATUS" == "1" ]; then
+    echo "DB is online"
+  else
+    echo "Couldn't access DB :("
   fi
 else
   echo "Argument \"$1\" not found"
