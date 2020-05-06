@@ -6,8 +6,6 @@
     <file>/app/modules</file>
     <file>/app/db</file>
 
-    <exclude-pattern>/app/modules/Common/Test/Integrational/VariableTest.php</exclude-pattern>
-
     <config name="installed_paths" value="vendor/slevomat/coding-standard,vendor/moxio/php-codesniffer-sniffs"/>
 
     <rule ref="Generic.Files.LineLength">
