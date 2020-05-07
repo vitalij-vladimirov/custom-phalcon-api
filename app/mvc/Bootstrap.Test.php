@@ -20,7 +20,9 @@ $bootstrap = new Bootstrap();
 $app = $bootstrap->runApp($customConfig);
 $db = $app->di->get('db');
 
-if ($_SERVER['PHP_SELF'] === '/app/vendor/bin/phpunit') {
+if ($_SERVER['PHP_SELF'] === '/app/vendor/bin/phpunit'
+    || substr($_SERVER['PHP_SELF'], 0, 19) === '/app/vendor/phpunit'
+) {
     putenv('TEST_TOKEN=1');
 }
 
