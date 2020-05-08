@@ -3,31 +3,37 @@ declare(strict_types=1);
 
 namespace Example\Service;
 
+use Illuminate\Support\Collection;
+use Common\Service\Injectable;
 use Common\Entity\PaginatedResult;
 use Common\Entity\PaginationFilter;
-use Common\File;
 use Common\Json;
 use Example\Entity\VendorFilter;
 use Example\Model\VendorModel;
 use Example\Repository\VendorsRepository;
 use Example\Exception\VendorAlreadyExistsException;
-use Illuminate\Support\Collection;
+use Example\Resolver\ComposerDataResolver;
 
-class VendorManager
+class VendorManager extends Injectable
 {
-    private const COMPOSER_LOCATION = '/app/composer.lock';
-
     private VendorsRepository $vendorsRepository;
+    private ComposerDataResolver $composerDataResolver;
 
-    public function __construct(VendorsRepository $vendorsRepository)
-    {
+    public function __construct(
+        VendorsRepository $vendorsRepository,
+        ComposerDataResolver $composerDataResolver
+    ) {
         $this->vendorsRepository = $vendorsRepository;
+        $this->composerDataResolver = $composerDataResolver;
     }
 
     public function getVendorsList(VendorFilter $vendorFilter): Collection
     {
         if ($vendorFilter->getEnvironment() !== null) {
-            return $this->vendorsRepository->findManyBy('environment', $vendorFilter->getEnvironment());
+            return $this->vendorsRepository->findManyBy(
+                'environment',
+                $vendorFilter->getEnvironment()
+            );
         }
 
         return $this->vendorsRepository->all();
@@ -55,7 +61,14 @@ class VendorManager
 
     public function updateVendor(VendorModel $vendorModel, VendorModel $updateData): VendorModel
     {
-        if ($this->vendorsRepository->oneWithLibNameOrLibUrlAndDifferentIdExists($updateData, $vendorModel->getId())) {
+        $vendorExists = $this->vendorsRepository
+            ->oneWithLibNameOrLibUrlAndDifferentIdExists(
+                $updateData,
+                $vendorModel->getId()
+            )
+        ;
+
+        if ($vendorExists) {
             throw new VendorAlreadyExistsException();
         }
 
@@ -72,7 +85,7 @@ class VendorManager
 
     public function updateVendorsFromComposer(): void
     {
-        $composer = Json::decode($this->getComposerLockData());
+        $composer = Json::decode($this->composerDataResolver->getComposerLockData());
 
         /** @var VendorModel[] $vendors */
         $vendors = $this->vendorsRepository->all();
@@ -97,11 +110,6 @@ class VendorManager
         foreach ($currentVendorsList as $unusedVendor) {
             $this->vendorsRepository->deleteModel($unusedVendor);
         }
-    }
-
-    private function getComposerLockData(): string
-    {
-        return File::read(self::COMPOSER_LOCATION);
     }
 
     private function readPackagesAndUpdateVendors(

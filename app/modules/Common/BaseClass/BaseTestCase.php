@@ -4,9 +4,12 @@ declare(strict_types=1);
 namespace Common\BaseClass;
 
 use Phalcon\Config;
+use Phalcon\Di;
 use Phalcon\Db\Adapter\Pdo\AbstractPdo as PhalconDb;
 use Illuminate\Database\Capsule\Manager as EloquentDb;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Common\Service\Injectable;
 use Common\Entity\HttpResponse;
 use Common\Service\HttpRequestManager;
@@ -18,6 +21,7 @@ abstract class BaseTestCase extends TestCase
     protected Config $config;
     protected PhalconDb $db;
     protected EloquentDb $eloquent;
+    protected $di;
 
     private Injectable $injectable;
     private ?string $testToken;
@@ -28,6 +32,8 @@ abstract class BaseTestCase extends TestCase
     public function __construct()
     {
         parent::__construct();
+
+        $this->di = Di::getDefault();
 
         $this->injectable = new Injectable();
 
@@ -48,6 +54,13 @@ abstract class BaseTestCase extends TestCase
     protected function truncate(BaseModel $model): void
     {
         $this->eloquent::table($model->getTable())->truncate();
+    }
+
+    protected function registerMock(MockObject $mockObject): void
+    {
+        $reflection = new ReflectionClass($mockObject);
+
+        $this->di->set($reflection->getParentClass()->getName(), $mockObject);
     }
 
     protected function getRequest(
