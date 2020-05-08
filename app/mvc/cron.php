@@ -19,31 +19,39 @@ class Cron
     public function __construct(array $args)
     {
         $this->scheduler = new Scheduler();
-        $this->runCronjobs($this->scheduler, $args);
+        $this->runCronjobs($args);
         $this->scheduler->run();
     }
 
-    private function runCronjobs(Scheduler $cron, array $args): Scheduler
+    private function runCronjobs(array $args): void
     {
-        if (isset($args[1]) && $args[1] === 'development') {
-            return $this->development($cron);
+        if (isset($args[1]) && $args[1] !== 'production') {
+            $this->development();
+
+            return;
         }
 
-        return $this->production($cron);
+        $this->production();
     }
 
-    private function development(Scheduler $cron): Scheduler
+    private function development(): void
     {
-        $cron->php('/app/mvc/cli.php Common:CacheNamespaces cron')->everyMinute();
-        $cron->php('/app/mvc/cli.php Common:RemoveUnusedFiles')->everyMinute();
+        $this->scheduler
+            ->php('/app/mvc/cli.php Common:CacheNamespaces cron')
+            ->everyMinute()
+        ;
 
-        return $cron;
+        $this->scheduler
+            ->php('/app/mvc/cli.php Common:RemoveUnusedFiles')
+            ->everyMinute()
+        ;
     }
 
-    private function production(Scheduler $cron): Scheduler
+    private function production(): void
     {
-        $cron->php('/app/mvc/cli.php Common:RemoveUnusedFiles')->everyMinute();
-
-        return $cron;
+        $this->scheduler
+            ->php('/app/mvc/cli.php Common:RemoveUnusedFiles')
+            ->everyMinute()
+        ;
     }
 }

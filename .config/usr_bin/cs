@@ -4,7 +4,7 @@ set -e
 
 if [ -z "$1" ]; then
   /app/vendor/bin/php-cs-fixer fix --config=config/phpCsFixerConfig.php --dry-run --verbose
-  /app/vendor/bin/phpcs -p --cache=/var/cache/phalcon/phpCodeSnifferCache.json
+  /app/vendor/bin/phpcs -p --cache=/var/cache/phalcon/php_code_sniffer.json
 elif [ "$1" == "fix" ]; then
   /app/vendor/bin/php-cs-fixer fix --config=config/phpCsFixerConfig.php --verbose
   /app/vendor/bin/phpcbf -p

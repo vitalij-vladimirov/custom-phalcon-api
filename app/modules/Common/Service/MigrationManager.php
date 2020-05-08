@@ -14,8 +14,8 @@ use Common\File;
 
 final class MigrationManager extends Injectable
 {
-    private const STUB_PATH = '/app/modules/Common/Config/Database/migration_stubs';
-    private const MIGRATION_CONFIG = '/app/modules/Common/Config/Database/migration-config.php';
+    private const STUB_PATH = BASE_PATH . '/modules/Common/Config/Database/migration_stubs';
+    private const MIGRATION_CONFIG = BASE_PATH . '/modules/Common/Config/Database/migration-config.php';
     private const FORBIDDEN_TABLE_NAMES = ['migration', 'phinx'];
 
     private MigrationCreator $migrationCreator;

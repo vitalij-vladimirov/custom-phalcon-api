@@ -161,6 +161,7 @@ class Bootstrap
     private function defineGlobals(): void
     {
         define('APP_ENV', $this->di->get('config')->environment ?? 'production');
+        define('BASE_PATH', $this->di->get('config')->application->basePath);
 
         // Load Eloquent DB
         $this->di->get('eloquent');

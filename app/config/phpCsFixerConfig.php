@@ -3,18 +3,25 @@
 use Phalcon\Config;
 
 /** @var Config $config */
-$config = require '/app/config/config.php';
+$config = require 'config.php';
 
 $finder = PhpCsFixer\Finder::create()
     ->in([
-        '/app/mvc',
-        '/app/db',
-        '/app/modules',
+        'mvc',
+        'db',
+        'modules',
     ])
 ;
 
+$lineEnding = "\n";
+
+//TODO: resolve HOST_OS
+//if (getenv('HOST_OS') === 'UNIX') {
+//    $lineEnding = "\r\n";
+//}
+
 return PhpCsFixer\Config::create()
-    ->setLineEnding("\r\n")
+    ->setLineEnding($lineEnding)
     ->setFinder($finder)
-    ->setCacheFile($config->application->cacheDir . '/php_cs_cache.json')
+    ->setCacheFile($config->application->cacheDir . '/php_cs.json')
 ;
