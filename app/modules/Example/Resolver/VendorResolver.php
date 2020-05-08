@@ -5,7 +5,6 @@ namespace Example\Resolver;
 
 use Common\ApiException\NotFoundApiException;
 use Common\BaseClass\BaseResolver;
-use Documentation\Entity\ParameterDoc;
 use Example\Config\ErrorCodes;
 use Example\Model\VendorModel;
 use Example\Repository\VendorsRepository;
@@ -29,11 +28,5 @@ class VendorResolver extends BaseResolver
         }
 
         return $vendor;
-    }
-
-    public function parameterDocumentation(): ?ParameterDoc
-    {
-        // TODO: write parameter documentation
-        return null;
     }
 }

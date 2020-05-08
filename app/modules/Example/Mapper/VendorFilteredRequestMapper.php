@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Example\Mapper;
 
 use Common\Interfaces\RequestMapperInterface;
-use Documentation\Entity\RequestDoc;
 use Example\Entity\VendorFilter;
 
 class VendorFilteredRequestMapper implements RequestMapperInterface
@@ -22,11 +21,5 @@ class VendorFilteredRequestMapper implements RequestMapperInterface
         }
 
         return $vendorFilter;
-    }
-
-    public function requestDocumentation(): ?RequestDoc
-    {
-        // TODO: write request documentation
-        return null;
     }
 }

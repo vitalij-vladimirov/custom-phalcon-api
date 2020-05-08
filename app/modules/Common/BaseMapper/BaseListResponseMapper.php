@@ -5,7 +5,6 @@ namespace Common\BaseMapper;
 
 use Illuminate\Support\Collection;
 use Common\Interfaces\ResponseMapperInterface;
-use Documentation\Entity\ResponseDoc;
 
 class BaseListResponseMapper implements ResponseMapperInterface
 {
@@ -28,11 +27,5 @@ class BaseListResponseMapper implements ResponseMapperInterface
         }
 
         return $data;
-    }
-
-    public function responseDocumentation(): ?ResponseDoc
-    {
-        // TODO: write response documentation, create default paginated result doc
-        return null;
     }
 }
