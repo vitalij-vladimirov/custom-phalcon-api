@@ -14,7 +14,7 @@ This is Docker based Phalcon API with structured framework and MySQL 8.0 DB.
 #### Run application
 
 - `./run up`
-  - Runs `docker-compose up -d` (builds new image if now found).
+  - Runs `docker-compose up -d` (builds new image if not found).
   - Fixes difference of Docker EOL configuration between Windows and Unix/Mac.
   - Runs migrations and seeds.
 
