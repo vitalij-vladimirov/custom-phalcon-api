@@ -29,6 +29,9 @@ check_db() {
 }
 
 run_unix_files_formatter() {
+  # TODO: find better way to submit host os to app inside container
+  docker exec -ti "$APP_NAME" bash -c "echo '$OSTYPE' >> /var/cache/host_os.txt"
+
   if [ "$OSTYPE" == "msys" ]; then
     for FILE in "${LIST_OF_UNIX_FILES[@]}"
     do
