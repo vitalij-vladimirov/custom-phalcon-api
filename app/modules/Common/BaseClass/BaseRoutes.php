@@ -162,8 +162,6 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
      */
     private function validateRouteLogic(): void
     {
-        $documentationStatus = $this->route->getDocumentation()->getStatus();
-        
         if (!class_exists($this->route->getController())) {
             throw new LogicException('Controller not found.');
         }
@@ -194,16 +192,6 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
             )) {
                 throw new LogicException('Request mapper must implement RequestMapperInterface.');
             }
-
-            if (!method_exists($this->route->getRequestMapper(), self::DEFAULT_ACTIONS['request_mapper_action'])) {
-                throw new LogicException('Request mapper action not found.');
-            }
-            
-            if ($documentationStatus === true
-                && !method_exists($this->route->getRequestMapper(), self::DEFAULT_ACTIONS['request_mapper_docs'])
-            ) {
-                throw new LogicException('Request mapper documentation not found.');
-            }
         }
 
         if ($this->route->getResponseMapper() !== null) {
@@ -218,16 +206,6 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
             )) {
                 throw new LogicException('Request mapper must implement ResponseMapperInterface.');
             }
-
-            if (!method_exists($this->route->getResponseMapper(), self::DEFAULT_ACTIONS['response_mapper_action'])) {
-                throw new LogicException('Response mapper action not found.');
-            }
-
-            if ($documentationStatus === true
-                && !method_exists($this->route->getResponseMapper(), self::DEFAULT_ACTIONS['response_mapper_docs'])
-            ) {
-                throw new LogicException('Response mapper documentation not found.');
-            }
         }
 
         if (count($this->route->getResolvers()) !== 0) {
@@ -238,16 +216,6 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
 
                 if (!class_exists($resolver)) {
                     throw new LogicException('Parameter \'' . $parameter . '\' resolver not found.');
-                }
-
-                if (!method_exists($resolver, self::DEFAULT_ACTIONS['resolver_action'])) {
-                    throw new LogicException('Parameter \'' . $parameter . '\' resolver action not found.');
-                }
-
-                if ($documentationStatus === true
-                    && !method_exists($resolver, self::DEFAULT_ACTIONS['resolver_docs'])
-                ) {
-                    throw new LogicException('Parameter \'' . $parameter . '\' resolver documentation not found.');
                 }
             }
         }

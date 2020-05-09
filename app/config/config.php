@@ -6,17 +6,6 @@ use Common\Service\CustomRouter;
 
 return new Config([
 
-    'environment' => getenv('APP_ENV') ?? 'production',
-
-    'environments' => [
-        'production',
-        'development',
-        'testing',
-    ],
-
-    'localhostUrl' => getenv('APP_URL'),
-    'containerUrl' => getenv('CONTAINER_URL'),
-
     /*
      * Specify cli commands shortcuts he to avoid Writing long command paths
      * Shortcut must specify full command path: Module:Task:command
@@ -56,8 +45,19 @@ return new Config([
         'collation'  => getenv('DB_COLLATION'),
     ],
 
+    'environment' => getenv('APP_ENV') ?? 'production',
+    'environments' => [
+        'production',
+        'development',
+        'testing',
+    ],
+    'localhostUrl' => getenv('APP_URL'),
+    'containerUrl' => getenv('CONTAINER_URL'),
+    'containerHostOs' => getenv('CONTAINER_HOST_OS'),
+
     'application' => [
         'baseUri'           => '/',
+        'basePath'          => '/app',
         'mvcDir'            => '/app/mvc',
         'modulesDir'        => '/app/modules',
         'migrationsDir'     => '/app/db/migrations',

@@ -5,7 +5,6 @@ namespace Common\BaseMapper;
 
 use Common\Entity\PaginatedResult;
 use Common\Interfaces\ResponseMapperInterface;
-use Documentation\Entity\ResponseDoc;
 
 class BasePaginatedResponseMapper implements ResponseMapperInterface
 {
@@ -23,12 +22,6 @@ class BasePaginatedResponseMapper implements ResponseMapperInterface
     public function mapResponseToArray($object): array
     {
         return $this->getPaginatedResponse($object);
-    }
-
-    public function responseDocumentation(): ?ResponseDoc
-    {
-        // TODO: write response documentation, create default paginated result doc
-        return null;
     }
 
     private function getPaginatedResponse(PaginatedResult $paginatedResult): array

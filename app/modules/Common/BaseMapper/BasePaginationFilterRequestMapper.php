@@ -5,7 +5,6 @@ namespace Common\BaseMapper;
 
 use Common\Entity\PaginationFilter;
 use Common\Interfaces\RequestMapperInterface;
-use Documentation\Entity\RequestDoc;
 
 class BasePaginationFilterRequestMapper implements RequestMapperInterface
 {
@@ -41,12 +40,6 @@ class BasePaginationFilterRequestMapper implements RequestMapperInterface
         );
 
         return $paginationFilter;
-    }
-
-    public function requestDocumentation(): ?RequestDoc
-    {
-        // TODO: Implement requestDocumentation() method.
-        return null;
     }
 
     public function removePaginationAttributes(array $data): array

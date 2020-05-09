@@ -5,8 +5,6 @@ namespace Example\Mapper;
 
 use Common\Interfaces\RequestMapperInterface;
 use Common\Interfaces\ResponseMapperInterface;
-use Documentation\Entity\RequestDoc;
-use Documentation\Entity\ResponseDoc;
 use Example\Model\VendorModel;
 
 class VendorMapper implements RequestMapperInterface, ResponseMapperInterface
@@ -22,12 +20,6 @@ class VendorMapper implements RequestMapperInterface, ResponseMapperInterface
         ;
     }
 
-    public function requestDocumentation(): ?RequestDoc
-    {
-        // TODO: write request documentation
-        return null;
-    }
-
     /**
      * @param VendorModel $object
      * @return array
@@ -37,11 +29,5 @@ class VendorMapper implements RequestMapperInterface, ResponseMapperInterface
         $object->setHidden(['created_at', 'updated_at']);
 
         return $object->toArray();
-    }
-
-    public function responseDocumentation(): ?ResponseDoc
-    {
-        // TODO: write response documentation
-        return null;
     }
 }
