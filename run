@@ -50,19 +50,19 @@ Docker arguments:
   ${0} down   - stop app
   ${0} build  - rebuild project
   ${0} clear  - clear data folder (may need to be run with sudo on Linux)
+  ${0} fix    - fix unix files when running docker from windows
 
 CLI:
   ${0} cli {task} {...params}
 
 Testing arguments:
   ${0} test             - run full test (cs && unit)
-  ${0} cs               - run Code Sniffers tests
+  ${0} cs               - run Code Standard tests
   ${0} cs fix           - run code autofix
-  ${0} cs {dir}         - run Code Sniffers in exact directory
+  ${0} cs {dir}         - run Code Standard in exact directory
   ${0} unit             - run paratest
   ${0} unit {test_name} - run exact test class or test method
   ${0} db               - check if DB is online
-  ${0} fix              - fix unix files when running docker from windows
 "
   exit
 
@@ -114,11 +114,11 @@ elif [ "$1" == "clear" ]; then
     /bin/rm -rf $FILE
   done;
 
-  for DIR in ${STRUCTURE[@]}; do
+  for DIR in "${STRUCTURE[@]}"; do
     echo "Creating dir" $DIR;
     /bin/mkdir $PATH/$DIR
     /bin/chmod 0777 $PATH/$DIR
-    > $PATH/$DIR/.gitkeep
+    > "$PATH"/"$DIR"/.gitkeep
   done
 
 elif [ "$1" == "down" ]; then
