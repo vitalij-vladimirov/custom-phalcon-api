@@ -1,4 +1,4 @@
-# Phalcon API
+# Custom Phalcon API
 
 This is Docker based Phalcon API with structured framework and MySQL 8.0 DB.
 
