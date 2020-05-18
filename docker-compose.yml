@@ -22,9 +22,17 @@ services:
       - 3380:3306
     environment:
       - MYSQL_DATABASE=phalcon_api
-      - MYSQL_ROOT_PASSWORD=api
+      - MYSQL_ROOT_PASSWORD=pass
     volumes:
-      - ./.config/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./data/mysql:/var/lib/mysql:rw
       - ./data/log:/var/log/mysql:rw
-    command: "--innodb_use_native_aio=0"
+    command: [
+      "--innodb_use_native_aio=0",
+      "--log_error=/var/log/mysql/error.log",
+      "--slow_query_log=1",
+      "--long_query_time=1",
+      "--general_log=0",
+      "--general_log_file=/var/log/mysql/general.log",
+      "--slow_query_log_file=/var/log/mysql/slow-query.log",
+      "--log_queries_not_using_indexes=1"
+    ]

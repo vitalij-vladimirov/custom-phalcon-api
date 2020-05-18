@@ -25,13 +25,14 @@ class Cron
 
     private function runCronjobs(array $args): void
     {
-        if (isset($args[1]) && $args[1] !== 'production') {
-            $this->development();
-
-            return;
+        switch ($args[1]) {
+            case 'development':
+                $this->development();
+                break;
+            case 'production':
+                $this->production();
+                break;
         }
-
-        $this->production();
     }
 
     private function development(): void
