@@ -32,6 +32,8 @@ class Cron
             case 'production':
                 $this->production();
                 break;
+            default:
+                exit;
         }
     }
 

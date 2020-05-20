@@ -1,8 +1,6 @@
 #!/bin/bash -e
 
-# TODO: review and refactoring needed
-
-APP_NAME='phalcon-api'
+APP_NAME="phalcon-api"
 
 LIST_OF_UNIX_FILES=(
   "/usr/bin/cs"
@@ -107,16 +105,16 @@ elif [ "$1" == "clear" ]; then
     "log"
   )
 
-  for FILE in $DATA_DIR/*; do
-    echo "Removing "$FILE;
-    /bin/rm -rf $FILE
+  for FILE in "$DATA_DIR"/*; do
+    echo "Removing $FILE";
+    /bin/rm -rf "$FILE"
   done;
 
   for DIR in "${STRUCTURE[@]}"; do
-    echo "Creating dir" $DIR;
-    /bin/mkdir $DATA_DIR/$DIR
-    /bin/chmod 0777 $DATA_DIR/$DIR
-    > "$DATA_DIR"/"$DIR"/.gitkeep
+    echo "Creating dir $DIR";
+    /bin/mkdir "$DATA_DIR/$DIR"
+    /bin/chmod 0777 "$DATA_DIR/$DIR"
+    echo "" >> "$DATA_DIR/$DIR/.gitkeep"
   done
 
 elif [ "$1" == "down" ]; then

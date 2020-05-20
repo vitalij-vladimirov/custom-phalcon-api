@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
+use Common\BaseClass\BaseRoutes;
 use Phalcon\Http\Response;
 use Phalcon\Mvc\Micro;
 use Mvc\RouterInterface;
 use Common\Config\DefaultErrorCodes;
 use Common\BaseClass\BaseModel;
 use Common\Exception\LogicException;
-use Common\Interfaces\RoutesInterface;
 use Common\ApiException\ApiException;
 use Common\ApiException\NotFoundApiException;
 use Common\Entity\RequestData;
@@ -149,14 +149,14 @@ final class CustomRouter extends Injectable implements RouterInterface
             throw new NotFoundApiException();
         }
 
-        if (!in_array(RoutesInterface::class, class_implements($routesClass), true)) {
-            throw new LogicException('Routes class must implement RoutesInterface.');
+        if (!is_a($routesClass, BaseRoutes::class, true)) {
+            throw new LogicException('Routes class must extend BaseRoutes.');
         }
 
-        /** @var RoutesInterface $routes */
+        /** @var BaseRoutes $routes */
         $routes = $this->inject($routesClass);
 
-        $response = $routes->get($request);
+        $response = $routes->getRoute($request);
 
         $this->resolveResponse($app, $request, $response);
 
