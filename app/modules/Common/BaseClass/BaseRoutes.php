@@ -17,19 +17,19 @@ use Common\Service\Injectable;
 use Common\Entity\Route;
 use Common\Interfaces\RequestMapperInterface;
 use Common\Interfaces\ResponseMapperInterface;
-use Common\Interfaces\RoutesInterface;
 use Common\Entity\RequestData;
 use Common\Variable;
 use Common\Regex;
 
-abstract class BaseRoutes extends Injectable implements RoutesInterface
+abstract class BaseRoutes extends Injectable
 {
     protected array $get = [];
     protected array $post = [];
     protected array $put = [];
+    protected array $patch = [];
     protected array $delete = [];
 
-    protected RequestData $request;
+    protected RequestData $requestData;
     protected string $routePath;
     protected Route $route;
 
@@ -55,7 +55,7 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
     abstract protected function routes(): void;
 
     /**
-     * @param RequestData $request
+     * @param RequestData $requestData
      *
      * @return mixed
      *
@@ -65,9 +65,9 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
      * @throws UnauthorizedApiException
      * @throws ForbiddenException
      */
-    public function get(RequestData $request)
+    public function getRoute(RequestData $requestData)
     {
-        $this->request = $request;
+        $this->requestData = $requestData;
 
         $this->findRoute();
         $this->validateRoute();
@@ -80,8 +80,8 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
      */
     private function findRoute(): void
     {
-        $method = $this->request->getMethod();
-        $path = $this->request->getPath();
+        $method = $this->requestData->getMethod();
+        $path = $this->requestData->getPath();
 
         if (count($this->{$method}) === 0) {
             throw new NotFoundApiException();
@@ -94,8 +94,8 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
             return;
         }
 
-        $pattern = ($this->request->getType() === RequestData::REQUEST_TYPE_API) ? '/^\/api' : '/^';
-        foreach ($this->request->getParams() as $param) {
+        $pattern = ($this->requestData->getType() === RequestData::REQUEST_TYPE_API) ? '/^\/api' : '/^';
+        foreach ($this->requestData->getParams() as $param) {
             $pattern .= '\/(' . $param . '|\{[a-zA-Z0-9_]{1,}\})';
         }
         $pattern .= '$/';
@@ -229,7 +229,7 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
     private function runRoute()
     {
         // Get collected request data
-        $data = $this->request->getData();
+        $data = $this->requestData->getData();
 
         // Validate data provider with request
         $this->validateData($data);
@@ -317,15 +317,15 @@ abstract class BaseRoutes extends Injectable implements RoutesInterface
         $routePathExploded = explode('/', $this->routePath);
         $routePaths = array_slice(
             $routePathExploded,
-            count($routePathExploded) - count($this->request->getParams())
+            count($routePathExploded) - count($this->requestData->getParams())
         );
 
         foreach ($routePaths as $key => $value) {
-            if ($value !== $this->request->getParam($key)
+            if ($value !== $this->requestData->getParam($key)
                 && Regex::isValidPattern($value, '/^\{[a-zA-Z0-9_]{1,}\}$/')
             ) {
                 $valueKey = str_replace(['{', '}'], '', $value);
-                $parameters[$valueKey] = $this->request->getParam($key);
+                $parameters[$valueKey] = $this->requestData->getParam($key);
             }
         }
 

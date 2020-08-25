@@ -52,6 +52,8 @@ This is Docker based Phalcon API with structured framework and MySQL 8.0 DB.
 | --- | --- | --- |
 | Run CLI command | `./run cli $module:$task:$command ...$arguments` | `cli $module:$task:$command ...$arguments` |
 | Check if DB is online | `./run db` | - |
+| Run DB migrations manually (runs automatically on app launch) | `./run migration` | `cli migration:run` |
+| Seed DB | `./run seed` | `cli seed:run` |
 | Run full test (cs && unit) | `./run test` | - |
 | Run Code Standard tests | `./run cs` | `cs` |
 | Run code autofix | `./run cs fix` | `cs fix` |
@@ -59,12 +61,20 @@ This is Docker based Phalcon API with structured framework and MySQL 8.0 DB.
 | Run paratest | `./run unit` | `unit` |
 | Run exact test class or test method | `./run unit $testName` | `unit $testName` |
 | Fix unix files when running docker from windows | `./run fix` | - |
+| Edit file with Midnight Commander that works correctly in PHPStorm Terminal | - | `edit $filePath` |
 
 #### If DB does not start
 
 - DB files are saved in `./data/mysql` and mysql logs in `./data/log`.
 - In Linux distributions you may need to `chmod 0777` ./data directory.
 - When rebuilding image in Linux, total clearing of these dirs has to be done. Run `sudo ./run clear` to do it.
+
+#### If migration not successful
+
+- When running app migration will run automatically.
+- App launcher waits for DB coming online up to 60 seconds. If DB couldn't start in that time (better do not run app on 1 core celeron cpu), you can do these actions after app & DB launch:
+  1. `./run migration`
+  2. `./run seed`
 
 #### Tested on
 
@@ -75,7 +85,6 @@ This is Docker based Phalcon API with structured framework and MySQL 8.0 DB.
   - Remove ./data folder content before image rebuild.
 - Mac (Docker for Mac)
   - App URI: `http://localhost:801`.
-  - No serious problems/advices detected expect that mac is pretty shi**y OS for development.
 - Windows (Docker Toolbox only, not tested on Docker for Windows yet)
   - App URI: `http://192.168.99.100:801`
   - If default uri does not work, check docker ip with `docker-machine ip default` command.

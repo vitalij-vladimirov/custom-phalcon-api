@@ -1,15 +1,12 @@
 #!/bin/bash -e
 
-# TODO: review and refactoring needed
-
-APP_NAME='phalcon-api'
+APP_NAME="phalcon-api"
 
 LIST_OF_UNIX_FILES=(
   "/usr/bin/cs"
   "/usr/bin/edit"
   "/usr/bin/cli"
   "/usr/bin/unit"
-  "/etc/mc/mc.keymap"
 )
 
 check_db() {
@@ -29,9 +26,6 @@ check_db() {
 }
 
 run_unix_files_formatter() {
-  # TODO: find better way to submit host os to app inside container
-  docker exec -ti "$APP_NAME" bash -c "echo '$OSTYPE' >> /var/cache/host_os.txt"
-
   if [ "$OSTYPE" == "msys" ]; then
     for FILE in "${LIST_OF_UNIX_FILES[@]}"
     do
@@ -44,13 +38,15 @@ if [ -z "$1" ]; then
 
   echo "
 Docker arguments:
-  ${0} up     - run app
-  ${0} exec   - exec to $APP_NAME
-  ${0} ps     - docker ps -a
-  ${0} down   - stop app
-  ${0} build  - rebuild project
-  ${0} clear  - clear data folder (may need to be run with sudo on Linux)
-  ${0} fix    - fix unix files when running docker from windows
+  ${0} up        - run app
+  ${0} exec      - exec to $APP_NAME
+  ${0} ps        - docker ps -a
+  ${0} down      - stop app
+  ${0} build     - rebuild project
+  ${0} clear     - clear data folder (may need to be run with sudo on Linux)
+  ${0} migration - run database migration
+  ${0} seed      - seed database
+  ${0} fix       - fix unix files when running docker from windows
 
 CLI:
   ${0} cli {task} {...params}
@@ -102,23 +98,23 @@ elif [ "$1" == "build" ]; then
 
 elif [ "$1" == "clear" ]; then
 
-  PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/data"
+  DATA_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/data"
 
   STRUCTURE=(
     "mysql"
     "log"
   )
 
-  for FILE in $PATH/*; do
-    echo "Removing "$FILE;
-    /bin/rm -rf $FILE
+  for FILE in "$DATA_DIR"/*; do
+    echo "Removing $FILE";
+    /bin/rm -rf "$FILE"
   done;
 
   for DIR in "${STRUCTURE[@]}"; do
-    echo "Creating dir" $DIR;
-    /bin/mkdir $PATH/$DIR
-    /bin/chmod 0777 $PATH/$DIR
-    > "$PATH"/"$DIR"/.gitkeep
+    echo "Creating dir $DIR";
+    /bin/mkdir "$DATA_DIR/$DIR"
+    /bin/chmod 0777 "$DATA_DIR/$DIR"
+    echo "" >> "$DATA_DIR/$DIR/.gitkeep"
   done
 
 elif [ "$1" == "down" ]; then
@@ -137,6 +133,10 @@ elif [ "$1" == "cli" ]; then
   docker exec -ti "$APP_NAME" bash -c "cli $2 $3 $4 $5 $6 $7 $8 $9"
 elif [ "$1" == "fix" ]; then
   run_unix_files_formatter
+elif [ "$1" == "migration" ] || [ "$1" == "migrate" ]; then
+  docker exec -ti "$APP_NAME" bash -c "cli migration:run"
+elif [ "$1" == "seed" ]; then
+  docker exec -ti "$APP_NAME" bash -c "cli seed:run"
 elif [ "$1" == "db" ]; then
   check_db
   if [ "$DB_STATUS" == "1" ]; then

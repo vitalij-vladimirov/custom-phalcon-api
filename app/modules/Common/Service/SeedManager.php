@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Common\Service;
 
+use Common\BaseClass\BaseSeeder;
 use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Filesystem\Filesystem;
 use Common\Exception\LogicException;
@@ -118,6 +119,8 @@ final class SeedManager extends Injectable
             throw new LogicException('Seeder not found.');
         }
 
-        (new $seedClass())->run();
+        /** @var BaseSeeder $seeder */
+        $seeder = $this->inject($seedClass);
+        $seeder->run();
     }
 }

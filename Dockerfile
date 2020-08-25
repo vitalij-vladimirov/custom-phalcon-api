@@ -17,11 +17,10 @@ COPY .config/nginx/10-location-root.conf /opt/docker/etc/nginx/vhost.common.d/10
 COPY .config/mcedit/mc.keymap /etc/mc/mc.keymap
 COPY .config/composer/composer_1.10.6.phar /usr/local/bin/composer
 
-# Configure Phalcon 4.0.4
+# Configure Phalcon
 COPY .config/php-ext/* /usr/local/lib/php/extensions/no-debug-non-zts-20190902/
 RUN echo "extension=psr.so" > /usr/local/etc/php/conf.d/docker-php-ext-psr.ini
 RUN echo "extension=phalcon.so" > /usr/local/etc/php/conf.d/docker-php-ext-phalcon.ini
-RUN echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20190902/xdebug.so" > /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 # Create additional /usr/bin/ commands
 COPY .config/usr_bin/* /usr/bin/

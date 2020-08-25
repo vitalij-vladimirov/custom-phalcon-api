@@ -1,5 +1,8 @@
 * text=auto
 *.sh text eol=lf
 *.php text eol=lf
+*.cnf text eol=lf
+*.conf text eol=lf
+*.keymap text eol=lf
 *.phar -text
 *.so -text
